@@ -32,7 +32,7 @@ class PhotoAdmin(AutoUserMixin, admin.ModelAdmin):
     search_fields = ['user', 'description']
     date_hierarchy = 'added'
 
-    admin_thumb_span6 = AdminThumbnail(image_field='image_span6')
+    admin_thumb_span6 = AdminThumbnail(image_field='image_200')
     admin_thumb_span1 = AdminThumbnail(image_field='thumb_span1')
 
     # inlines
