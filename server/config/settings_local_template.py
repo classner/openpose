@@ -128,14 +128,14 @@ S3_ENABLE_WRITE = False
 
 # Important to put a valid email
 ADMINS = (
-    ('ADMIN_NAME', 'ADMIN_EMAIL'),
+    ('mkiefel', 'mk@nopw.de'),
 )
 
 # Time zone choices: http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 TIME_ZONE = 'Europe/Berlin'
 
 # Locaion of files
-DATA_DIR = 'DATA_DIR'
+DATA_DIR = 'data'
 
 # IP addresses that are allowed to access django-debug-toolbar.
 # If your debug server is not local, put your machine's IP here.

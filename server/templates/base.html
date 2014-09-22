@@ -7,23 +7,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
-	<title>{% if iiw %}IIW - {% else %}OpenSurfaces - {% endif %}
-		{% block head_title %}
-			{% if iiw %}
-				Intrinsic Images in the Wild
-			{% else %}
-				A Richly Annotated Catalog of Surface Appearance
-			{% endif %}
-		{% endblock %}
+	<title>OpenPose
 	</title>
 
-	{% if iiw %}
-		<meta name="description" content='{% if head_description %}{{ head_description }}{% else %}We introduce a large scale, public dataset for intrinsic image decompositions of indoor scenes (Intrinsic Images in the Wild) with crowdsourced annotations of pairwise comparisons of material properties. We develop a dense CRF-based algorithm for intrinsic image decomposition of these images that outperforms state-of-the-art algorithms.{% endif %}'/>
-	{% else %}
-		<meta name="description" content='{% if head_description %}{{ head_description }}{% else %}OpenSurfaces is a large database of annotated surfaces created from real-world consumer photographs. Our annotation framework draws on crowdsourcing to segment surfaces from photos, and then annotate them with rich surface properties, including material, texture and contextual information.{% endif %}'/>
-	{% endif %}
+  <meta name="description" content='{% if head_description %}{{ head_description }}{% else %}We introduce a overview pager for comparing different pose estimation methods.{% endif %}'/>
 
-	<meta name="author" content="{% if head_author %}{{ head_author }}{% else %}Cornell University{% endif %}"/>
+	<meta name="author" content="{% if head_author %}{{ head_author }}{% else %}MPI Tuebingen{% endif %}"/>
 
 	{% if iiw %}
 		<link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}favicon.ico"/>

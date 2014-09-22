@@ -33,7 +33,7 @@ class PhotoAdmin(AutoUserMixin, admin.ModelAdmin):
     date_hierarchy = 'added'
 
     admin_thumb_span6 = AdminThumbnail(image_field='image_200')
-    admin_thumb_span1 = AdminThumbnail(image_field='thumb_span1')
+    admin_thumb_span1 = AdminThumbnail(image_field='image_200')
 
     # inlines
     class PhotoLabelInlineBase(AutoUserMixin, admin.TabularInline):

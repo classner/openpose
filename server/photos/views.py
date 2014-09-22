@@ -155,8 +155,6 @@ def photo_detail(request, pk):
     # sections on the page
     nav_section_keys = [
         ("photo", 'Photo'),
-        ("shapes", 'Material segmentations'),
-        ("vanishing", 'Vanishing points'),
         ("whitebalance", 'Whitebalance'),
     ]
     nav_sections = [

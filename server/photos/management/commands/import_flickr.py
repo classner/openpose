@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         admin_user = User.objects.get_or_create(
-            username='admin')[0].get_profile()
+            username='mkiefel')[0].get_profile()
 
         delete = bool(options['delete'])
 
@@ -35,18 +35,17 @@ class Command(BaseCommand):
             print 'Visiting %s: %d files' % (root, len(files))
 
             # only create a category if has at least one photo
-            scene_category = None
+            scene_category, _ = PhotoSceneCategory.objects.get_or_create(name='LSP')
 
             num_added = 0
             for filename in progress.bar(files):
                 if filename.endswith(".jpg"):
                     path = os.path.join(root, filename)
 
-                    split = filename.rindex('_')
-                    flickr_username = filename[:split]
-                    flickr_id = filename[split + 1:filename.rindex('.')]
-                    flickr_user = FlickrUser.objects.get_or_create(
-                        username=flickr_username)[0]
+                    #split = filename.rindex('_')
+                    flickr_username = None
+                    flickr_id = None
+                    flickr_user = None
 
                     #license = License.objects.get_or_create(
                         #user=user, name='CC BY-NC-SA 2.0')[0]
@@ -56,22 +55,23 @@ class Command(BaseCommand):
                         scene_category, _ = PhotoSceneCategory.objects \
                             .get_or_create(name=name)
 
-                    try:
-                        add_photo(
-                            path=path,
-                            user=admin_user,
-                            scene_category=scene_category,
-                            flickr_user=flickr_user,
-                            flickr_id=flickr_id,
-                            license=None,
-                            must_have_exif=True,
-                            must_have_fov=True,
-                        )
-                    except Exception as e:
-                        print '\nNot adding photo:', e
-                    else:
-                        print '\nAdded photo:', path
-                        num_added += 1
+                    #try:
+                    add_photo(
+                        path=path,
+                        user=admin_user,
+                        scene_category=scene_category,
+                        flickr_user=flickr_user,
+                        flickr_id=flickr_id,
+                        license=None,
+                        must_have_exif=False,
+                        must_have_fov=False,
+                        exif='',
+                    )
+                    #except Exception as e:
+                        #print '\nNot adding photo:', e
+                    #else:
+                        #print '\nAdded photo:', path
+                        #num_added += 1
 
                     if delete:
                         from common.tasks import os_remove_file

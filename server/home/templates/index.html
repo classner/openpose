@@ -5,8 +5,8 @@
 <div class="jumbotron masthead" id="overview">
 	<div class="container">
 		<h1>OpenPose</h1>
-		<p><a href="http://www.cs.cornell.edu/~sbell/" target="_blank">Sean Bell</a>, <a href="#">Paul Upchurch</a>, <a href="http://www.cs.cornell.edu/~snavely/" target="_blank">Noah Snavely</a>, <a href="http://www.cs.cornell.edu/~kb/" target="_blank">Kavita Bala</a></p>
-		<p><a href="http://rgb.cs.cornell.edu" target="_blank">Cornell University</a></p>
+		<p>The authors of the project.</p>
+		<p><a href="http://is.mpg.de" target="_blank">Max Planck Institute for Intelligent Systems</a></p>
 	</div>
 </div>
 {% endblock %}
@@ -22,41 +22,7 @@
 			{% include "index_table.html" %}
 		</div>
 	</div>
-
-	<div class="span3">
-		<div class="page-header">
-			<h2>Materials</h2>
-		</div>
-	</div>
-
-	<div class="span3">
-		<div class="page-header">
-			<h2>Reflectances</h2>
-		</div>
-	</div>
-
-	<div class="span3">
-		<div class="page-header">
-			<h2>Textures</h2>
-		</div>
-
-	</div>
 </div>
 
-<hr/>
-<div class="row">
-	<div class="span12">
-		<p class="lead">OpenSurfaces is a large database of annotated surfaces created
-		from real-world consumer photographs. Our annotation framework draws on
-		crowdsourcing to segment surfaces from photos, and then annotate them with
-		rich surface properties, including material, texture and contextual
-		information.</p>
-	</div>
-</div>
-<div class="row">
-	<div class="span12">
-		<img src="{{ STATIC_URL }}img/teaser4-web.jpg" alt="" />
-	</div>
-</div>
 {% endcache %}
 {% endblock content %}

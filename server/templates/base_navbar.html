@@ -7,11 +7,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			{% if iiw %}
-				<a class="brand" href="{% url 'intrinsic-splash' %}">Intrinsic Images in the Wild</a>
-			{% else %}
-				<a class="brand" href="{% url 'home' %}">OpenSurfaces</a>
-			{% endif %}
+      <a class="brand" href="{% url 'home' %}">OpenPose</a>
 			<div class="nav-collapse collapse">
 				<ul class="nav">
 					<li class='dropdown{% ifequal nav "publications" %} active{% endifequal %}'>
