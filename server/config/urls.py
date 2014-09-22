@@ -12,12 +12,8 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^photos/', include('photos.urls')),
-    url(r'^bsdfs/', include('bsdfs.urls')),
-    url(r'^normals/', include('normals.urls')),
-    url(r'^shapes/', include('shapes.urls')),
     url(r'^mturk/', include('mturk.urls')),
     url(r'^analytics/', include('analytics.urls')),
-    url(r'^intrinsic/', include('intrinsic.urls')),
     url(r'^accounts/', include('accounts.urls')),
 
     # django-user-accounts with some custom modifications

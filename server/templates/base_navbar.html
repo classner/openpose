@@ -18,12 +18,6 @@
 						<a href="#"><i class="icon-fixed-width icon-download-alt"></i> Publications <b class="caret"></b></a>
 
 						<ul class="dropdown-menu">
-							<li{% ifequal subnav "opensurfaces" %} class="active"{% endifequal %}>
-								<a href="{% url 'publications' 'opensurfaces' %}"><i class="icon-fixed-width icon-file"></i> OpenSurfaces [SIG13]</a>
-							</li>
-							<li{% ifequal subnav "intrinsic" %} class="active"{% endifequal %}>
-								<a href="{% url 'publications' 'intrinsic' %}"><i class="icon-fixed-width icon-file"></i> Intrinsic Images in the Wild [SIG14]</a>
-							</li>
 						</ul>
 					</li>
 
@@ -35,46 +29,7 @@
 							<li{% ifequal nav "browse/photo" %} class="active"{% endifequal %}>
 								<a href="{% url 'photo-by-category' %}"><i class="icon-fixed-width icon-picture"></i> Scenes</a>
 							</li>
-
-							<li{% ifequal nav "browse/substance" %} class="active"{% endifequal %}>
-								<a href="{% url 'substance-all' %}"><i class="icon-fixed-width icon-leaf"></i> Materials</a>
-							</li>
-
-							<li{% ifequal nav "browse/name" %} class="active"{% endifequal %}>
-								<a href="{% url 'name-all' %}"><i class="icon-fixed-width icon-plane"></i> Objects</a>
-							</li>
-
-							<li{% ifequal nav "browse/rectified-normal" %} class="active"{% endifequal %}>
-								<a href="{% url 'rectified-normal-best' %}"><i class="icon-fixed-width icon-road"></i> Textures</a>
-							</li>
-
-							<li{% ifequal nav "browse/bsdf-wd" %} class="active"{% endifequal %}>
-								<a href="{% url 'bsdf-good' "wd" %}"><i class="icon-fixed-width icon-tint"></i> Reflectances</a>
-							</li>
-
-							<li class="divider"></li>
-							<li class="nav-header">Intrinsic Images in the Wild</li>
-
-							<li{% ifequal nav "browse/intrinsic-photo-all" %} class="active"{% endifequal %}>
-								<a href="{% url 'intrinsic-photo-all' %}"><i class="icon-fixed-width icon-chevron-left"></i> Reflectance Judgements</a>
-							</li>
-							<li{% ifequal nav "browse/intrinsic-algorithm-all" %} class="active"{% endifequal %}>
-								<a href="{% url 'intrinsic-algorithm-all' %}"><i class="icon-fixed-width icon-sort-by-attributes-alt"></i> Intrinsic Image Evaluation</a>
-							</li>
-							<li{% ifequal nav "browse/intrinsic-decomposition" %} class="active"{% endifequal %}>
-								<a href="{% url 'intrinsic-decomposition-by-algorithm' 1141 %}"><i class="icon-fixed-width icon-copy"></i> Intrinsic Image Decompositions</a>
-							</li>
 						</ul>
-					</li>
-
-					{% if not iiw %}
-					<li{% ifequal nav "analytics" %} class="active"{% endifequal %}>
-						<a href="{% url 'analytics-material-shapes' %}"><i class="icon-fixed-width icon-bar-chart"></i> Statistics</a>
-					</li>
-					{% endif %}
-
-					<li{% ifequal nav "material-shape-search" %} class="active"{% endifequal %}>
-						<a href="{% url 'material-shape-search' %}"><i class="icon-fixed-width icon-search"></i> Search</a>
 					</li>
 
 					{% if user.is_staff %}

@@ -55,7 +55,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = os.path.join(DATA_DIR, 'static')
 
 # Default file permissions
-FILE_UPLOAD_PERMISSIONS = 0644
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 # URL prefix for static files.
 # NOTE: In a few places, this is hard-coded.  So you should search through the
@@ -260,13 +260,13 @@ INSTALLED_APPS = tuple(filter(None, [
     'accounts',
     'analytics',
     'licenses',
-    'poly',
+    #'poly',
     'mturk',
     'photos',
-    'shapes',
-    'bsdfs',
-    'normals',
-    'intrinsic',
+    #'shapes',
+    #'bsdfs',
+    #'normals',
+    #'intrinsic',
 ]))
 
 # A sample logging configuration. The only tangible logging performed by this

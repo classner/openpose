@@ -4,7 +4,7 @@
 {% block header %}
 <div class="jumbotron masthead" id="overview">
 	<div class="container">
-		<h1>OpenSurfaces</h1>
+		<h1>OpenPose</h1>
 		<p><a href="http://www.cs.cornell.edu/~sbell/" target="_blank">Sean Bell</a>, <a href="#">Paul Upchurch</a>, <a href="http://www.cs.cornell.edu/~snavely/" target="_blank">Noah Snavely</a>, <a href="http://www.cs.cornell.edu/~kb/" target="_blank">Kavita Bala</a></p>
 		<p><a href="http://rgb.cs.cornell.edu" target="_blank">Cornell University</a></p>
 	</div>
@@ -13,26 +13,6 @@
 
 {% block content %}
 {% cache 3600 home-index-content %}
-<div class="row-fluid">
-	<div class="span6">
-		<div class="alert">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<p>New! Our SIGGRAPH 2014 paper is now online:</p>
-			<p><a class="btn" href="{% url "intrinsic-splash" %}">Intrinsic Images in the Wild</a></p>
-		</div>
-	</div>
-	<div class="span6">
-		<div class="alert">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<p>New! The code for our full crowdsourcing pipeline is online:</p>
-			<p>
-				<a class="btn" href="https://www.github.com/seanbell/opensurfaces" target="_blank"><i class="icon-github"></i> Code (Github repository)</a>&nbsp;
-				<a class="btn" href="/docs" target="_blank"><i class="icon-book"></i> Documentation</a>
-			</p>
-		</div>
-	</div>
-</div>
-
 <div class="row">
 	<div class="span3">
 		<div class="page-header">
@@ -47,20 +27,12 @@
 		<div class="page-header">
 			<h2>Materials</h2>
 		</div>
-
-		<a href="{% url 'substance-all' %}">
-			<img src="{{ STATIC_URL }}img/fabric.jpg" alt="" />
-		</a>
 	</div>
 
 	<div class="span3">
 		<div class="page-header">
 			<h2>Reflectances</h2>
 		</div>
-
-		<a href="{% url 'bsdf-good' "wd" %}">
-			<img src="{{ STATIC_URL }}img/blob-sequence.jpg" alt="" />
-		</a>
 	</div>
 
 	<div class="span3">
@@ -68,9 +40,6 @@
 			<h2>Textures</h2>
 		</div>
 
-		<a href="{% url 'rectified-normal-best' %}">
-			<img src="{{ STATIC_URL }}img/textures.jpg" alt="" />
-		</a>
 	</div>
 </div>
 

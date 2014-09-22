@@ -3,7 +3,6 @@ from django.contrib import admin
 from imagekit.admin import AdminThumbnail
 from common.admin import AutoUserMixin
 
-from shapes.models import MaterialShape, SubmittedShape
 from photos.models import FlickrUser, PhotoSceneCategory, Photo, \
     PhotoWhitebalanceLabel, PhotoSceneQualityLabel
 
@@ -47,15 +46,7 @@ class PhotoAdmin(AutoUserMixin, admin.ModelAdmin):
     class PhotoSceneQualityLabelInline(PhotoLabelInlineBase):
         model = PhotoSceneQualityLabel
 
-    class SubmittedShapeInline(PhotoLabelInlineBase):
-        model = SubmittedShape
-
-    class MaterialShapeInline(PhotoLabelInlineBase):
-        model = MaterialShape
-
     inlines = [
-        SubmittedShapeInline,
-        MaterialShapeInline,
         PhotoWhitebalanceLabelInline,
         PhotoSceneQualityLabelInline,
     ]

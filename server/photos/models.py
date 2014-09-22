@@ -219,49 +219,6 @@ class Photo(UserBase):
     #: hash for simple duplicate detection
     md5 = models.CharField(max_length=32)
 
-    #: This is not "vanishing lines" in the sense that it is an infinite line
-    #: passing through the vanishing point.  Rather, this is a list of line
-    #: *segments* detected in the image, classified as likely passing through a
-    #: certain vanishing point.
-    #:
-    #: json-encoded list of groups.  Each group: list of lines.  Each line: x1,
-    #: y1, x2, y2 normalized by width and height.  The groups are stored in
-    #: order of decreasing size.
-    vanishing_lines = models.TextField(blank=True)
-
-    #: Vanishing points, json-encoded.  Format: list of normalized (x, y) tuples.
-    vanishing_points = models.TextField(blank=True)
-
-    #: Sum of the length of all vanishing line segments (vanishing_lines).
-    vanishing_length = models.FloatField(blank=True, null=True)
-
-    #: cache of the number of correct material shapes
-    #: for this photo (useful optimization when sorting by this count).
-    #: These values are updated by the celery task
-    #: photos.tasks.update_photos_num_shapes()
-    num_shapes = models.IntegerField(default=0)
-
-    #: cache of the number of vertices in all correct material shapes
-    #: for this photo (useful optimization when sorting by this count).
-    #: These values are updated by the celery task
-    #: photos.tasks.update_photos_num_shapes()
-    num_vertices = models.IntegerField(default=0)
-
-    #: if True, this is part of the IIW ("Intrinsic Images in the Wild" paper) dataset.
-    in_iiw_dataset = models.BooleanField(default=False)
-
-    #: if True, this is part of the IIW ("Intrinsic Images in the Wild" paper) dense dataset.
-    in_iiw_dense_dataset = models.BooleanField(default=False)
-
-    #: cache of the number of intrinsic comparisons with nonzero score
-    num_intrinsic_comparisons = models.IntegerField(default=0)
-
-    #: cache of the number of intrinsic points (all points)
-    num_intrinsic_points = models.IntegerField(default=0)
-
-    #: median intrinsic images error
-    median_intrinsic_error = models.FloatField(blank=True, null=True)
-
     class Meta:
         verbose_name = "Photo"
         verbose_name_plural = "Photos"

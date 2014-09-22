@@ -37,14 +37,6 @@ PHOTO_FILTERS = {
             })
     },
 
-    'vp': {
-        'name': 'Has vanishing points',
-        'filter': dict_union(
-            Photo.DEFAULT_FILTERS, {
-                'vanishing_length__isnull': False,
-            })
-    },
-
     'ls': {
         'name': 'Varying lighting',
         'filter': {
@@ -52,30 +44,9 @@ PHOTO_FILTERS = {
         }
     },
 
-    'syn': {
-        'name': 'Synthetic',
-        'filter': {
-            'intrinsic_synthetic__multilayer_exr__isnull': False
-        }
-    },
-
-    'ia': {
-        'name': 'Has intrinsic judgements',
-        'filter': {
-            'in_iiw_dataset': True,
-        }
-    },
-
-    'id': {
-        'name': 'Has dense intrinsic judgements',
-        'filter': {
-            'in_iiw_dataset': True,
-            'in_iiw_dense_dataset': True,
-        }
-    },
 }
 # display order
-PHOTO_FILTER_KEYS = ['wb', 'nwb', 'vp', 'ls', 'ia', 'id', 'syn', 'all']
+PHOTO_FILTER_KEYS = ['wb', 'nwb', 'ls', 'all']
 
 
 def photo_by_category_entries(category_id, filter_key):
@@ -149,15 +120,7 @@ def photo_by_category(request, category_id='all', filter_key='wb',
     if query_filter:
         entries = entries.filter(**query_filter)
 
-    if filter_key == 'vp':
-        entries = entries.order_by('-vanishing_length')
-    elif filter_key == 'ic':
-        entries = entries.order_by('-num_intrinsic_comparisons')
-    else:
-        if filter_key == 'all':
-            entries = entries.order_by('-added')
-        else:
-            entries = entries.order_by('-num_vertices', '-scene_category_correct_score')
+        entries = entries.order_by('-added')
 
     context = dict_union({
         'nav': 'browse/photo',
@@ -189,20 +152,12 @@ def photo_detail(request, pk):
             'whitebalanced', 'Whitebalance'),
     ]
 
-    try:
-        intrinsic_synthetic = photo.intrinsic_synthetic
-    except ObjectDoesNotExist:
-        intrinsic_synthetic = None
-
     # sections on the page
     nav_section_keys = [
         ("photo", 'Photo'),
         ("shapes", 'Material segmentations'),
         ("vanishing", 'Vanishing points'),
         ("whitebalance", 'Whitebalance'),
-        ("intrinsic_synthetic", 'Synthetic Rendering') if intrinsic_synthetic else None,
-        ("intrinsic_judgements", 'Reflectance Judgements'),
-        ("intrinsic_decompositions", 'Intrinsic Image Decompositions'),
     ]
     nav_sections = [
         {
@@ -217,7 +172,6 @@ def photo_detail(request, pk):
         'nav': 'browse/photo',
         'photo': photo,
         'votes': votes,
-        'intrinsic_synthetic': intrinsic_synthetic,
         'nav_sections': nav_sections,
     })
 

@@ -132,7 +132,7 @@ ADMINS = (
 )
 
 # Time zone choices: http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-TIME_ZONE = 'TIME_ZONE'
+TIME_ZONE = 'Europe/Berlin'
 
 # Locaion of files
 DATA_DIR = 'DATA_DIR'
@@ -148,12 +148,12 @@ INTERNAL_IPS = ('127.0.0.1',)
 SECRET_KEY = 'SECRET_KEY'
 DATABASES = {
     'default': {
-        'NAME': 'DB_NAME',
-        'USER': 'DB_USER',
-        'PASSWORD': 'DB_PASS',
+        'NAME': 'labelmaterial',
+        'USER': 'labelmaterial',
+        'PASSWORD': 'pose',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'HOST': '',
-        'PORT': 'DB_PORT',
+        'PORT': '',
         'CONN_MAX_AGE': 0 if DEBUG else 600,
 
     }
