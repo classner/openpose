@@ -260,13 +260,9 @@ INSTALLED_APPS = tuple(filter(None, [
     'accounts',
     'analytics',
     'licenses',
-    #'poly',
     'mturk',
     'photos',
-    #'shapes',
-    #'bsdfs',
-    #'normals',
-    #'intrinsic',
+    #'segmentation',
 ]))
 
 # A sample logging configuration. The only tangible logging performed by this

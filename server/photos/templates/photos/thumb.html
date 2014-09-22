@@ -1,4 +1,4 @@
-<a href="{% url 'photo-detail' entry.id %}" class="thumbnail tool" rel="tooltip" data-original-title="{{ entry.valid_material_shapes.count }} material segmentations">
+<a href="{% url 'photo-detail' entry.id %}" class="thumbnail tool" rel="tooltip" data-original-title="person">
 	<div class="overlay-wrapper">
 		<div class="hover-toggle">
 			<img class="show-on-mouseout" src="{{ entry.image_square_300.url }}" alt=""/>
@@ -8,7 +8,6 @@
 		</div>
 		{% if entry.scene_category %}
 		<div class="overlay-container">
-			{# <p class="overlay-content">{{ entry.num_shapes }} <i class="icon-leaf"></i></p> #}
 			<p class="overlay-content">{{ entry.scene_category.name }}</p>
 		</div>
 		{% endif %}

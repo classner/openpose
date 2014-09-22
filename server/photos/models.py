@@ -232,8 +232,6 @@ class Photo(UserBase):
         'stylized': False,
         'nonperspective': False,
         'scene_category_correct': True,
-        'scene_category_correct_score__isnull': False,
-        'license__creative_commons': True,
     }
 
     def save(self, *args, **kwargs):
