@@ -13,8 +13,8 @@
 <div class="well well-nav">
 	<ul class="nav nav-list">
 		<li class="nav-header">Experiments</li>
-		{% for c in categories %}
-		<li{% ifequal category_slug c.slug %} class="active"{% endifequal %}>
+		{% for c in datasets %}
+		<li{% ifequal dataset_slug c.slug %} class="active"{% endifequal %}>
 			<a href="{% url 'mturk-admin-example' c.slug %}">{{ c.slug }} ({{ c.count }})</a>
 		</li>
 		{% endfor %}

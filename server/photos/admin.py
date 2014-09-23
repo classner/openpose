@@ -3,67 +3,33 @@ from django.contrib import admin
 from imagekit.admin import AdminThumbnail
 from common.admin import AutoUserMixin
 
-from photos.models import FlickrUser, PhotoSceneCategory, Photo, \
-    PhotoWhitebalanceLabel, PhotoSceneQualityLabel
-
+from photos.models import FlickrUser, PhotoDataset, Photo
 
 admin.site.register(FlickrUser)
-admin.site.register(PhotoSceneCategory)
-admin.site.register(PhotoWhitebalanceLabel)
-admin.site.register(PhotoSceneQualityLabel)
-
+admin.site.register(PhotoDataset)
 
 class PhotoAdmin(AutoUserMixin, admin.ModelAdmin):
     fieldsets = [
         (None, {
-            'fields': ['added', 'user', 'image_orig', 'admin_thumb_span6', 'aspect_ratio', 'scene_category',
-                       'scene_category_correct', 'whitebalanced', 'description', 'exif',
+            'fields': ['added', 'user', 'image_orig', 'admin_thumb_span6', 'aspect_ratio', 'dataset',
+                       'description', 'exif',
                        'flickr_user', 'flickr_id']
         }),
     ]
 
     # fields
     readonly_fields = ['added', 'admin_thumb_span6']
-    list_display = ['user', 'admin_thumb_span1', 'scene_category',
-                    'scene_category_correct', 'whitebalanced', 'added']
+    list_display = ['user', 'admin_thumb_span1', 'dataset',
+                    'added']
 
     # field display
-    list_filter = ['added', 'scene_category_correct', 'whitebalanced']
+    list_filter = ['added']
     search_fields = ['user', 'description']
     date_hierarchy = 'added'
 
     admin_thumb_span6 = AdminThumbnail(image_field='image_200')
     admin_thumb_span1 = AdminThumbnail(image_field='image_200')
 
-    # inlines
-    class PhotoLabelInlineBase(AutoUserMixin, admin.TabularInline):
-        fk_name = 'photo'
-        extra = 1
-
-    class PhotoWhitebalanceLabelInline(PhotoLabelInlineBase):
-        model = PhotoWhitebalanceLabel
-
-    class PhotoSceneQualityLabelInline(PhotoLabelInlineBase):
-        model = PhotoSceneQualityLabel
-
-    inlines = [
-        PhotoWhitebalanceLabelInline,
-        PhotoSceneQualityLabelInline,
-    ]
+    inlines = []
 
 admin.site.register(Photo, PhotoAdmin)
-
-
-#class PhotoCollectionAdmin(AutoUserMixin, admin.ModelAdmin):
-    #pass
-#admin.site.register(PhotoCollection, PhotoCollectionAdmin)
-
-
-#class PhotoSceneCategoryAdmin(AutoUserMixin, admin.ModelAdmin):
-    #pass
-#admin.site.register(PhotoSceneCategory, PhotoSceneCategoryAdmin)
-
-
-#class PhotoAttributeAdmin(AutoUserMixin, admin.ModelAdmin):
-    #pass
-#admin.site.register(PhotoAttribute, PhotoAttributeAdmin)

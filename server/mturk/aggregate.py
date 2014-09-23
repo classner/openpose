@@ -21,7 +21,7 @@ def experiment_slugs():
 
 
 @cacheback(300)
-def experiments_as_categories():
+def experiments_as_datasets():
     l = ['all'] + experiment_slugs()
     return [{'slug': s} for s in l]
 
@@ -48,7 +48,7 @@ def aggregate_experiment_all():
     return experiments
 
 
-def admin_stats_category(experiment_slug):
+def admin_stats_dataset(experiment_slug):
     aggregates = aggregate_experiment_all()
     if aggregates:
         if experiment_slug in aggregates:

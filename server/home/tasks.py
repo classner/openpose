@@ -13,32 +13,6 @@ from common.utils import dict_union
 def update_index_context_task():
 
     data = {
-        'num_scenes_good': Photo.objects.filter(**Photo.DEFAULT_FILTERS).count(),
-        'num_scenes_all': Photo.objects.all().count(),
-
-        'num_whitebalanced_good': Photo.objects.filter(whitebalanced=True, scene_category_correct=True).count(),
-        'num_whitebalanced_all': Photo.objects.filter(whitebalanced_score__isnull=False, scene_category_correct=True).count(),
-
-        #'num_shapes_good': MaterialShape.objects.filter(**MaterialShape.DEFAULT_FILTERS).count(),
-        #'num_shapes_all': MaterialShape.objects.filter().count(),
-
-        #'num_substances_good': MaterialShape.objects.filter(**dict_union({'substance__fail': False}, MaterialShape.DEFAULT_FILTERS)).count(),
-        #'num_substances_all': MaterialShape.objects.filter(**dict_union({'substance_entropy__isnull': False}, MaterialShape.DEFAULT_FILTERS)).count(),
-
-        #'num_planar_good': MaterialShape.objects.filter(**dict_union({'planar': True}, MaterialShape.DEFAULT_FILTERS)).count(),
-        #'num_planar_all': MaterialShape.objects.filter(**MaterialShape.DEFAULT_FILTERS).count(),
-
-        #'num_names_good': MaterialShape.objects.filter(**dict_union({'name__fail': False}, MaterialShape.DEFAULT_FILTERS)).count(),
-        #'num_names_all': MaterialShape.objects.filter(**dict_union({'name_entropy__isnull': False}, MaterialShape.DEFAULT_FILTERS)).count(),
-
-        #'num_textures_good': MaterialShape.objects.filter(rectified_normal__isnull=False, planar=True, correct=True).count(),
-        #'num_textures_all': ShapeRectifiedNormalLabel.objects.distinct('shape').count(),
-
-        #'num_bsdfs_good': MaterialShape.objects.filter(bsdf_wd__isnull=False).count(),
-        #'num_bsdfs_all': ShapeBsdfLabel_wd.objects.all().distinct('shape').count(),
-
-        #'num_judgements_all': IntrinsicPointComparison.objects.all().count(),
-
         'num_assignments_good': MtAssignment.objects.filter(hit__sandbox=False, status='A').count(),
         'num_assignments_all': MtAssignment.objects.filter(hit__sandbox=False, status__isnull=False).count(),
 

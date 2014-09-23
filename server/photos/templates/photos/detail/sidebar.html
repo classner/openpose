@@ -44,25 +44,9 @@
 	{% endif %}
 
 	<p>
-		<b>Scene: </b>
-		{% if photo.scene_category %}
-		<a href="{% url 'photo-by-category' photo.scene_category_id %}">{{ photo.scene_category.name }}</a>
-		{% else %}
-		Unknown
-		{% endif %}
-	</p>
-	<p>
-		<b>Scene correct: </b>
-		{% if photo.scene_category %}
-		{{ photo.scene_category_correct }}{% if photo.scene_category_correct_method == 'A' %} (set by Admin){% endif %}
-		{% else %}
-		N/A
-		{% endif %}
-	</p>
-	<p>
-		<b>Whitebalanced: </b>
-		{% if photo.whitebalanced != None %}
-		{{ photo.whitebalanced }}
+		<b>Dataset: </b>
+		{% if photo.dataset %}
+		<a href="{% url 'photo-by-dataset' photo.dataset_id %}">{{ photo.dataset.name }}</a>
 		{% else %}
 		Unknown
 		{% endif %}

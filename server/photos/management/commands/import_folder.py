@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         admin_user = User.objects.get_or_create(
-            username='mkiefel')[0].get_profile()
+            username='admin')[0].get_profile()
 
         delete = bool(options['delete'])
 
@@ -47,8 +47,8 @@ class Command(BaseCommand):
                     flickr_id = None
                     flickr_user = None
 
-                    license = License.objects.get_or_create(
-                        user=user, name='CC BY-NC-SA 2.0')[0]
+                    #license = License.objects.get_or_create(
+                        #user=admin_user, name='CC BY-NC-SA 2.0')[0]
 
                     if not dataset:
                         name = os.path.basename(root).replace('+', ' ')
@@ -59,13 +59,18 @@ class Command(BaseCommand):
                         add_photo(
                             path=path,
                             user=admin_user,
-                            scene_category=scene_category,
+                            dataset=dataset,
                             flickr_user=flickr_user,
                             flickr_id=flickr_id,
-                            license=license,
+                            #license=license,
                             must_have_exif=False,
                             must_have_fov=False,
                             exif='',
+                            synthetic=False,
+                            inappropriate=False,
+                            rotated=False,
+                            stylized=False,
+                            nonperspective=False,
                         )
                     except Exception as e:
                         print '\nNot adding photo:', e

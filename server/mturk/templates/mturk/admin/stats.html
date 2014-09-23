@@ -17,8 +17,8 @@
 <div class="well well-nav">
 	<ul class="nav nav-list">
 		<li class="nav-header">Experiments</li>
-		{% for c in categories %}
-		<li{% ifequal category_slug c.slug %} class="active"{% endifequal %}>
+		{% for c in datasets %}
+		<li{% ifequal dataset_slug c.slug %} class="active"{% endifequal %}>
 			<a href="{% url 'mturk-admin-stats' c.slug %}">{{ c.slug }}</a>
 		</li>
 		{% endfor %}
@@ -91,8 +91,8 @@
 
 {% block scripts %}{{ block.super }}
 <script type="text/javascript">
-	window.category_slug = "{{ category_slug }}";
-	window.table_url = "{% url 'mturk-admin-stats-table' category_slug %}";
+	window.dataset_slug = "{{ dataset_slug }}";
+	window.table_url = "{% url 'mturk-admin-stats-table' dataset_slug %}";
 </script>
 {% include "d3_scripts.html" %}
 {% compress js %}

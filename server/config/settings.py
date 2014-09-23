@@ -262,7 +262,6 @@ INSTALLED_APPS = tuple(filter(None, [
     'licenses',
     'mturk',
     'photos',
-    #'segmentation',
 ]))
 
 # A sample logging configuration. The only tangible logging performed by this
@@ -354,11 +353,6 @@ MTURK_COMMISSION = 0.10
 #: Modules that contain MTurk experiments and ``configure_experiments`` or
 #: ``update_changed_objects`` methods.
 MTURK_MODULES = (
-    'photos.experiments',
-    'shapes.experiments',
-    'bsdfs.experiments',
-    'normals.experiments',
-    'intrinsic.experiments',
 )
 
 # Captcha

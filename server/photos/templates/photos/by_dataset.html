@@ -4,7 +4,7 @@
 {% block header %}
 <div class="jumbotron subhead" id="overview">
 	<div class="container">
-		<h1>Scenes</h1>
+		<h1>Datasets</h1>
 	</div>
 </div>
 {% endblock %}
@@ -12,9 +12,9 @@
 {% block sidenav %}
 <div class="well well-nav">
 	<ul class="nav nav-list">
-		{% include "category_filter_items.html" with categories=categories_all %}
+		{% include "dataset_filter_items.html" with datasets=datasets_all %}
 		<li class="nav-header">Photos</li>
-		{% include "category_filter_items.html" with categories=categories %}
+		{% include "dataset_filter_items.html" with datasets=datasets %}
 	</ul>
 </div>
 {% endblock %}
@@ -26,7 +26,7 @@
 	{% for f in filters %}
 	{% if f.count > 0 %}
 	<li{% ifequal filter_key f.key %} class="active"{% endifequal %}>
-		<a href="{% url 'photo-by-category' category_id f.key %}">{{ f.name }} ({{ f.count }})</a>
+		<a href="{% url 'photo-by-dataset' dataset_id f.key %}">{{ f.name }} ({{ f.count }})</a>
 	</li>
 	{% endif %}
 	{% endfor %}

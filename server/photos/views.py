@@ -10,9 +10,9 @@ from cacheback.decorators import cacheback
 from endless_pagination.decorators import page_template
 from django.http import Http404
 
-from common.utils import dict_union, prepare_votes_bar, \
+from common.utils import dict_union, \
     json_response, json_success_response
-from photos.models import Photo, PhotoSceneCategory
+from photos.models import Photo, PhotoDataset
 
 # different ways photos can be filtered
 PHOTO_FILTERS = {
@@ -20,94 +20,70 @@ PHOTO_FILTERS = {
         'name': 'Raw input',
         'filter': Photo.DEFAULT_FILTERS
     },
-
-    'wb': {
-        'name': 'Whitebalanced (WB)',
-        'filter': dict_union(
-            Photo.DEFAULT_FILTERS, {
-                'whitebalanced': True,
-            })
-    },
-
-    'nwb': {
-        'name': 'Not WB',
-        'filter': dict_union(
-            Photo.DEFAULT_FILTERS, {
-                'whitebalanced': False,
-            })
-    },
-
-    'ls': {
-        'name': 'Varying lighting',
-        'filter': {
-            'light_stack__isnull': False,
-        }
-    },
-
 }
 # display order
-PHOTO_FILTER_KEYS = ['wb', 'nwb', 'ls', 'all']
+PHOTO_FILTER_KEYS = ['all']
 
 
-def photo_by_category_entries(category_id, filter_key):
+def photo_by_dataset_entries(dataset_id, filter_key):
     """ Returns queryset for each filter """
 
     photo_filter = PHOTO_FILTERS[filter_key]['filter']
-    if category_id != 'all':
+    if dataset_id != 'all':
         photo_filter = dict_union(photo_filter, {
-            'scene_category_id': category_id
+            'dataset_id': dataset_id
         })
     return Photo.objects.filter(**photo_filter)
 
 
 @cacheback(3600)
-def photo_scene_categories(**filters):
-    """ Returns the category list along with photo counts """
-    categories = [
+def photo_datasets(**filters):
+    """ Returns the dataset list along with photo counts """
+    datasets = [
         {'id': c.id, 'name': c.name, 'count': c.photo_count(**filters)}
-        for c in PhotoSceneCategory.objects.all()
+        for c in PhotoDataset.objects.all()
     ]
-    categories = filter(lambda x: x['count'], categories)
-    categories.sort(key=lambda x: x['count'], reverse=True)
+    datasets = filter(lambda x: x['count'], datasets)
+    datasets.sort(key=lambda x: x['count'], reverse=True)
 
-    categories_all = [
+    datasets_all = [
         {'id': 'all', 'name': 'all', 'count': Photo.objects.filter(
             **Photo.DEFAULT_FILTERS
         ).filter(**filters).count()}
     ]
 
     return {
-        'categories': categories,
-        'categories_all': categories_all
+        'datasets': datasets,
+        'datasets_all': datasets_all
     }
 
 
 @cacheback(300)
-def photo_by_category_filters(category_id):
+def photo_by_dataset_filters(dataset_id):
     """ Returns the list of filters extended with the photo count """
     ret = []
     for k in PHOTO_FILTER_KEYS:
         ret.append(dict_union({
             'key': k,
-            'count': photo_by_category_entries(category_id, k).count(),
+            'count': photo_by_dataset_entries(dataset_id, k).count(),
         }, PHOTO_FILTERS[k]))
     return ret
 
 
 @page_template('grid_page.html')
-def photo_by_category(request, category_id='all', filter_key='wb',
-                      template='photos/by_category.html',
+def photo_by_dataset(request, dataset_id='all', filter_key='all',
+                      template='photos/by_dataset.html',
                       extra_context=None):
 
-    """ List of photos, filtered by a scene and optional extra ``filter_key`` """
+    """ List of photos, filtered by a dataset and optional extra ``filter_key`` """
 
     if filter_key not in PHOTO_FILTERS:
         raise Http404
 
-    if category_id != 'all':
-        category_id = int(category_id)
+    if dataset_id != 'all':
+        dataset_id = int(dataset_id)
 
-    entries = photo_by_category_entries(category_id, filter_key)
+    entries = photo_by_dataset_entries(dataset_id, filter_key)
 
     query_filter = {}
     for k, v in request.GET.iteritems():
@@ -124,11 +100,11 @@ def photo_by_category(request, category_id='all', filter_key='wb',
 
     context = dict_union({
         'nav': 'browse/photo',
-        'subnav': 'by-category',
+        'subnav': 'by-dataset',
         'filter_key': filter_key,
-        'category_id': category_id,
-        'filters': photo_by_category_filters(category_id),
-        'url_name': 'photo-by-category',
+        'dataset_id': dataset_id,
+        'filters': photo_by_dataset_filters(dataset_id),
+        'url_name': 'photo-by-dataset',
         'entries': entries,
         'entries_per_page': 30,
         'span': 'span3',
@@ -136,31 +112,22 @@ def photo_by_category(request, category_id='all', filter_key='wb',
         'thumb_template': 'photos/thumb.html',
     }, extra_context)
 
-    context.update(photo_scene_categories())
+    context.update(photo_datasets())
     return render(request, template, context)
 
 
 def photo_detail(request, pk):
     photo = get_object_or_404(Photo, pk=pk)
 
-    votes = [
-        prepare_votes_bar(
-            photo, 'scene_qualities', 'scene_category_correct',
-            'correct', 'Scene label correct'),
-        prepare_votes_bar(
-            photo, 'whitebalances', 'whitebalanced',
-            'whitebalanced', 'Whitebalance'),
-    ]
-
     # sections on the page
     nav_section_keys = [
         ("photo", 'Photo'),
-        ("whitebalance", 'Whitebalance'),
     ]
     nav_sections = [
         {
             'key': t[0],
             'name': t[1],
+            'votes': [],
             'template': 'photos/detail/%s.html' % t[0],
         }
         for t in nav_section_keys if t
@@ -169,54 +136,5 @@ def photo_detail(request, pk):
     return render(request, 'photos/detail.html', {
         'nav': 'browse/photo',
         'photo': photo,
-        'votes': votes,
         'nav_sections': nav_sections,
     })
-
-
-@ensure_csrf_cookie
-@staff_member_required
-def photo_curate(request, template='photos/curate.html'):
-    if request.method == 'POST':
-        if request.POST['action'] == 'button':
-            photo_id = request.POST['photo_id']
-            attr = request.POST['attr']
-            Photo.objects.filter(id=photo_id).update(
-                **{attr: request.POST['val'].lower() == u'true'}
-            )
-            val = Photo.objects.filter(id=photo_id) \
-                .values_list(attr, flat=True)[0]
-            return json_response({
-                'photo_id': photo_id,
-                'attr': attr,
-                'val': val
-            })
-        elif request.POST['action'] == 'done':
-            items = json.loads(request.POST['items'])
-            for item in items:
-                print item
-                Photo.objects.filter(id=item['photo_id']).update(
-                    **item['updates']
-                )
-            return json_success_response()
-        else:
-            raise Http404
-    else:
-        entries = Photo.objects \
-            .filter(scene_category_correct=True) \
-            .filter(
-                Q(inappropriate__isnull=True) |
-                Q(nonperspective__isnull=True) |
-                Q(stylized__isnull=True) |
-                Q(rotated__isnull=True)) \
-            .order_by('-num_vertices', 'scene_category_correct_score')
-
-        count = entries.count()
-        entries = list(entries[:400])
-        entries.sort(key=lambda x: x.aspect_ratio)
-
-        return render(request, template, {
-            'nav': 'browse/photo',
-            'count': count,
-            'entries': entries,
-        })

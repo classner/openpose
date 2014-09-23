@@ -6,9 +6,9 @@
 				<image x="0" y="0" width="100%" height="100%" xlink:href="{{ entry.image_512.url }}"/>
 			</svg>
 		</div>
-		{% if entry.scene_category %}
+		{% if entry.dataset %}
 		<div class="overlay-container">
-			<p class="overlay-content">{{ entry.scene_category.name }}</p>
+			<p class="overlay-content">{{ entry.dataset.name }}</p>
 		</div>
 		{% endif %}
 	</div>

@@ -14,10 +14,10 @@
 <div id="subnav">
 	<ul class="nav nav-pills">
 		<li class="dropdown" style="margin-right:30px">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><b class="caret"></b> Filter by experiment: {{ category.slug }} ({{ category.count }})</a>
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><b class="caret"></b> Filter by experiment: {{ dataset.slug }} ({{ dataset.count }})</a>
 			<ul class="dropdown-menu">
-				{% for c in categories %}
-				<li{% ifequal category_slug c.slug %} class="active"{% endifequal %}>
+				{% for c in datasets %}
+				<li{% ifequal dataset_slug c.slug %} class="active"{% endifequal %}>
 					<a href="{% url 'mturk-admin-submission' c.slug filter_key %}">{{ c.slug }} ({{ c.count }})</a>
 				</li>
 				{% endfor %}
@@ -26,7 +26,7 @@
 
 		{% for f in filters %}
 		<li{% ifequal filter_key f.key %} class="active"{% endifequal %}>
-			<a href="{% url 'mturk-admin-submission' category_slug f.key %}">{{ f.slug }} {% comment %}({{ f.count }}){% endcomment %}</a>
+			<a href="{% url 'mturk-admin-submission' dataset_slug f.key %}">{{ f.slug }} {% comment %}({{ f.count }}){% endcomment %}</a>
 		</li>
 		{% endfor %}
 	</ul>

@@ -1,20 +1,19 @@
 from django.conf.urls import patterns, url
-from photos.views import photo_by_category, photo_detail, photo_curate
+from photos.views import photo_by_dataset, photo_detail
 
 urlpatterns = patterns(
     '',
 
     url(r'^$',
-        photo_by_category, name='photo-by-category'),
+        photo_by_dataset, name='photo-by-dataset'),
 
-    url(r'^scene/(?P<category_id>\w+)/$',
-        photo_by_category, name='photo-by-category'),
+    url(r'^dataset/(?P<dataset_id>\w+)/$',
+        photo_by_dataset, name='photo-by-dataset'),
 
-    url(r'^scene/(?P<category_id>\w+)/(?P<filter_key>\w+)/$',
-        photo_by_category, name='photo-by-category'),
+    url(r'^dataset/(?P<dataset_id>\w+)/(?P<filter_key>\w+)/$',
+        photo_by_dataset, name='photo-by-dataset'),
 
     url(r'^(?P<pk>\d+)/$',
         photo_detail, name='photo-detail'),
 
-    url(r'^curate/$', photo_curate, name='photo-curate'),
 )

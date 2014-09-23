@@ -17,8 +17,8 @@ from common.utils import dict_union, dump_queryset_to_static_csv, \
 
 from mturk.models import MtAssignment, Experiment, \
     PendingContent, ExperimentExample
-from mturk.aggregate import experiments_as_categories, \
-    experiment_slugs, admin_stats_category
+from mturk.aggregate import experiments_as_datasets, \
+    experiment_slugs, admin_stats_dataset
 
 
 @staff_member_required
@@ -55,7 +55,7 @@ def admin_assignment_csv_url():
 @staff_member_required
 def admin_stats_table(request, experiment_slug):
     return render(request, "mturk/admin/stats_table.html", {
-        'category': admin_stats_category(experiment_slug)
+        'dataset': admin_stats_dataset(experiment_slug)
     })
 
 
@@ -64,16 +64,16 @@ def admin_stats(request, experiment_slug='all'):
     return render(request, "mturk/admin/stats.html", {
         'nav': 'mturk-admin',
         'subnav': 'stats',
-        'category_slug': experiment_slug,
-        'categories': experiments_as_categories(),
-        'category': admin_stats_category(experiment_slug),
+        'dataset_slug': experiment_slug,
+        'datasets': experiments_as_datasets(),
+        'dataset': admin_stats_dataset(experiment_slug),
         'stats_csv_url': admin_assignment_csv_url(),
         'table_template': 'mturk/admin/stats_table.html',
     })
 
 
 @cacheback(15)
-def admin_example_categories():
+def admin_example_datasets():
     ret = filter(lambda x: x['count'] > 0, [
         {'slug': c.slug, 'count': c.examples.count()}
         for c in Experiment.objects.all()
@@ -88,7 +88,7 @@ def admin_example(request, experiment_slug='all',
                   template='mturk/admin/example.html',
                   extra_context=None):
 
-    categories = admin_example_categories()
+    datasets = admin_example_datasets()
 
     entries = ExperimentExample.objects \
         .filter(experiment__slug=experiment_slug) \
@@ -104,8 +104,8 @@ def admin_example(request, experiment_slug='all',
         'nav': 'mturk-admin',
         'subnav': 'example',
         'entries': entries,
-        'categories': categories,
-        'category_slug': experiment_slug,
+        'datasets': datasets,
+        'dataset_slug': experiment_slug,
         'entries_per_page': 30,
         'span': 'span3',
         'rowsize': '3',
@@ -176,25 +176,25 @@ def pending_content_entries(experiment_slug, filter_key):
 
 
 @cacheback(15)
-def admin_pending_content_categories():
+def admin_pending_content_datasets():
     """ Returns a dictionary mapping:
-        filter --> category --> {slug, count}
+        filter --> dataset --> {slug, count}
     """
     slugs = experiment_slugs()
 
     ret = {}
     for filter_key in PENDING_CONTENT_FILTERS_LIST:
-        categories = [
+        datasets = [
             {'slug': slug,
              'count': pending_content_entries(slug, filter_key).count()}
             for slug in slugs
         ]
-        categories.append(
+        datasets.append(
             {'slug': 'all',
              'count': pending_content_entries('all', filter_key).count()}
         )
-        categories.sort(key=lambda x: (-x['count'], x['slug']))
-        ret[filter_key] = categories
+        datasets.sort(key=lambda x: (-x['count'], x['slug']))
+        ret[filter_key] = datasets
     return ret
 
 
@@ -208,17 +208,17 @@ def admin_pending_content(
     if filter_key not in PENDING_CONTENT_FILTERS_LIST:
         raise Http404
 
-    categories = admin_pending_content_categories()
+    datasets = admin_pending_content_datasets()
 
     filters = []
     for key in PENDING_CONTENT_FILTERS_LIST:
         count = 0
-        for cat in categories[key]:
+        for cat in datasets[key]:
             if cat['slug'] == experiment_slug:
                 count = cat['count']
                 break
         else:
-            count = categories[key][0]['count']
+            count = datasets[key][0]['count']
 
         filters.append(
             dict_union(
@@ -235,8 +235,8 @@ def admin_pending_content(
         'subnav': 'pending-content',
         'filters': filters,
         'filter_key': filter_key,
-        'categories': categories[filter_key],
-        'category_slug': experiment_slug,
+        'datasets': datasets[filter_key],
+        'dataset_slug': experiment_slug,
         'entries': entries,
         'entries_per_page': 30,
         'span': 'span3',
@@ -246,7 +246,7 @@ def admin_pending_content(
 
 
 @cacheback(15)
-def admin_feedback_categories():
+def admin_feedback_datasets():
     ret = filter(lambda x: x['count'] > 0, [
         {'slug': slug,
          'count': MtAssignment.objects.filter(
@@ -285,8 +285,8 @@ def admin_feedback(request, experiment_slug='all',
     return render(request, template, dict_union({
         'nav': 'mturk-admin',
         'subnav': 'feedback',
-        'categories': admin_feedback_categories(),
-        'category_slug': experiment_slug,
+        'datasets': admin_feedback_datasets(),
+        'dataset_slug': experiment_slug,
         'entries': entries,
         'entries_per_page': 30,
         'span': 'span9',
@@ -348,7 +348,7 @@ def submission_entries(experiment_slug, filter_key):
 
 
 @cacheback(15)
-def admin_submission_categories():
+def admin_submission_datasets():
     ret = filter(lambda x: x['count'] > 0, [
         {'slug': slug,
          'count': MtAssignment.objects.filter(
@@ -433,11 +433,11 @@ def admin_submission(request, experiment_slug='all', filter_key='all',
                 {'key': key, 'count': count}
             ))
 
-        categories = admin_submission_categories()
-        category = None
-        for c in categories:
+        datasets = admin_submission_datasets()
+        dataset = None
+        for c in datasets:
             if c['slug'] == experiment_slug:
-                category = c
+                dataset = c
                 break
         else:
             raise Http404
@@ -445,9 +445,9 @@ def admin_submission(request, experiment_slug='all', filter_key='all',
         return render(request, template, dict_union({
             'nav': 'mturk-admin',
             'subnav': 'submission',
-            'categories': categories,
-            'category_slug': experiment_slug,
-            'category': category,
+            'datasets': datasets,
+            'dataset_slug': experiment_slug,
+            'dataset': dataset,
             'filters': filters,
             'filter_key': filter_key,
             'entries': entries,
