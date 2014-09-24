@@ -4,9 +4,9 @@ from segmentation.views import segmentation, task
 urlpatterns = patterns(
     '',
 
-    url(r'^segmentation$',
+    url(r'^task/segmentation$',
         segmentation, name='segmentation'),
 
-    url(r'^$',
+    url(r'^task$',
         task, name='task'),
 )
