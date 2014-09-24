@@ -82,6 +82,8 @@ class Photo(UserBase):
     #: original uploaded image (jpg format)
     image_orig = models.ImageField(upload_to='photos', storage=STORAGE)
 
+    name = models.TextField(blank=True)
+
     #: Options for thumbnails.
     #: **Warning**: changing this will change the hash on all image thumbnails and you will need to re-resize every photo in the database.
     _THUMB_OPTS = {

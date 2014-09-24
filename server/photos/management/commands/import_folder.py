@@ -42,10 +42,10 @@ class Command(BaseCommand):
                 if filename.endswith(".jpg"):
                     path = os.path.join(root, filename)
 
-                    #split = filename.rindex('_')
                     flickr_username = None
                     flickr_id = None
                     flickr_user = None
+                    name, _ = os.path.splitext(os.path.basename(filename))
 
                     #license = License.objects.get_or_create(
                         #user=admin_user, name='CC BY-NC-SA 2.0')[0]
@@ -71,6 +71,7 @@ class Command(BaseCommand):
                             rotated=False,
                             stylized=False,
                             nonperspective=False,
+                            name=name,
                         )
                     except Exception as e:
                         print '\nNot adding photo:', e

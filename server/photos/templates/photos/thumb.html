@@ -1,4 +1,4 @@
-<a href="{% url 'photo-detail' entry.id %}" class="thumbnail tool" rel="tooltip" data-original-title="person">
+<a href="{% url 'photo-detail' entry.id %}" class="thumbnail tool" rel="tooltip" data-original-title="{{ entry.name }}">
 	<div class="overlay-wrapper">
 		<div class="hover-toggle">
 			<img class="show-on-mouseout" src="{{ entry.image_square_300.url }}" alt=""/>
