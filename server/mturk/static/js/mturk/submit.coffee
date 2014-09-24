@@ -124,10 +124,16 @@ $( ->
         console.log data
 
         host = window.getURLParameter('turkSubmitTo')
+
+        if submit_host?
+          new_url = "#{host}/mturk/externalSubmit#{window.location.search}"
+        else
+          new_url = window.location.href
+
+        host = if submit_host? then "#{submit_host}/" else ""
         console.log "host: #{host}"
 
         if data.result == "success"
-          new_url = "#{host}/mturk/externalSubmit#{window.location.search}"
           console.log "success: redirecting to #{new_url}"
           window.location = new_url
           setInterval((-> window.location = new_url), 5000)

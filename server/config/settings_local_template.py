@@ -6,6 +6,9 @@
 ## IMPORTANT SETTINGS
 ##
 
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 # If True, errors will be presented to the user in the browser, and all queries
 # will be stored in memory -- so don't leave the server running for too long
 # with DEBUG enabled.
@@ -55,7 +58,7 @@ CELERY_ALWAYS_EAGER = False
 # OPENSURFACES_REMOTE_STORAGE_URL as it is accessed (i.e. "lazily).  If False,
 # then the default storage (DEFAULT_FILE_STORAGE) will be used.  See
 # settings.py to see how this variable is used.
-OPENSURFACES_USE_REMOTE_DATA = True
+OPENSURFACES_USE_REMOTE_DATA = False
 
 # URL where remote OpenSurfaces data is available.
 OPENSURFACES_REMOTE_STORAGE_URL = 'http://labelmaterial.s3.amazonaws.com/'
@@ -135,7 +138,7 @@ ADMINS = (
 TIME_ZONE = 'Europe/Berlin'
 
 # Locaion of files
-DATA_DIR = 'data'
+DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 # IP addresses that are allowed to access django-debug-toolbar.
 # If your debug server is not local, put your machine's IP here.

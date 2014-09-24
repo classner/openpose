@@ -12,6 +12,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin_tools/', include('admin_tools.urls')),
     url(r'^photos/', include('photos.urls')),
+    url(r'^segmentation/', include('segmentation.urls')),
     url(r'^mturk/', include('mturk.urls')),
     url(r'^analytics/', include('analytics.urls')),
     url(r'^accounts/', include('accounts.urls')),

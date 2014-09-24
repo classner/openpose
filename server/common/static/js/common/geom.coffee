@@ -50,6 +50,51 @@ class AABB
     x: (p.x - @min.x) / (@max.x - @min.x)
     y: (p.y - @min.y) / (@max.y - @min.y)
 
+# A scribble -- a list of points
+class Scribble
+  constructor: (pts, @is_foreground) ->
+    @aabb = new AABB()
+    @points = []
+    @push_points(pts) if pts?
+
+  push_point: (p) -> if p?
+    @points.push(clone_pt(p))
+    @aabb.extend_pt(p)
+
+  push_points: (pts) ->
+    for p in pts
+      @push_point(p)
+
+  # remove last point
+  pop_point: (p) ->
+    if @points.length > 0
+      ret = @points.pop()
+      @aabb.recompute_from_points(@points)
+      ret
+
+  # move point index i to position p
+  set_point: (i, p) -> if p?
+    @points[i].x = p.x
+    @points[i].y = p.y
+    @aabb.recompute_from_points(@points)
+    p
+
+  empty: -> @points.length == 0
+
+  # point accessors
+  get_pt: (i) -> clone_pt(@points[i])
+  num_points: -> @points.length
+  clone_points: -> (clone_pt(p) for p in @points)
+  get_aabb: -> @aabb.clone()
+
+  # return the average vertex position
+  midpoint: ->
+    if @points.length < 1 then return undefined
+    x = y = 0
+    for p in @points
+      x += p.x
+      y += p.y
+    return {x: x/@points.length, y: y/@points.length}
 
 # Mathematical polygon (2D)
 class Polygon
