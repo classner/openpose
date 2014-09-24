@@ -21,9 +21,8 @@ class Migration(SchemaMigration):
             ('time_active_ms', self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True)),
             ('reward', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=4, blank=True)),
             ('photo', self.gf('django.db.models.fields.related.ForeignKey')(related_name='scribbles', to=orm['photos.Photo'])),
-            ('vertices', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('num_vertices', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('vertices_method', self.gf('django.db.models.fields.CharField')(max_length=1, null=True, blank=True)),
+            ('scribbles', self.gf('django.db.models.fields.TextField')(null=True)),
+            ('num_scribbles', self.gf('django.db.models.fields.IntegerField')(null=True)),
         ))
         db.send_create_signal(u'segmentation', ['PersonSegmentation'])
 
@@ -253,6 +252,7 @@ class Migration(SchemaMigration):
             'inappropriate': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'license': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'photos'", 'null': 'True', 'to': u"orm['licenses.License']"}),
             'md5': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'name': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'nonperspective': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'orig_height': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'orig_width': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
@@ -274,16 +274,15 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invalid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'mturk_assignment': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['mturk.MtAssignment']"}),
-            'num_vertices': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'num_scribbles': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'photo': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'scribbles'", 'to': u"orm['photos.Photo']"}),
             'quality_method': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
             'reward': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '8', 'decimal_places': '4', 'blank': 'True'}),
             'sandbox': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'scribbles': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'time_active_ms': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'time_ms': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['accounts.UserProfile']"}),
-            'vertices': ('django.db.models.fields.TextField', [], {'null': 'True'}),
-            'vertices_method': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['accounts.UserProfile']"})
         }
     }
 

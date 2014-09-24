@@ -1,8 +1,11 @@
 from django.db import models
 
+import json
+
 from photos.models import Photo
 from common.models import EmptyModelBase, ResultBase
-from common.utils import get_content_tuple
+
+from common.utils import get_content_tuple, recursive_sum
 
 class PersonSegmentation(ResultBase):
     """ Person segmentation submitted by user. """
@@ -11,12 +14,12 @@ class PersonSegmentation(ResultBase):
 
     # Vertices format: x1,y1,x2,y2,x3,y3,... (coords are fractions of width/height)
     # (this format allows easy embedding into javascript)
-    vertices = models.TextField(null=True)
+    scribbles = models.TextField(null=True)
     # num_vertices should be equal to len(points.split(','))//2
-    num_vertices = models.IntegerField(null=True)
+    num_scribbles = models.IntegerField(null=True)
 
     def __unicode__(self):
-        return '%s vertices in scribble segmentation' % self.num_vertices
+        return '%s scribbles in segmentation' % self.num_scribbles
 
     def get_thumb_template(self):
         return 'submitted_segmentation_thumb.html'
@@ -46,32 +49,23 @@ class PersonSegmentation(ResultBase):
             raise ValueError("Unknown slug: %s" % slug)
 
         # store results in SubmittedShape objects
-        new_objects_list = []
-        for idx in xrange(len(scribbles_list)):
-            scribble = scribbles_list[idx]
-            scribble_time_ms = time_ms_list[idx]
-            scribble_time_active_ms = time_active_ms_list[idx]
-
+        for scribble in scribbles_list:
             num_vertices = len(scribble)
             if num_vertices % 2 != 0:
                 raise ValueError("Odd number of vertices (%d)" % num_vertices)
-            num_vertices //= 2
 
-            new_obj, created = photo.scribbles.get_or_create(
-                user=user,
-                mturk_assignment=mturk_assignment,
-                time_ms=scribble_time_ms,
-                time_active_ms=scribble_time_active_ms,
-                # (repr gives more float digits)
-                vertices=','.join([repr(f) for f in scribble]),
-                num_vertices=num_vertices,
-                **kwargs
-            )
+        new_obj, created = photo.scribbles.get_or_create(
+            user=user,
+            mturk_assignment=mturk_assignment,
+            time_ms=recursive_sum(time_ms),
+            time_active_ms=recursive_sum(time_active_ms),
+            # (repr gives more float digits)
+            scribbles=json.dumps(scribbles_list),
+            num_scribbles=len(scribbles_list),
+            **kwargs
+        )
 
-            if created:
-                new_objects_list.append(new_obj)
-
-        if new_objects_list:
-            return {get_content_tuple(photo): new_objects_list}
+        if created:
+            return {get_content_tuple(photo): [new_obj]}
         else:
             return {}
