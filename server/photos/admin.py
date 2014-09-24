@@ -19,8 +19,7 @@ class PhotoAdmin(AutoUserMixin, admin.ModelAdmin):
 
     # fields
     readonly_fields = ['added', 'admin_thumb_span6']
-    list_display = ['user', 'admin_thumb_span1', 'dataset',
-                    'added']
+    list_display = ['user', 'admin_thumb_span1', 'dataset', 'added']
 
     # field display
     list_filter = ['added']

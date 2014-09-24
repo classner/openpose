@@ -263,6 +263,7 @@ INSTALLED_APPS = tuple(filter(None, [
     'mturk',
     'photos',
     'segmentation',
+    'pose',
 ]))
 
 # A sample logging configuration. The only tangible logging performed by this

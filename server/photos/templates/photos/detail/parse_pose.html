@@ -1,0 +1,13 @@
+<h2 style="margin-top:30px">Parse Pose</h2>
+{% if photo.parse_pose.all %}
+  <div class="row-fluid" style="margin-top:20px">
+    <div class="span3">
+      <div class="thumbnail">
+        <div class="overlay-wrapper">
+        {% include "photos/parse_pose.svg" with entry=photo large="True" %}
+      </div>
+    </div>
+  </div>
+{% else %}
+  <p>This photo has not been annotated, yet.</p>
+{% endif %}
