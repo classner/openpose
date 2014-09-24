@@ -81,6 +81,7 @@ class ControllerUI
 
   set_segmentation_overlay: (url) =>
     @s.stage_ui.set_segmentation_overlay(url, @, =>
+      @segmentation_overlay_url = url
       console.log "loaded background"
     )
 

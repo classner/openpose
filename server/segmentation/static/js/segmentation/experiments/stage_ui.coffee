@@ -170,24 +170,29 @@ class StageUI
     @draw()
 
   set_segmentation_overlay: (overlay_url, ui, on_load) ->
-    overlay_obj = new Image()
-    overlay_obj.onload = do() => =>
-      if @overlay?
-        @overlay.setImage(overlay_obj)
-      else
-        @overlay = new Kinetic.Image(
-          x:0, y: 0, image: overlay_obj,
-          width: @size.width, height: @size.height,
-          opacity: 0.5)
-        @overlay_layer.add(@overlay)
-        @overlay.on('mousedown', ->
-          if not ui.s.panning
-            ui.unselect_poly()
-        )
-      @draw()
-      on_load?()
+    if overlay_url?
+      overlay_obj = new Image()
+      overlay_obj.onload = =>
+        if @overlay?
+          @overlay.setImage(overlay_obj)
+        else
+          @overlay = new Kinetic.Image(
+            x:0, y: 0, image: overlay_obj,
+            width: @size.width, height: @size.height,
+            opacity: 0.5)
+          @overlay_layer.add(@overlay)
+          @overlay.on('mousedown', ->
+            if not ui.s.panning
+              ui.unselect_poly()
+          )
+        @draw()
+        on_load?()
 
-    overlay_obj.src = overlay_url;
+      overlay_obj.src = overlay_url;
+    else
+      if @overlay?
+        @remove(@overlay)
+        @overlay = null
 
   set_photo: (photo_url, ui, on_load) ->
     @add_loading()

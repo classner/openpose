@@ -75,17 +75,20 @@ class UECreateScribble extends UndoableEvent
     # request
     ui.s.segmentation_overlay_request.abort() if ui.segmentation_overlay_request?
 
-    @old_overlay_url = ui.segmentation_overlay_url ? null
+    if ui.segmentation_overlay_url?
+      @old_overlay_url = ui.segmentation_overlay_url
+    else
+      @old_overlay_url = null
 
     ui.s.segmentation_overlay_request = $.ajax(
       type: "POST"
-      url: window.location.href + "segmentation"
+      url: window.location.href + "/segmentation"
       contentType: "application/x-www-form-urlencoded; charset=UTF-8"
       dataType: "text"
       data: ui.s.get_submit_data()
       success: (data, status, jqxhr) =>
         @overlay_url = "data:image/jpeg;base64," + data
-        ui.s.set_segmentation_overlay(@overlay_url)
+        ui.set_segmentation_overlay(@overlay_url)
       error: (jqxhr, status, error) ->
         console.log status
       complete: ->
@@ -99,12 +102,13 @@ class UECreateScribble extends UndoableEvent
     @id = scribble_ui.id
     @time_ms = scribble_ui.time_ms
     @time_active_ms = scribble_ui.time_active_ms
+    ui.s.remove_scribble()
 
-    ui.s.set_segmentation_overlay(@old_overlay_url)
+    ui.set_segmentation_overlay(@old_overlay_url)
   redo: (ui) ->
     ui.s.insert_scribble(@points, @is_foreground, @id, @time_ms, @time_active_ms)?.update(ui)
 
-    ui.s.set_segmentation_overlay(@overlay_url)
+    ui.set_segmentation_overlay(@overlay_url)
   entry: -> { name: "UECreateScribble", args: { pts: @pts } }
 
 class UEClosePolygon extends UndoableEvent
