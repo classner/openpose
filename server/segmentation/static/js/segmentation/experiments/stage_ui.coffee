@@ -32,7 +32,10 @@ class StageUI
     )
 
   add: (o, opacity=1.0, duration=0.4) ->
-    @object_layer.add(o)
+    @add_to_layer(o, @object_layer, opacity, duration)
+
+  add_to_layer: (o, layer, opacity=1.0, duration=0.4) ->
+    layer.add(o)
     if duration > 0
       o.setOpacity(0)
       o.add_trans = o.transitionTo(opacity:opacity, duration:duration)
@@ -178,9 +181,8 @@ class StageUI
         else
           @overlay = new Kinetic.Image(
             x:0, y: 0, image: overlay_obj,
-            width: @size.width, height: @size.height,
-            opacity: 0.5)
-          @overlay_layer.add(@overlay)
+            width: @size.width, height: @size.height)
+          @add_to_layer(@overlay, @overlay_layer, 0.5)
           @overlay.on('mousedown', ->
             if not ui.s.panning
               ui.unselect_poly()

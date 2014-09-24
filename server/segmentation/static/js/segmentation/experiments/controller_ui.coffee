@@ -77,12 +77,29 @@ class ControllerUI
       console.log "loaded photo_url: #{photo_url}"
       @s.loading = false
       @s.update_buttons()
+      @request_new_segmentation_overlay()
     )
 
   set_segmentation_overlay: (url) =>
     @s.stage_ui.set_segmentation_overlay(url, @, =>
       @segmentation_overlay_url = url
       console.log "loaded background"
+    )
+
+  request_new_segmentation_overlay: =>
+    @s.segmentation_overlay_request = $.ajax(
+      type: "POST"
+      url: window.location.href + "/segmentation"
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
+      dataType: "text"
+      data: @s.get_submit_data()
+      success: (data, status, jqxhr) =>
+        @overlay_url = "data:image/jpeg;base64," + data
+        @set_segmentation_overlay(@overlay_url)
+      error: (jqxhr, status, error) ->
+        console.log status
+      complete: ->
+        @s.segmentation_overlay_request = null
     )
 
   keydown: (e) =>

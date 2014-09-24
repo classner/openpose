@@ -135,8 +135,6 @@ def segmentation(request):
             foreground_annotation_scribbles = []
             background_annotation_scribbles = []
 
-        print foreground_annotation_scribbles
-
         overlay_img = Image.fromarray(calc_overlay_img(img,
             background_annotation_scribbles + foreground_annotation_scribbles +
             scribbles))

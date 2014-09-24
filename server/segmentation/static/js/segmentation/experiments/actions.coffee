@@ -80,20 +80,7 @@ class UECreateScribble extends UndoableEvent
     else
       @old_overlay_url = null
 
-    ui.s.segmentation_overlay_request = $.ajax(
-      type: "POST"
-      url: window.location.href + "/segmentation"
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
-      dataType: "text"
-      data: ui.s.get_submit_data()
-      success: (data, status, jqxhr) =>
-        @overlay_url = "data:image/jpeg;base64," + data
-        ui.set_segmentation_overlay(@overlay_url)
-      error: (jqxhr, status, error) ->
-        console.log status
-      complete: ->
-        ui.s.segmentation_overlay_request = null
-    )
+    ui.request_new_segmentation_overlay()
 
   undo: (ui) ->
     [..., scribble_ui] = ui.s.closed_scribbles
