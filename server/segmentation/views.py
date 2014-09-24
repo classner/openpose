@@ -17,6 +17,7 @@ from StringIO import StringIO
 
 from photos.models import Photo
 from segmentation.models import PersonSegmentation
+from pose.models import ParsePose
 from mturk.views.external import external_task_browser_check
 from mturk.models import Experiment
 from accounts.models import UserProfile
@@ -102,14 +103,59 @@ def segmentation(request):
                 for scribble_coords in scribbles_coords
                 ]
 
-        img = Photo.objects.filter(id=img_id)[0].open_image()
-        overlay_img = Image.fromarray(calc_overlay_img(img, scribbles))
+        photo = Photo.objects.get(id=img_id)
+        img = photo.open_image()
+
+        width, height = img.size
+
+        # get the annotation
+        try:
+            # just grab the first annotation
+            pose = photo.parse_pose.all()[0]
+            annotation = np.array(pose.pose)
+
+            end_points = build_to_endpoints().dot(annotation) \
+                    * np.array([[1.0 / width, 1.0 / height]])
+
+            foreground_annotation_scribbles = [
+                    {'points': end_points[2*s : 2*s+2, :],
+                        'is_foreground': True}
+                    for s in xrange(end_poins.shape[0] // 2)
+                    ]
+
+            # draw a frame, we are sure that this will be background
+            background_annotation_scribbles = [
+                    {'points': np.array([[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]),
+                        'is_foreground': False}
+                    ]
+        except IndexError:
+            # if there is no annotation
+            foreground_annotation_scribbles = []
+            background_annotation_scribbles = []
+
+        overlay_img = Image.fromarray(calc_overlay_img(img,
+            background_annotation_scribbles + foreground_annotation_scribbles +
+            scribbles))
 
         overlay_img.save(bytes_io, u"JPEG")
 
         return HttpResponse(
                 base64.standard_b64encode(bytes_io.getvalue()),
                 content_type=u'data/text')
+
+def build_to_endpoints():
+  i = np.array([1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+    17, 18, 19, 20]) - 1
+  j = np.array([9, 10, 3, 4,
+    3, 2, 4, 5, 2, 1, 5, 6,
+    9, 8, 10, 11, 8, 7, 11, 12,
+    14, 13]) - 1
+  weight = np.array([0.5, 0.5, 0.5, 0.5,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1])
+  return sparse.coo_matrix((weight, (i, j)), shape=(2 * get_stick_count(),
+    14)).tocsr()
 
 def mangle_scribble(scribble_coords):
     #if not (('points' in scribble_coords) and ('is_foreground' in
