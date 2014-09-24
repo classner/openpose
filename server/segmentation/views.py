@@ -1,4 +1,4 @@
-#from multilabel import segment
+from multilabel import segment
 
 import json
 
@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from PIL import Image, ImageDraw
 
 import numpy as np
+import scipy.sparse as sparse
 
 import base64
 
@@ -115,12 +116,13 @@ def segmentation(request):
             annotation = np.array(pose.pose)
 
             end_points = build_to_endpoints().dot(annotation) \
+                    * np.max([width, height]) \
                     * np.array([[1.0 / width, 1.0 / height]])
 
             foreground_annotation_scribbles = [
                     {'points': end_points[2*s : 2*s+2, :],
                         'is_foreground': True}
-                    for s in xrange(end_poins.shape[0] // 2)
+                    for s in xrange(end_points.shape[0] // 2)
                     ]
 
             # draw a frame, we are sure that this will be background
@@ -132,6 +134,8 @@ def segmentation(request):
             # if there is no annotation
             foreground_annotation_scribbles = []
             background_annotation_scribbles = []
+
+        print foreground_annotation_scribbles
 
         overlay_img = Image.fromarray(calc_overlay_img(img,
             background_annotation_scribbles + foreground_annotation_scribbles +
@@ -154,7 +158,7 @@ def build_to_endpoints():
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1])
-  return sparse.coo_matrix((weight, (i, j)), shape=(2 * get_stick_count(),
+  return sparse.coo_matrix((weight, (i, j)), shape=(2 * 10,
     14)).tocsr()
 
 def mangle_scribble(scribble_coords):
@@ -183,8 +187,8 @@ def calc_overlay_img(img, scribbles):
             draw.line((points[s-1, 0] * width, points[s-1, 1] * height,
                     points[s, 0] * width, points[s, 1] * height),
                     fill=fill, width=2)
-    #seg = segment(np.asfortranarray(img), np.asarray(scribbles_map, order='fortran'))
-    seg = np.ones_like(img)
+    seg = segment(np.asfortranarray(img), np.asarray(scribbles_map, order='fortran'))
+    #seg = np.ones_like(img)
 
     seg[seg == 1] = 255
 
