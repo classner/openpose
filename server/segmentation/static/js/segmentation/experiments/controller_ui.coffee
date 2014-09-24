@@ -196,19 +196,6 @@ class ControllerUI
     if @s.mode == Mode.scribble and @s.open_scribble
       @s.undoredo.run(new UECreateScribble())
 
-      $.ajax(
-        type: "POST"
-        url: window.location.href + "segmentation"
-        contentType: "application/x-www-form-urlencoded; charset=UTF-8"
-        dataType: "text"
-        data: @s.get_submit_data()
-        success: (data, status, jqxhr) =>
-          @overlay_url = "data:image/jpeg;base64," + data
-          @set_segmentation_overlay(@overlay_url)
-        error: (jqxhr, status, error) ->
-          console.log status
-      )
-
     return not @s.panning
 
   mousemove: (e) =>
