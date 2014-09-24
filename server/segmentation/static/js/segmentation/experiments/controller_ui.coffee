@@ -19,16 +19,16 @@ class ControllerUI
       .on('selectstart', -> false)
 
     # init buttons
-    $(@s.btn_draw).on('click', =>
-      if @s.mode != Mode.draw then @switch_mode(Mode.draw))
+    #$(@s.btn_draw).on('click', =>
+      #if @s.mode != Mode.draw then @switch_mode(Mode.draw))
     $(@s.btn_scribble).on('click', =>
       if @s.mode != Mode.scribble then @switch_mode(Mode.scribble))
-    $(@s.btn_edit).on('click', =>
-      if @s.mode != Mode.edit then @switch_mode(Mode.edit))
-    $(@s.btn_close).on('click', =>
-      if not @s.loading then @close_poly())
-    $(@s.btn_delete).on('click', =>
-      if not @s.loading then @delete_sel_poly())
+    #$(@s.btn_edit).on('click', =>
+      #if @s.mode != Mode.edit then @switch_mode(Mode.edit))
+    #$(@s.btn_close).on('click', =>
+      #if not @s.loading then @close_poly())
+    #$(@s.btn_delete).on('click', =>
+      #if not @s.loading then @delete_sel_poly())
     $(@s.btn_zoom_reset).on('click', =>
       if not @s.loading then @zoom_reset())
 
@@ -103,12 +103,12 @@ class ControllerUI
         @s.panning = true
         @s.update_cursor()
         false
-      when 68 # D
-        if @s.mode != Mode.draw then @switch_mode(Mode.draw)
-        false
-      when 65 # A
-        if @s.mode != Mode.edit then @switch_mode(Mode.edit)
-        false
+      #when 68 # D
+        #if @s.mode != Mode.draw then @switch_mode(Mode.draw)
+        #false
+      #when 65 # A
+        #if @s.mode != Mode.edit then @switch_mode(Mode.edit)
+        #false
       when 83 # S
         if @s.mode != Mode.scribble then @switch_mode(Mode.scribble)
         false
