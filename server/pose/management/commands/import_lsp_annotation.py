@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
         image_name_template = 'im{0:04d}'
 
-        annotations = annotations_file.get('joints')[0:2, :, 0:1000]
+        annotations = annotations_file.get('joints')[0:2, :, :]
 
         for i in progress.bar(xrange(annotations.shape[2])):
             # get the right image from the dataset that is connected to this
