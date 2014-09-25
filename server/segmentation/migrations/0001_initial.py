@@ -21,6 +21,7 @@ class Migration(SchemaMigration):
             ('time_active_ms', self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True)),
             ('reward', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=4, blank=True)),
             ('photo', self.gf('django.db.models.fields.related.ForeignKey')(related_name='scribbles', to=orm['photos.Photo'])),
+            ('segmentation', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
             ('scribbles', self.gf('django.db.models.fields.TextField')(null=True)),
             ('num_scribbles', self.gf('django.db.models.fields.IntegerField')(null=True)),
         ))
@@ -280,6 +281,7 @@ class Migration(SchemaMigration):
             'reward': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '8', 'decimal_places': '4', 'blank': 'True'}),
             'sandbox': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'scribbles': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            'segmentation': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'time_active_ms': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'time_ms': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['accounts.UserProfile']"})

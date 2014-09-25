@@ -98,7 +98,7 @@ class ControllerUI
         @set_segmentation_overlay(@overlay_url)
       error: (jqxhr, status, error) ->
         console.log status
-      complete: ->
+      complete: =>
         @s.segmentation_overlay_request = null
     )
 

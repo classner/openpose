@@ -35,7 +35,7 @@ def configure_experiments():
         keywords='person,images,segment',
         #frame_height=8000,
         requirements={},
-        auto_add_hits=True,  # settings.MTURK_SANDBOX,
+        auto_add_hits=False,  # settings.MTURK_SANDBOX,
     )
 
 

@@ -60,11 +60,18 @@ class ControllerState
     scribble_list = []
     for scribble in @closed_scribbles
       points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
+
+      # calculate the points with respect to a frame with the right aspact ratio
+      factor = Math.max(@stage_ui.size.width, @stage_ui.size.height)
+
+      x_max = @stage_ui.size.width / factor
+      y_max = @stage_ui.size.height / factor
+
       for p in scribble.scribble.points
-        points_scaled.points.push(Math.max(0, Math.min(1,
-          p.x / @stage_ui.size.width)))
-        points_scaled.points.push(Math.max(0, Math.min(1,
-          p.y / @stage_ui.size.height)))
+        points_scaled.points.push([
+          Math.max(0, Math.min(x_max, p.x / factor)),
+          Math.max(0, Math.min(y_max, p.y / factor)),
+        ])
       scribble_list.push(points_scaled)
 
     poly_list = []

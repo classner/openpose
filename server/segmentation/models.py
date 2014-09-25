@@ -1,16 +1,26 @@
 from django.db import models
+from django.core.files.images import ImageFile
 
 import json
+
+from tempfile import NamedTemporaryFile
 
 from photos.models import Photo
 from common.models import EmptyModelBase, ResultBase
 
-from common.utils import get_content_tuple, recursive_sum
+from common.utils import get_content_tuple, recursive_sum, \
+        get_opensurfaces_storage
+
+from segmentation.utils import calc_pose_overlay_img
+
+STORAGE = get_opensurfaces_storage()
 
 class PersonSegmentation(ResultBase):
     """ Person segmentation submitted by user. """
 
     photo = models.ForeignKey(Photo, related_name='scribbles')
+
+    segmentation = models.ImageField(upload_to='segmentation', storage=STORAGE)
 
     # Vertices format: x1,y1,x2,y2,x3,y3,... (coords are fractions of width/height)
     # (this format allows easy embedding into javascript)
@@ -36,34 +46,43 @@ class PersonSegmentation(ResultBase):
             raise ValueError("Unknown version: %s" % version)
 
         photo = hit_contents[0]
-        scribbles_list = results[str(photo.id)][u'scribbles']
+        scribbles = results[str(photo.id)][u'scribbles']
         time_ms_list = time_ms[str(photo.id)][u'scribbles']
         time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
 
-        if len(scribbles_list) != len(time_ms_list):
+        if len(scribbles) != len(time_ms_list):
             raise ValueError("Result length mismatch (%s polygons, %s times)" % (
-                len(scribbles_list), len(time_ms_list)))
+                len(scribbles), len(time_ms_list)))
 
         slug = experiment.slug
         if slug != u'segment_person':
             raise ValueError("Unknown slug: %s" % slug)
 
-        # store results in SubmittedShape objects
-        for scribble in scribbles_list:
-            num_vertices = len(scribble)
-            if num_vertices % 2 != 0:
-                raise ValueError("Odd number of vertices (%d)" % num_vertices)
+        # check if the scribbles make sense
+        for scribble in scribbles:
+            for point in scribble[u'points']:
+                if len(point) != 2:
+                    raise ValueError("Point with more than 2 coordinates")
 
-        new_obj, created = photo.scribbles.get_or_create(
-            user=user,
-            mturk_assignment=mturk_assignment,
-            time_ms=recursive_sum(time_ms),
-            time_active_ms=recursive_sum(time_active_ms),
-            # (repr gives more float digits)
-            scribbles=json.dumps(scribbles_list),
-            num_scribbles=len(scribbles_list),
-            **kwargs
-        )
+        # generate the segmentation image
+        overlay_img = calc_pose_overlay_img(photo, scribbles)
+        with NamedTemporaryFile(prefix=u'segmentation_', suffix=u'.jpg') as f:
+            print f.name
+            overlay_img.save(f, u"JPEG")
+            f.seek(0)
+            segmentation = ImageFile(f)
+
+            new_obj, created = photo.scribbles.get_or_create(
+                user=user,
+                segmentation=segmentation,
+                mturk_assignment=mturk_assignment,
+                time_ms=recursive_sum(time_ms),
+                time_active_ms=recursive_sum(time_active_ms),
+                # (repr gives more float digits)
+                scribbles=json.dumps(scribbles),
+                num_scribbles=len(scribbles),
+                **kwargs
+            )
 
         if created:
             return {get_content_tuple(photo): [new_obj]}

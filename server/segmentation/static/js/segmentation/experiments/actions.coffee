@@ -91,6 +91,7 @@ class UECreateScribble extends UndoableEvent
     @time_active_ms = scribble_ui.time_active_ms
     ui.s.remove_scribble()
 
+    @overlay_url = ui.segmentation_overlay_url
     ui.set_segmentation_overlay(@old_overlay_url)
   redo: (ui) ->
     ui.s.insert_scribble(@points, @is_foreground, @id, @time_ms, @time_active_ms)?.update(ui)
