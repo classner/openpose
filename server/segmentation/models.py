@@ -67,7 +67,6 @@ class PersonSegmentation(ResultBase):
         # generate the segmentation image
         overlay_img = calc_pose_overlay_img(photo, scribbles)
         with NamedTemporaryFile(prefix=u'segmentation_', suffix=u'.jpg') as f:
-            print f.name
             overlay_img.save(f, u"JPEG")
             f.seek(0)
             segmentation = ImageFile(f)
