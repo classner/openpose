@@ -2,8 +2,8 @@ import json
 
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 
 from PIL import Image
 
@@ -23,8 +23,8 @@ from mturk.models import Experiment
 from accounts.models import UserProfile
 from common.utils import json_success_response, json_error_response
 
+@login_required(login_url="/account/login")
 @ensure_csrf_cookie
-@staff_member_required
 def task(request):
     # replace this with a fetch from your database
     if request.method == 'POST':
