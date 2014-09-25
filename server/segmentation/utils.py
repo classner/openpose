@@ -2,7 +2,8 @@ import numpy as np
 
 from PIL import Image, ImageDraw
 
-from multilabel import segment
+#from multilabel import segment
+from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
 
 def calc_pose_overlay_img(photo, scribbles):
     img = photo.open_image()
@@ -35,13 +36,23 @@ def build_annotation_scribbles(parse_pose):
 
     return background_annotation_scribbles + foreground_annotation_scribbles
 
-def calc_overlay_img(img, scribbles):
-    width, height = img.size
+def calc_overlay_img(imgImage, scribbles):
+    width, height = imgImage.size
+
+    img = np.asarray(imgImage)
 
     scale = max(width, height)
 
-    scribbles_map = Image.fromarray(np.ones((height, width), dtype=np.uint8) * 255)
-    draw = ImageDraw.Draw(scribbles_map)
+    bgd_model = np.zeros((1, 65), np.float64)
+    fgd_model = np.zeros((1, 65), np.float64)
+
+    rect = (5, 5, width-5, height-5)
+
+    scribbles_map = np.zeros(img.shape[:2], dtype=np.uint8)
+    grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_RECT)
+
+    scribbles_map_img = Image.fromarray(scribbles_map)
+    draw = ImageDraw.Draw(scribbles_map_img)
 
     for scribble in scribbles:
         points = np.array(scribble[u'points'])
@@ -55,8 +66,13 @@ def calc_overlay_img(img, scribbles):
             draw.line((points[s-1, 0] * scale, points[s-1, 1] * scale,
                     points[s, 0] * scale, points[s, 1] * scale),
                     fill=fill, width=2)
-    seg = segment(np.asfortranarray(img), np.asarray(scribbles_map, order='fortran'))
 
-    seg[seg == 1] = 255
+    scribbles_map = np.asarray(scribbles_map_img)
+
+    grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_MASK)
+
+    seg = np.where((scribbles_map==1) + (scribbles_map==3),255,0).astype('uint8')
+
+    Image.fromarray(seg).save('out.png')
 
     return Image.fromarray(seg)
