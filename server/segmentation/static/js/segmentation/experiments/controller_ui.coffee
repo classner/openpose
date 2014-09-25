@@ -23,6 +23,8 @@ class ControllerUI
       #if @s.mode != Mode.draw then @switch_mode(Mode.draw))
     $(@s.btn_scribble).on('click', =>
       if @s.mode != Mode.scribble then @switch_mode(Mode.scribble))
+    $(@s.btn_toggle).on('click', =>
+      if @s.mode == Mode.scribble then @s.stage_ui.toggle_segment_layer()?.draw())
     #$(@s.btn_edit).on('click', =>
       #if @s.mode != Mode.edit then @switch_mode(Mode.edit))
     #$(@s.btn_close).on('click', =>
@@ -129,6 +131,9 @@ class ControllerUI
         #false
       when 83 # S
         if @s.mode != Mode.scribble then @switch_mode(Mode.scribble)
+        false
+      when 84 # T
+        if @s.mode == Mode.scribble then @s.stage_ui.toggle_segment_layer()?.draw()
         false
       when 46,8 # delete,backspace
         switch @s.mode

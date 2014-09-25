@@ -39,6 +39,7 @@ class ControllerState
     @btn_draw = if args.btn_draw? then args.btn_draw else '#btn-draw'
     @btn_scribble = if args.btn_scribble? then args.btn_scribble else '#btn-scribble'
     @btn_edit = if args.btn_edit? then args.btn_edit else '#btn-edit'
+    @btn_toggle = if args.btn_toggle? then args.btn_toggle else '#btn-toggle'
     @btn_close = if args.btn_close? then args.btn_close else '#btn-close'
     @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
     @btn_delete = if args.btn_delete? then args.btn_delete else '#btn-delete'
@@ -356,6 +357,7 @@ class ControllerState
     set_btn_enabled(@btn_draw, not @loading)
     set_btn_enabled(@btn_scribble, not @loading)
     set_btn_enabled(@btn_edit, not @loading)
+    set_btn_enabled(@btn_toggle, not @loading)
     set_btn_enabled(@btn_delete, @can_delete_sel())
     set_btn_enabled(@btn_zoom_reset,
       not @loading and @stage_ui.zoom_exp > 0)

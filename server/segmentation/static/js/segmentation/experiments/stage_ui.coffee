@@ -25,11 +25,23 @@ class StageUI
     @stage.add(@object_layer)
     @object_layer.setZIndex(2)
 
+    @overlay_layer_visible = true
+
     @stage.on('mouseout', => @object_layer.draw())
     @stage.on('mousemove', ->
       if not ui.s.panning
         ui.update()
     )
+
+  toggle_segment_layer: ->
+    @overlay_layer_visible = !@overlay_layer_visible
+
+    if @overlay_layer_visible
+      @overlay_layer.show()
+    else
+      @overlay_layer.hide()
+
+    @overlay_layer
 
   add: (o, opacity=1.0, duration=0.4) ->
     @add_to_layer(o, @object_layer, opacity, duration)
