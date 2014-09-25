@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.core.files.images import ImageFile
 
 import json
@@ -66,22 +66,23 @@ class PersonSegmentation(ResultBase):
 
         # generate the segmentation image
         overlay_img = calc_pose_overlay_img(photo, scribbles)
-        with NamedTemporaryFile(prefix=u'segmentation_', suffix=u'.jpg') as f:
-            overlay_img.save(f, u"JPEG")
-            f.seek(0)
-            segmentation = ImageFile(f)
+        with transaction.atomic():
+            with NamedTemporaryFile(prefix=u'segmentation_', suffix=u'.jpg') as f:
+                overlay_img.save(f, u"JPEG")
+                f.seek(0)
+                segmentation = ImageFile(f)
 
-            new_obj, created = photo.scribbles.get_or_create(
-                user=user,
-                segmentation=segmentation,
-                mturk_assignment=mturk_assignment,
-                time_ms=recursive_sum(time_ms),
-                time_active_ms=recursive_sum(time_active_ms),
-                # (repr gives more float digits)
-                scribbles=json.dumps(scribbles),
-                num_scribbles=len(scribbles),
-                **kwargs
-            )
+                new_obj, created = photo.scribbles.get_or_create(
+                    user=user,
+                    segmentation=segmentation,
+                    mturk_assignment=mturk_assignment,
+                    time_ms=recursive_sum(time_ms),
+                    time_active_ms=recursive_sum(time_active_ms),
+                    # (repr gives more float digits)
+                    scribbles=json.dumps(scribbles),
+                    num_scribbles=len(scribbles),
+                    **kwargs
+                )
 
         if created:
             return {get_content_tuple(photo): [new_obj]}
