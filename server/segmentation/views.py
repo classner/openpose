@@ -51,9 +51,9 @@ def task(request):
 
         return json_success_response()
     else:
-        #response = external_task_browser_check(request)
-        #if response:
-            #return response
+        response = external_task_browser_check(request)
+        if response:
+            return response
 
         imgs = Photo.objects.filter(scribbles=None)
 

@@ -130,7 +130,7 @@ def external_task_browser_check(request):
         valid_browser = False
         if 'HTTP_USER_AGENT' in request.META:
             ua = user_agent_parser.Parse(request.META['HTTP_USER_AGENT'])
-            if ua['user_agent']['family'].lower() in ('firefox', 'chrome'):
+            if ua['user_agent']['family'].lower() in ('firefox', 'chrome', 'chromium'):
                 device = ua['device']
                 if 'is_mobile' not in device or not device['is_mobile']:
                     valid_browser = True
