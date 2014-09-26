@@ -21,7 +21,7 @@ from pose.models import ParsePose
 from mturk.views.external import external_task_browser_check
 from mturk.models import Experiment
 from accounts.models import UserProfile
-from common.utils import json_success_response, json_error_response
+from common.utils import json_success_response, json_error_response, html_error_response
 
 @login_required(login_url="/account/login")
 @ensure_csrf_cookie
@@ -38,7 +38,6 @@ def task(request):
 
         assert(len(results) == 1)
 
-        # for not really needed here...
         img_id = results.keys()[0]
 
         experiment, _ = Experiment.objects.get_or_create(slug=u'segment_person',
@@ -52,30 +51,37 @@ def task(request):
 
         return json_success_response()
     else:
-        response = external_task_browser_check(request)
-        if response:
-            return response
+        #response = external_task_browser_check(request)
+        #if response:
+            #return response
 
-        img = Photo.objects.filter(scribbles=None)[0]
+        imgs = Photo.objects.filter(scribbles=None)
 
-        # hard-coded example image:
-        context = {
-            # the current task
-            u'content': img,
+        if imgs:
+            # pick a random non annotated picture
+            img = imgs[np.random.randint(len(imgs))]
 
-            # if 'true', ask the user a feedback survey at the end and promise
-            # payment to complete it.  Must be 'true' or 'false'.
-            u'ask_for_feedback': 'false',
+            # hard-coded example image:
+            context = {
+                # the current task
+                u'content': img,
 
-            # feedback_bonus is the payment in dollars that we promise users
-            # for completing feedback
-            u'feedback_bonus': 0.02,
+                # if 'true', ask the user a feedback survey at the end and promise
+                # payment to complete it.  Must be 'true' or 'false'.
+                u'ask_for_feedback': 'false',
 
-            # template containing html for instructions
-            u'instructions': 'segmentation/experiments/segment_person_inst_content.html'
-        }
+                # feedback_bonus is the payment in dollars that we promise users
+                # for completing feedback
+                u'feedback_bonus': 0.02,
 
-    return render(request, u'segmentation/experiments/segment_person.html', context)
+                # template containing html for instructions
+                u'instructions': 'segmentation/experiments/segment_person_inst_content.html'
+            }
+
+            return render(request, u'segmentation/experiments/segment_person.html', context)
+        else:
+            return html_error_response(request,
+                    'All images are already segmented.')
 
 @ensure_csrf_cookie
 def segmentation(request):
