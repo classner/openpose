@@ -138,7 +138,7 @@ ADMINS = (
 TIME_ZONE = 'Europe/Berlin'
 
 # Locaion of files
-DATA_DIR = os.path.join(BASE_DIR, 'data')
+DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 
 # IP addresses that are allowed to access django-debug-toolbar.
 # If your debug server is not local, put your machine's IP here.
