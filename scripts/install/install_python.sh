@@ -106,16 +106,6 @@ git reset --hard fe5ba700f1adbb489c69af311558d64370d73d36
 python setup.py install
 cd "$REPO_DIR"
 
-# install a specific version of three.js since they don't seem to care about
-# backwards compatibility.  Almost every upgrade breaks something.
-echo ""
-echo "Downloading three.js"
-[[ -d opt/three.js ]] || git clone git://github.com/mrdoob/three.js.git opt/three.js
-cd opt/three.js
-git fetch --all
-git reset --hard r54
-cd "$REPO_DIR"
-
 # unfortunately, something downgrades our installation of celery, so we need to
 # re-upgrade it here (function defined above)
 _install_python_packages
