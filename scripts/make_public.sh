@@ -39,15 +39,11 @@ if [[ ! -f /etc/supervisor/conf.d/$PROJECT_NAME.conf ]]; then
 		$SRC_DIR/config/supervisor_template.conf \
 		> $REPO_DIR/_tmp.conf
 
-	sudo mv $REPO_DIR/_tmp.conf \
+	mv $REPO_DIR/_tmp.conf \
 		/etc/supervisor/conf.d/$PROJECT_NAME.conf
-
-	sudo supervisorctl reread
-	sudo supervisorctl update
 else
 	echo "gunicorn already set up"
 fi
-sudo supervisorctl start $PROJECT_NAME
 
 ##
 # logrotate
@@ -61,7 +57,7 @@ if [[ ! -f /etc/logrotate.d/nginx-$PROJECT_NAME ]]; then
 		$SRC_DIR/config/logrotate_template.conf \
 		> $REPO_DIR/_tmp.conf
 
-	sudo mv $REPO_DIR/_tmp.conf \
+	mv $REPO_DIR/_tmp.conf \
 		/etc/logrotate.d/nginx-$PROJECT_NAME
 fi
 
@@ -83,22 +79,21 @@ if [[ ! -f /etc/nginx/sites-available/$PROJECT_NAME ]]; then
 		$SRC_DIR/config/nginx_template.conf \
 		> $REPO_DIR/_tmp.conf
 
-	sudo mv $REPO_DIR/_tmp.conf \
+	mv $REPO_DIR/_tmp.conf \
 		/etc/nginx/sites-available/$PROJECT_NAME
 
 	# disable the default nginx site
-	sudo rm -f /etc/nginx/sites-enabled/default
+	rm -f /etc/nginx/sites-enabled/default
 fi
 
 if [[ ! -f /etc/nginx/sites-enabled/$PROJECT_NAME ]]; then
 	echo "Enabling nginx site..."
 
 	# activate our site
-	sudo ln -f -s \
+	ln -f -s \
 		/etc/nginx/sites-available/$PROJECT_NAME \
 		/etc/nginx/sites-enabled/$PROJECT_NAME
 else
 	echo "nginx already set up"
 fi
 
-sudo service nginx restart

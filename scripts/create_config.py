@@ -10,15 +10,23 @@ import glob
 import string
 import socket
 import readline
+import random
+
 
 # script directory
 DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_TEMPLATE = os.path.join(DIR, 'config_template.sh')
 CONFIG = os.path.join(DIR, 'config.sh')
 
+def random_string(n):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits)
+            for _ in range(n))
+
 # responses from user
 variables = {}
 
+# create some random passwords
+variables['DB_PASS'] = random_string(16)
 
 # tab autocomplete with file names
 def complete(text, state):
@@ -89,7 +97,7 @@ instead of use this script.
 
 prompt_var(
     'PROJECT_NAME',
-    default='opensurfaces',
+    default='openpose',
     regex=r'^[a-zA-Z_][a-zA-Z0-9_]*$',
     message='''
 Name for the project (used by scripts, database, S3, key prefixes, to refer to this project).
@@ -160,18 +168,8 @@ Location where backups are to be stored (i.e. snapshot dumps of the database)
 Note: $REPO_DIR refers to the repository directory.
 ''')
 
-prompt_var(
-    'DB_DIR',
-    default='',
-    message='''
-Optional -- non-default directory for database.  Leave blank to use the Ubuntu default.
-
-Common use case: you have an EC2 server with a small boot volume and a large
-EBS disk.  In that case, set this to a directory on the mounted EBS disk.
-''')
-
 # make sure paths are not local
-for f in 'BACKUP_DIR', 'DATA_DIR', 'DB_DIR':
+for f in 'BACKUP_DIR', 'DATA_DIR':
     if (variables[f] and
             not variables[f].startswith('/') and
             not variables[f].startswith('$REPO_DIR/')):
@@ -192,6 +190,20 @@ prompt_var(
     no_whitespace=False,
     message='''
 Your name (for emailing stack traces when the server crashes)
+''')
+
+prompt_var(
+    'DB_HOST',
+    default='db',
+    message='''
+Database Host
+''')
+
+prompt_var(
+    'DB_PORT',
+    default='5432',
+    message='''
+Database Port
 ''')
 
 # find default timezone from OS

@@ -12,7 +12,11 @@ source "$DIR/load_config.sh"
 
 echo ""
 echo "===================================================================="
-echo "This is a rather generic install script. Please, install necessary packages yourself."
-echo "This is meant for development only."
+echo "Now creating docker image."
+sudo docker build -t openpose .
 
+# exit message
+echo "$0: done!"
+echo ""
+echo "===================================================================="
 

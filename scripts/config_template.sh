@@ -59,9 +59,6 @@ REPO_DIR="$(readlink -f "$( builtin cd "$( dirname "$( readlink -f "${BASH_SOURC
 # Django source files.  Don't change this.
 SRC_DIR=$REPO_DIR/server
 
-# Virtualenv directory.  Don't change this.
-VENV_DIR=$REPO_DIR/venv
-
 # Location where local data is stored: (does not have to be inside the repository)
 #   $DATA_DIR/static: static assets such as js, css, and copies of the paper.
 #   $DATA_DIR/media: any locally saved images (currently everything is on S3)
@@ -90,6 +87,9 @@ PSQL_VERSION=9.1
 DB_CLUSTER=labelmaterial
 DB_NAME=labelmaterial
 DB_USER=labelmaterial
+DB_HOST=db
+DB_PORT=5432
+DB_PASS=password
 
 
 ######

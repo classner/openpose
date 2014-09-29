@@ -53,29 +53,19 @@ if [[ -z "$REPO_DIR" ]]; then
 	exit 1
 fi
 
-if [[ -z "$BACKUP_DIR" ]] || [[ -z "$DATA_DIR" ]] || [[ -z "$SRC_DIR" ]] || [[ -z "$VENV_DIR" ]]; then
+if [[ -z "$BACKUP_DIR" ]] || [[ -z "$DATA_DIR" ]] || [[ -z "$SRC_DIR" ]]; then
 	echo "Please configure directories in $DIR/config.sh"
 	echo "    BACKUP_DIR=$BACKUP_DIR"
 	echo "    DATA_DIR=$DATA_DIR"
-	echo "    VENV_DIR=$VENV_DIR"
 	echo "    SRC_DIR=$SRC_DIR"
 	exit 1
 fi
 
-if [[ "$BACKUP_DIR" != /* ]] || [[ "$DATA_DIR" != /* ]] || [[ "$SRC_DIR" != /* ]] || [[ "$VENV_DIR" != /* ]]; then
+if [[ "$BACKUP_DIR" != /* ]] || [[ "$DATA_DIR" != /* ]] || [[ "$SRC_DIR" != /* ]]; then
 	echo "Please configure directories in $DIR/config.sh -- they must be absolute paths (note that they can be constructed from variables that are absolute paths, such as REPO_DIR)"
 	echo "    BACKUP_DIR=$BACKUP_DIR"
 	echo "    DATA_DIR=$DATA_DIR"
-	echo "    VENV_DIR=$VENV_DIR"
 	echo "    SRC_DIR=$SRC_DIR"
-	exit 1
-fi
-
-if [[ "$VENV_DIR" != "$REPO_DIR/venv" ]]; then
-	echo "Error: VENV_DIR (in $DIR/config) should be"
-	echo "    VENV_DIR=\$REPO_DIR/venv"
-	echo "Currently, it is:"
-	echo "    VENV_DIR=$VENV_DIR"
 	exit 1
 fi
 
@@ -146,12 +136,6 @@ if [[ -z "$KERNEL_SHMMAX" ]] || [[ -z "$KERNEL_SHMALL" ]]; then
 	echo "    KERNEL_SHMMAX=$KERNEL_SHMMAX"
 	echo "    KERNEL_SHMALL=$KERNEL_SHMALL"
 	exit 1
-fi
-
-if [[ -f $VENV_DIR/bin/activate ]]; then
-	source $VENV_DIR/bin/activate
-else
-	echo "Note: virtualenv ($VENV_DIR) not yet created"
 fi
 
 echo "$0: loaded $DIR/config.sh"

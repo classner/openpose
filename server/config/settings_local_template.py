@@ -6,9 +6,6 @@
 ## IMPORTANT SETTINGS
 ##
 
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
 # If True, errors will be presented to the user in the browser, and all queries
 # will be stored in memory -- so don't leave the server running for too long
 # with DEBUG enabled.
@@ -131,14 +128,14 @@ S3_ENABLE_WRITE = False
 
 # Important to put a valid email
 ADMINS = (
-    ('mkiefel', 'mk@nopw.de'),
+    ('ADMIN_NAME', 'ADMIN_EMAIL'),
 )
 
 # Time zone choices: http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-TIME_ZONE = 'Europe/Berlin'
+TIME_ZONE = 'TIME_ZONE'
 
 # Locaion of files
-DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
+DATA_DIR = 'DATA_DIR'
 
 # IP addresses that are allowed to access django-debug-toolbar.
 # If your debug server is not local, put your machine's IP here.
@@ -151,12 +148,12 @@ INTERNAL_IPS = ('127.0.0.1',)
 SECRET_KEY = 'SECRET_KEY'
 DATABASES = {
     'default': {
-        'NAME': 'labelmaterial',
-        'USER': 'labelmaterial',
-        'PASSWORD': 'pose',
+        'NAME': 'DB_NAME',
+        'USER': 'DB_USER',
+        'PASSWORD': 'DB_PASS',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '',
-        'PORT': '',
+        'HOST': 'DB_HOST',
+        'PORT': 'DB_PORT',
         'CONN_MAX_AGE': 0 if DEBUG else 600,
 
     }
