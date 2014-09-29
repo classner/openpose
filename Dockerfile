@@ -52,3 +52,4 @@ RUN "${REPO_DIR}/scripts/install/install_server.sh"
 COPY scripts /home/appuser/scripts
 
 EXPOSE 80
+VOLUME ["/home/appuser/data/media"]
