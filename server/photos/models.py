@@ -94,16 +94,16 @@ class Photo(UserBase):
     }
 
     #: The photograph resized to fit inside the rectangle 200 x 400
-    image_200 = ImageSpecField([ResizeToFit(200, 2 * 200)], **_THUMB_OPTS)
+    image_200 = ImageSpecField([ResizeToFit(200, 2 * 200, True)], **_THUMB_OPTS)
     #: The photograph resized to fit inside the rectangle 300 x 600
-    image_300 = ImageSpecField([ResizeToFit(300, 2 * 300)], **_THUMB_OPTS)
+    image_300 = ImageSpecField([ResizeToFit(300, 2 * 300, True)], **_THUMB_OPTS)
 
     #: The photograph resized to fit inside the rectangle 512 x 1024
-    image_512 = ImageSpecField([ResizeToFit(512, 2 * 512)], **_THUMB_OPTS)
+    image_512 = ImageSpecField([ResizeToFit(512, 2 * 512, True)], **_THUMB_OPTS)
     #: The photograph resized to fit inside the rectangle 1024 x 2048
-    image_1024 = ImageSpecField([ResizeToFit(1024, 2 * 1024)], **_THUMB_OPTS)
+    image_1024 = ImageSpecField([ResizeToFit(1024, 2 * 1024, True)], **_THUMB_OPTS)
     #: The photograph resized to fit inside the rectangle 2048 x 4096
-    image_2048 = ImageSpecField([ResizeToFit(2048, 2 * 2048)], **_THUMB_OPTS)
+    image_2048 = ImageSpecField([ResizeToFit(2048, 2 * 2048, True)], **_THUMB_OPTS)
 
     #: The photograph cropped (and resized) to fit inside the square 300 x 300
     image_square_300 = ImageSpecField([SmartResize(300, 300)], **_THUMB_OPTS)
