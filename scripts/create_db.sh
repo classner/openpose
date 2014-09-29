@@ -12,10 +12,4 @@ cd "$REPO_DIR"
 
 set -e
 
-CID=$(sudo docker run --name openpose-data -d postgres)
-sleep 3
-
-IP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' "${CID}")
-PORT=$(sudo docker inspect --format '{{ .Config.ExposedPorts }}' openpose-data | sed 's#^[^[:digit:]]*\([[:digit:]]*\)/tcp.*$#\1#')
-echo "CREATE USER \"${DB_USER}\" WITH LOGIN PASSWORD '${DB_PASS}'" | psql -U postgres -h "${IP}" -p "${PORT}" -U postgres
-createdb -U postgres -h "${IP}" -p "${PORT}" -U postgres --owner=labelmaterial --encoding=UTF8 labelmaterial
+sudo docker run --name openpose-data -v ${REPO_DIR}/db:/var/lib/postgresql/data -d postgres
