@@ -32,6 +32,9 @@ COPY scripts/install/install_memcached.sh /home/appuser/scripts/install/install_
 RUN "${REPO_DIR}/scripts/install/install_memcached.sh"
 
 COPY server /home/appuser/server
+# configure django
+COPY scripts/install/install_server.sh /home/appuser/scripts/install/install_server.sh
+RUN "${REPO_DIR}/scripts/install/install_server.sh"
 
 # create and fix dirs
 COPY scripts/install/install_dirs.sh /home/appuser/scripts/install/install_dirs.sh
@@ -43,10 +46,6 @@ COPY scripts/install/install_nginx.sh /home/appuser/scripts/install/install_ngin
 COPY scripts/make_public.sh /home/appuser/scripts/make_public.sh
 COPY scripts/collect_static.sh /home/appuser/scripts/collect_static.sh
 RUN "${REPO_DIR}/scripts/install/install_nginx.sh"
-
-# configure django
-COPY scripts/install/install_server.sh /home/appuser/scripts/install/install_server.sh
-RUN "${REPO_DIR}/scripts/install/install_server.sh"
 
 # copy the rest of the scripts
 COPY scripts /home/appuser/scripts
