@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This script sets up directories and fixes permissions
+# This script runs everything.
 #
 
 # find the scripts directory
