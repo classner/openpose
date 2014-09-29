@@ -13,6 +13,7 @@ libboost-thread-dev
 libeigen3-dev
 libfftw3-dev
 libfreetype6-dev
+libjpeg-dev
 liblcms
 liblcms-dev
 liblcms-utils
