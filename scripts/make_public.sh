@@ -96,4 +96,3 @@ if [[ ! -f /etc/nginx/sites-enabled/$PROJECT_NAME ]]; then
 else
 	echo "nginx already set up"
 fi
-
