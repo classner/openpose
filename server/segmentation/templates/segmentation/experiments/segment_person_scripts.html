@@ -6,6 +6,11 @@
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/geom.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/actions.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/active_timer.coffee"></script>
+<script>
+window.get_segmentation_url = function() {
+  return "{% url 'segmentation.segmentation' %}";
+}
+</script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/actions.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/controller_state.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/controller_ui.coffee"></script>

@@ -5,7 +5,7 @@ urlpatterns = patterns(
     '',
 
     url(r'^task/segmentation$',
-        segmentation, name='segmentation'),
+        segmentation, name='segmentation.segmentation'),
 
     url(r'^task$',
         task, name='task'),

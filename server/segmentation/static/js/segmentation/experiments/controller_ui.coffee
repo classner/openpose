@@ -91,7 +91,7 @@ class ControllerUI
   request_new_segmentation_overlay: =>
     @s.segmentation_overlay_request = $.ajax(
       type: "POST"
-      url: window.location.href + "/segmentation"
+      url: window.get_segmentation_url()
       contentType: "application/x-www-form-urlencoded; charset=UTF-8"
       dataType: "text"
       data: @s.get_submit_data()
