@@ -25,7 +25,7 @@ def configure_experiments():
         version=3,  # 2: intrinsic images, 1: original opensurfaces
         reward=Decimal('0.02'),
         num_outputs_max=1,
-        contents_per_hit=50,
+        contents_per_hit=1,
         content_type_model=Photo,
         out_content_type_model=PersonSegmentation,
         out_content_attr='photo',
