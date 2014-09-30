@@ -81,7 +81,6 @@ class PersonSegmentation(ResultBase):
                     # (repr gives more float digits)
                     scribbles=json.dumps(scribbles),
                     num_scribbles=len(scribbles),
-                    **kwargs
                 )
 
         if created:
