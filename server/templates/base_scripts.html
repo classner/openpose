@@ -8,6 +8,26 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-combobox.js"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/hacks.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/modals.coffee"></script>
+<script>
+window.get_account_logout_url = function () {
+  return "{% url 'account_logout' %}";
+};
+window.get_account_login_ajax_url = function () {
+  return "{% url 'account_login_ajax' %}";
+};
+window.get_account_login_url = function () {
+  return "{% url 'account_login' %}";
+};
+window.get_account_signup_ajax_url = function () {
+  return "{% url 'account_signup_ajax' %}";
+};
+window.get_account_signup_url = function () {
+  return "{% url 'account_signup' %}";
+};
+window.get_home_url = function () {
+  return "{% url 'home' %}";
+};
+</script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/login.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/scroll.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/ui_events.coffee"></script>

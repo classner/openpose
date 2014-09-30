@@ -3,7 +3,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 # urls
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, include, url, include
 from accounts.views import SignupView, SignupViewAjax, LoginView, LoginViewAjax
 urlpatterns = patterns(
     '',
@@ -22,11 +22,15 @@ urlpatterns = patterns(
     url(r'^account/login/$', LoginView.as_view(), name='account_login'),
     url(r'^account/signup-ajax/$', SignupViewAjax.as_view(), name='account_signup_ajax'),
     url(r'^account/login-ajax/$', LoginViewAjax.as_view(), name='account_login_ajax'),
-    url(r'^account/', include('account.urls')),
+    url(r'^account/', include('account.urls'), name='account'),
 
     # captcha
     url(r'^captcha/', include('captcha.urls')),
 )
+
+urlpatterns = patterns('',
+        url(r'^app1/', include(urlpatterns)),
+        )
 
 # media files
 from django.conf.urls.static import static

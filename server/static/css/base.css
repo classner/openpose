@@ -4869,19 +4869,19 @@ table.table thead .sorting_desc_disabled {
   *cursor: hand;
 }
 table.table thead .sorting {
-  background: url('/static/img/sort_both.png') no-repeat center right;
+  background: url('{{ STATIC_URL }}img/sort_both.png') no-repeat center right;
 }
 table.table thead .sorting_asc {
-  background: url('/static/img/sort_asc.png') no-repeat center right;
+  background: url('{{ STATIC_URL }}img/sort_asc.png') no-repeat center right;
 }
 table.table thead .sorting_desc {
-  background: url('/static/img/sort_desc.png') no-repeat center right;
+  background: url('{{ STATIC_URL }}img/sort_desc.png') no-repeat center right;
 }
 table.table thead .sorting_asc_disabled {
-  background: url('/static/img/sort_asc_disabled.png') no-repeat center right;
+  background: url('{{ STATIC_URL }}img/sort_asc_disabled.png') no-repeat center right;
 }
 table.table thead .sorting_desc_disabled {
-  background: url('/static/img/sort_desc_disabled.png') no-repeat center right;
+  background: url('{{ STATIC_URL }}img/sort_desc_disabled.png') no-repeat center right;
 }
 table.dataTable th:active {
   outline: none;
@@ -6675,7 +6675,7 @@ a.menu:after,
 }
 /* grunge on navbar */
 /*.navbar::after {*/
-/*.pattern-overlay('/static/img/dust.png', .5)*/
+/*.pattern-overlay('{{ STATIC_URL }}img/dust.png', .5)*/
 /*}*/
 /*.navbar-inner > .container {*/
 /*position: relative;*/
@@ -6760,7 +6760,7 @@ a.menu:after,
   right: 0;
   bottom: 0;
   left: 0;
-  background: url('/static/img/wild_oliva.png') repeat center center;
+  background: url('{{ STATIC_URL }}img/wild_oliva.png') repeat center center;
   opacity: 0.8;
 }
 .jumbotron-gradient {

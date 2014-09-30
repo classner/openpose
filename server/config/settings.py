@@ -15,6 +15,9 @@ LANGUAGE_CODE = 'en-us'
 
 # allowed languages for an account
 ACCOUNT_LANGUAGES = (('en-us', 'English'),)
+ACCOUNT_SIGNUP_REDIRECT_URL = APP_URL
+ACCOUNT_LOGIN_REDIRECT_URL = APP_URL
+ACCOUNT_LOGOUT_REDIRECT_URL = APP_URL
 
 SITE_ID = 1
 
@@ -47,7 +50,7 @@ MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # temporary hack-fix for django-admin-tools
-ADMIN_MEDIA_PREFIX = '/static/admin/'
+ADMIN_MEDIA_PREFIX = APP_URL + 'static/admin/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -61,7 +64,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # NOTE: In a few places, this is hard-coded.  So you should search through the
 # entire codebase for accidental uses of '/static/' if you ever want to change
 # this.
-STATIC_URL = '/static/'
+STATIC_URL = APP_URL + 'static/'
 
 # HTTPS / SSL
 #if ENABLE_SSL:

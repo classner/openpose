@@ -1,10 +1,10 @@
 $ ->
 
   $("#nav-logout").on("click", ->
-    $.ajax("/account/logout/",
+    $.ajax(window.get_account_logout_url(),
       type: "POST"
       success: ->
-        window.location = "/"
+        window.location = window.get_home_url()
       error: ->
         window.hide_modal_loading()
         window.show_modal_error("Could not contact server.")
@@ -17,16 +17,16 @@ $ ->
 
   setup_login_form(
     selector: "#nav-login"
-    url: "/account/login-ajax/"
-    url_fallback: "/account/login/"
+    url: window.get_account_login_ajax_url()
+    url_fallback: window.get_account_login_url()
     label: "Log in"
     yes_text: "Log in"
   )
 
   setup_login_form(
     selector: "#nav-signup"
-    url: "/account/signup-ajax/"
-    url_fallback: "/account/signup/"
+    url: window.get_account_signup_ajax_url()
+    url_fallback: window.get_account_signup_url()
     label: "Create a new account"
     yes_text: "Sign up"
   )
