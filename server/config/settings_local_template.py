@@ -24,6 +24,9 @@ ENABLE_SSL = False
 # you still need to run ./scripts/files_changed.py
 ENABLE_CACHING = True
 
+# URL under which the application will run
+APP_URL = 'APP_URL'
+
 # Middlewhere caching: cache all pages for anonymous users (not signed in).
 CACHE_MIDDLEWARE_ENABLE = ENABLE_CACHING
 # Amount of time to cache pages for users who are not logged in

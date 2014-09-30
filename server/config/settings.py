@@ -19,6 +19,9 @@ ACCOUNT_SIGNUP_REDIRECT_URL = APP_URL
 ACCOUNT_LOGIN_REDIRECT_URL = APP_URL
 ACCOUNT_LOGOUT_REDIRECT_URL = APP_URL
 
+# tempory hack
+LOGIN_URL = APP_URL + "account/login"
+
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
@@ -47,7 +50,7 @@ MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = APP_URL + 'media/'
 
 # temporary hack-fix for django-admin-tools
 ADMIN_MEDIA_PREFIX = APP_URL + 'static/admin/'
@@ -65,6 +68,9 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # entire codebase for accidental uses of '/static/' if you ever want to change
 # this.
 STATIC_URL = APP_URL + 'static/'
+
+# force all script urls be relative to this URL
+FORCE_SCRIPT_NAME = APP_URL
 
 # HTTPS / SSL
 #if ENABLE_SSL:

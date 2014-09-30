@@ -27,6 +27,7 @@ sed -e "s|'ADMIN_NAME'|'$ADMIN_NAME'|g" \
 	-e "s|'SERVER_IP'|'$SERVER_IP'|g" \
 	-e "s|'TIME_ZONE'|'$TIME_ZONE'|g" \
 	-e "s|'SECRET_KEY'|'$SECRET_KEY'|g" \
+	-e "s|'APP_URL'|'$APP_URL'|g" \
 	$SRC_DIR/config/settings_local_template.py > \
 	$SRC_DIR/config/settings_local.py
 

@@ -206,6 +206,13 @@ prompt_var(
 Database Port
 ''')
 
+prompt_var(
+    'APP_URL',
+    default='/',
+    message='''
+    URL under which the app will be hosted.
+''')
+
 # find default timezone from OS
 if os.path.exists('/etc/timezone'):
     default_timezone = open('/etc/timezone').read().strip()

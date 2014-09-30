@@ -23,7 +23,7 @@ from mturk.models import Experiment
 from accounts.models import UserProfile
 from common.utils import json_success_response, json_error_response, html_error_response
 
-@login_required(login_url="/account/login")
+@login_required()
 @ensure_csrf_cookie
 def task(request):
     # replace this with a fetch from your database

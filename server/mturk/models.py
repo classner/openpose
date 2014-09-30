@@ -235,7 +235,8 @@ class Experiment(MtModelBase):
             # use raw IP for faster page loads -- a fresh DNS lookup can take
             # as long as 6s in India for some DNS servers
             base_url = 'http://' % settings.SERVER_IP
-        return base_url + reverse('mturk-external-task', args=(self.id,))
+        return base_url + settings.APP_URL + reverse('mturk-external-task',
+                args=(self.id,))
 
     def content_priority(self, obj):
         """ Returns the priority to assign to object obj """
