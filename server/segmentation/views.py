@@ -21,11 +21,12 @@ from pose.models import ParsePose
 from mturk.views.external import external_task_browser_check
 from mturk.models import Experiment
 from accounts.models import UserProfile
-from common.utils import json_success_response, json_error_response, html_error_response
+from common.utils import json_success_response, json_error_response, \
+        html_error_response, dict_union
 
 @login_required()
 @ensure_csrf_cookie
-def task(request):
+def task(request, dataset_id='all'):
     # replace this with a fetch from your database
     if request.method == 'POST':
         data = request.REQUEST
@@ -55,7 +56,18 @@ def task(request):
         if response:
             return response
 
-        imgs = Photo.objects.filter(scribbles=None)
+        photo_filter = {
+                'scribbles': None,
+                }
+
+        if dataset_id != 'all':
+            dataset_id = int(dataset_id)
+
+            photo_filter = dict_union(photo_filter, {
+                'dataset_id': dataset_id
+                })
+
+        imgs = Photo.objects.filter(**photo_filter)
 
         if imgs:
             # pick a random non annotated picture
