@@ -374,7 +374,7 @@ def admin_submission(request, experiment_slug='all', filter_key='all',
     if request.method == 'POST':
         # admin clicked a button in the UI
         try:
-            action = request.POST.get['action']
+            action = request.POST.get('action')
             assignment = MtAssignment.objects.get(
                 id=request.POST['assignment_id'])
             if action == 'approve':
