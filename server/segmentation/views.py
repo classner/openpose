@@ -71,12 +71,14 @@ def task(request, dataset_id='all'):
 
         if imgs:
             # pick a random non annotated picture
-            img = imgs[np.random.randint(len(imgs))]
+            contents = [imgs[np.random.randint(len(imgs))]]
 
-            # hard-coded example image:
             context = {
                 # the current task
-                u'content': img,
+                u'contents_json': json.dumps(
+                    [c.get_entry_dict() for c in contents]),
+                u'content_id_json': json.dumps(
+                    [{'id': c.id} for c in contents]),
 
                 # if 'true', ask the user a feedback survey at the end and promise
                 # payment to complete it.  Must be 'true' or 'false'.

@@ -22,7 +22,7 @@ def configure_experiments():
         slug='segment_person',
         template_dir='segmentation/experiments',
         module='segmentation.experiments',
-        version=3,  # 2: intrinsic images, 1: original opensurfaces
+        version=2,  # 2: intrinsic images, 1: original opensurfaces
         reward=Decimal('0.02'),
         num_outputs_max=1,
         contents_per_hit=1,

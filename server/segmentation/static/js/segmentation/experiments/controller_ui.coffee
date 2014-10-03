@@ -1,8 +1,10 @@
 # Main control logic for the UI.  Actions in this class delegate through
 # undo/redo and check whether something is feasible.
 class ControllerUI
-  constructor: (args) ->
-    @s = new ControllerState(@, args)
+  constructor: (contents, args) ->
+    content = contents[0]
+
+    @s = new ControllerState(@, content, args)
 
     # disable right click
     $(document).on('contextmenu', (e) =>
@@ -67,7 +69,7 @@ class ControllerUI
     @num_failed_closes = 0
 
     # init photo
-    if args.photo_url? then @set_photo(args.photo_url)
+    if content?.image?['2048']? then @set_photo(content?.image?['2048'])
 
   get_submit_data: =>
     @s.get_submit_data()

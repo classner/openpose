@@ -7,11 +7,11 @@ Mode =
 # Holds UI state; when something is modified, any dirty items are returned.
 # an instance of this is held by ControllerUI
 class ControllerState
-  constructor: (@ui, args) ->
+  constructor: (@ui, content, args) ->
     @loading = true
 
     # save id for get_submit_data
-    @photo_id = args.photo_id if args.photo_id?
+    @photo_id = content.id if content.id?
 
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)

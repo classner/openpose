@@ -1,9 +1,11 @@
 $( ->
-  template_args.width = $('#mt-container').width() - 4
-  template_args.height = $(window).height() - $('#mt-top-nohover').height() - 16
-  template_args.container_id = 'mt-container'
-  $('#poly-container').width(template_args.width).height(template_args.height)
-  window.controller_ui = new ControllerUI(template_args)
+  args = {
+    'width': $('#mt-container').width() - 4
+    'height': $(window).height() - $('#mt-top-nohover').height() - 16
+    'container_id': 'mt-container'
+  }
+
+  window.controller_ui = new ControllerUI(window.mt_contents, args)
 )
 
 btn_submit = ->

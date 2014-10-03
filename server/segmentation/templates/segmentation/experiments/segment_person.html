@@ -30,13 +30,8 @@
 
 {% block scripts %}{{ block.super }}
 
+{% include "mturk/content_json_script.html" %}
 {% include "segmentation/experiments/segment_person_scripts.html" %}
-<script type="text/javascript">
-window.template_args = {
-	photo_url: '{{ content.image_2048.url }}',
-	photo_id: {{ content.id }},
-};
-</script>
 
 {# note: common/util.coffee is already included in poly/scripts.html #}
 {% compress js %}
