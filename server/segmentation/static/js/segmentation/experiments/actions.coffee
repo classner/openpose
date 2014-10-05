@@ -75,12 +75,12 @@ class UECreateScribble extends UndoableEvent
     # request
     ui.s.segmentation_overlay_request.abort() if ui.segmentation_overlay_request?
 
-    if ui.segmentation_overlay_url?
-      @old_overlay_url = ui.segmentation_overlay_url
+    if ui.s.segmentation_overlay_url?
+      @old_overlay_url = ui.s.segmentation_overlay_url
     else
       @old_overlay_url = null
 
-    ui.request_new_segmentation_overlay()
+    ui.s.request_new_segmentation_overlay()
 
   undo: (ui) ->
     [..., scribble_ui] = ui.s.closed_scribbles
@@ -91,7 +91,7 @@ class UECreateScribble extends UndoableEvent
     @time_active_ms = scribble_ui.time_active_ms
     ui.s.remove_scribble()
 
-    @overlay_url = ui.segmentation_overlay_url
+    @overlay_url = ui.s.segmentation_overlay_url
     ui.set_segmentation_overlay(@old_overlay_url)
   redo: (ui) ->
     ui.s.insert_scribble(@points, @is_foreground, @id, @time_ms, @time_active_ms)?.update(ui)

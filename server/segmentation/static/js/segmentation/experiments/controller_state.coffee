@@ -7,11 +7,10 @@ Mode =
 # Holds UI state; when something is modified, any dirty items are returned.
 # an instance of this is held by ControllerUI
 class ControllerState
-  constructor: (@ui, content, args) ->
+  constructor: (@ui, @contents, @args) ->
     @loading = true
 
-    # save id for get_submit_data
-    @photo_id = content.id if content.id?
+    @content_index = 0
 
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
@@ -45,8 +44,11 @@ class ControllerState
     @btn_delete = if args.btn_delete? then args.btn_delete else '#btn-delete'
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
+    @init()
+
+  init: ->
     # gui elements
-    @stage_ui = new StageUI(ui, args)
+    @stage_ui = new StageUI(@ui, @args)
     @closed_polys = []  # PolygonUI elements
     @closed_scribbles = [] # ScribbleUI elements
 
@@ -55,6 +57,45 @@ class ControllerState
     @open_scribble = null
 
     @saved_point = null  # start of drag
+
+    if @contents[@content_index]?.image?['2048']?
+      url = @contents[@content_index].image['2048']
+
+      @set_photo(url)
+
+  set_segmentation_overlay: (url) =>
+    @stage_ui.set_segmentation_overlay(url, @, =>
+      @segmentation_overlay_url = url
+      console.log "loaded background"
+    )
+
+  request_new_segmentation_overlay: =>
+    @segmentation_overlay_request.abort() if @segmentation_overlay_request?
+
+    @segmentation_overlay_request = $.ajax(
+      type: "POST"
+      url: window.get_segmentation_url()
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
+      dataType: "text"
+      data: @get_submit_data()
+      success: (data, status, jqxhr) =>
+        overlay_url = "data:image/jpeg;base64," + data
+        @set_segmentation_overlay(overlay_url)
+      error: (jqxhr, status, error) ->
+        console.log status
+      complete: =>
+        @segmentation_overlay_request = null
+    )
+
+  set_photo: (photo_url) =>
+    @disable_buttons()
+    @loading = true
+    @stage_ui.set_photo(photo_url, @, =>
+      console.log "loaded photo_url: #{photo_url}"
+      @loading = false
+      @update_buttons()
+      @request_new_segmentation_overlay()
+    )
 
   # return data that will be submitted
   get_submit_data: =>
@@ -88,15 +129,16 @@ class ControllerState
     results = {}
     time_ms = {}
     time_active_ms = {}
-    results[@photo_id] = {}
-    results[@photo_id].poly = poly_list
-    results[@photo_id].scribbles = scribble_list
-    time_ms[@photo_id] = {}
-    time_ms[@photo_id].poly = (p.time_ms for p in @closed_polys)
-    time_ms[@photo_id].scribbles = (s.time_ms for s in @closed_scribbles)
-    time_active_ms[@photo_id] = {}
-    time_active_ms[@photo_id].poly = (p.time_active_ms for p in @closed_polys)
-    time_active_ms[@photo_id].scribbles = (s.time_active_ms for s in @closed_scribbles)
+    photo_id = @contents[@content_index].id
+    results[photo_id] = {}
+    results[photo_id].poly = poly_list
+    results[photo_id].scribbles = scribble_list
+    time_ms[photo_id] = {}
+    time_ms[photo_id].poly = (p.time_ms for p in @closed_polys)
+    time_ms[photo_id].scribbles = (s.time_ms for s in @closed_scribbles)
+    time_active_ms[photo_id] = {}
+    time_active_ms[photo_id].poly = (p.time_active_ms for p in @closed_polys)
+    time_active_ms[photo_id].scribbles = (s.time_active_ms for s in @closed_scribbles)
 
     version: '1.0'
     results: JSON.stringify(results)

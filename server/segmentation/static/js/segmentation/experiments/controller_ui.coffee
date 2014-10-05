@@ -2,9 +2,7 @@
 # undo/redo and check whether something is feasible.
 class ControllerUI
   constructor: (contents, args) ->
-    content = contents[0]
-
-    @s = new ControllerState(@, content, args)
+    @s = new ControllerState(@, contents, args)
 
     # disable right click
     $(document).on('contextmenu', (e) =>
@@ -68,43 +66,8 @@ class ControllerUI
     # popup explaining the problem
     @num_failed_closes = 0
 
-    # init photo
-    if content?.image?['2048']? then @set_photo(content?.image?['2048'])
-
   get_submit_data: =>
     @s.get_submit_data()
-
-  set_photo: (photo_url) =>
-    @s.disable_buttons()
-    @s.loading = true
-    @s.stage_ui.set_photo(photo_url, @, =>
-      console.log "loaded photo_url: #{photo_url}"
-      @s.loading = false
-      @s.update_buttons()
-      @request_new_segmentation_overlay()
-    )
-
-  set_segmentation_overlay: (url) =>
-    @s.stage_ui.set_segmentation_overlay(url, @, =>
-      @segmentation_overlay_url = url
-      console.log "loaded background"
-    )
-
-  request_new_segmentation_overlay: =>
-    @s.segmentation_overlay_request = $.ajax(
-      type: "POST"
-      url: window.get_segmentation_url()
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
-      dataType: "text"
-      data: @s.get_submit_data()
-      success: (data, status, jqxhr) =>
-        @overlay_url = "data:image/jpeg;base64," + data
-        @set_segmentation_overlay(@overlay_url)
-      error: (jqxhr, status, error) ->
-        console.log status
-      complete: =>
-        @s.segmentation_overlay_request = null
-    )
 
   keydown: (e) =>
     if @s.modal_count > 0 then return true
