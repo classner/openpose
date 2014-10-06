@@ -1,37 +1,18 @@
-# Wrapper for Kinetic.Stae
-class StageUI
-  constructor: (ui, args) ->
-    # maximum possible size
-    @bbox = {width: args.width, height: args.height}
-    # actual size
-    @size = {width: args.width, height: args.height}
-
-    # zoom information
-    @origin = {x: 0, y: 0}
-    @zoom_exp = 0
-    @zoom_exp_max = 7
-
-    @stage = new Kinetic.Stage(
-      container: args.container_id,
-      width: @size.width,
-      height: @size.height)
+class StageUIGroup
+  constructor: (@stage_ui) ->
     @photo_layer = new Kinetic.Layer()
-    @stage.add(@photo_layer)
+    @stage_ui.add_to_stage(@photo_layer)
     @photo_layer.setZIndex(0)
     @overlay_layer = new Kinetic.Layer()
-    @stage.add(@overlay_layer)
+    @stage_ui.add_to_stage(@overlay_layer)
     @overlay_layer.setZIndex(1)
     @object_layer = new Kinetic.Layer()
-    @stage.add(@object_layer)
+    @stage_ui.add_to_stage(@object_layer)
     @object_layer.setZIndex(2)
 
     @overlay_layer_visible = true
 
-    @stage.on('mouseout', => @object_layer.draw())
-    @stage.on('mousemove', ->
-      if not ui.s.panning
-        ui.update()
-    )
+    @size = @stage_ui.size
 
   toggle_segment_layer: ->
     @overlay_layer_visible = !@overlay_layer_visible
@@ -66,10 +47,122 @@ class StageUI
     else
       o.remove()
 
+  hide: ->
+    @photo_layer.hide()
+    @overlay_layer.hide()
+    @object_layer.hide()
+
+  show: ->
+    @photo_layer.show()
+    @overlay_layer.show()
+    @object_layer.show()
+
   draw: ->
     @photo_layer.draw()
     @overlay_layer.draw()
     @object_layer.draw()
+
+  error_line: (p1, p2) ->
+    el = new Kinetic.Line(
+      points: [clone_pt(p1), clone_pt(p2)], opacity: 0.5,
+      stroke: "#F00", strokeWidth: 10 / @get_zoom_factor(),
+      lineCap: "round")
+    @object_layer.add(el)
+    @remove(el)
+
+  add_loading: -> if not @k_loading?
+    @k_loading = new Kinetic.Text(
+      x: 30, y: 30, text: "Loading...", align: "left",
+      fontSize: 32, fontFamily: "Helvetica,Verdana,Ariel",
+      textFill: "#000")
+    @add(@k_loading)
+    @draw()
+
+  remove_loading: -> if @k_loading?
+    @remove(@k_loading)
+    @k_loading = null
+    @draw()
+
+  set_segmentation_overlay: (overlay_url, ui, on_load) ->
+    if overlay_url?
+      overlay_obj = new Image()
+      overlay_obj.onload = =>
+        if @overlay?
+          @overlay.setImage(overlay_obj)
+        else
+          @overlay = new Kinetic.Image(
+            x:0, y: 0, image: overlay_obj,
+            width: @size.width, height: @size.height)
+          @add_to_layer(@overlay, @overlay_layer, 0.5)
+          @overlay.on('mousedown', ->
+            if not ui.s.panning
+              ui.unselect_poly()
+          )
+        @draw()
+        on_load?()
+
+      overlay_obj.src = overlay_url;
+    else
+      if @overlay?
+        @remove(@overlay)
+        @overlay = null
+
+  set_photo: (photo_url, ui, on_load) ->
+    @add_loading()
+    @photo_obj = new Image()
+    @photo_obj.src = photo_url
+    @photo_obj.onload = do() => =>
+      @remove_loading()
+      @size = compute_dimensions(@photo_obj, @stage_ui.bbox)
+      #@stage.setWidth(@size.width)
+      #@stage.setHeight(@size.height)
+      @photo = new Kinetic.Image(
+        x: 0, y: 0, image: @photo_obj,
+        width: @size.width, height:@size.height)
+      @photo_layer.add(@photo)
+      @ready = true
+      @photo.on('mousedown', ->
+        if not ui.s.panning
+          ui.unselect_poly()
+      )
+      @draw()
+      on_load?()
+
+  mouse_pos: ->
+    p = @stage_ui.mouse_pos()
+
+    if not p?
+      return p
+    else
+      x: Math.min(p.x, @size.width)
+      y: Math.min(p.y, @size.height)
+
+# Wrapper for Kinetic.Stae
+class StageUI
+  constructor: (ui, args) ->
+    # maximum possible size
+    @bbox = {width: args.width, height: args.height}
+    # actual size
+    @size = {width: args.width, height: args.height}
+
+    # zoom information
+    @origin = {x: 0, y: 0}
+    @zoom_exp = 0
+    @zoom_exp_max = 7
+
+    @stage = new Kinetic.Stage(
+      container: args.container_id,
+      width: @size.width,
+      height: @size.height)
+
+    #@stage.on('mouseout', => @object_layer.draw())
+    @stage.on('mousemove', ->
+      if not ui.s.panning
+        ui.update()
+    )
+
+  add_to_stage: (o) ->
+    @stage.add(o)
 
   mouse_pos: ->
     p = @stage.getMousePosition()
@@ -163,68 +256,3 @@ class StageUI
       if delta.x != 0 or delta.y != 0
         @translate_delta(delta.x, delta.y)
 
-  error_line: (p1, p2) ->
-    el = new Kinetic.Line(
-      points: [clone_pt(p1), clone_pt(p2)], opacity: 0.5,
-      stroke: "#F00", strokeWidth: 10 / @get_zoom_factor(),
-      lineCap: "round")
-    @object_layer.add(el)
-    @remove(el)
-
-  add_loading: -> if not @k_loading?
-    @k_loading = new Kinetic.Text(
-      x: 30, y: 30, text: "Loading...", align: "left",
-      fontSize: 32, fontFamily: "Helvetica,Verdana,Ariel",
-      textFill: "#000")
-    @add(@k_loading)
-    @draw()
-
-  remove_loading: -> if @k_loading?
-    @remove(@k_loading)
-    @k_loading = null
-    @draw()
-
-  set_segmentation_overlay: (overlay_url, ui, on_load) ->
-    if overlay_url?
-      overlay_obj = new Image()
-      overlay_obj.onload = =>
-        if @overlay?
-          @overlay.setImage(overlay_obj)
-        else
-          @overlay = new Kinetic.Image(
-            x:0, y: 0, image: overlay_obj,
-            width: @size.width, height: @size.height)
-          @add_to_layer(@overlay, @overlay_layer, 0.5)
-          @overlay.on('mousedown', ->
-            if not ui.s.panning
-              ui.unselect_poly()
-          )
-        @draw()
-        on_load?()
-
-      overlay_obj.src = overlay_url;
-    else
-      if @overlay?
-        @remove(@overlay)
-        @overlay = null
-
-  set_photo: (photo_url, ui, on_load) ->
-    @add_loading()
-    @photo_obj = new Image()
-    @photo_obj.src = photo_url
-    @photo_obj.onload = do() => =>
-      @remove_loading()
-      @size = compute_dimensions(@photo_obj, @bbox)
-      #@stage.setWidth(@size.width)
-      #@stage.setHeight(@size.height)
-      @photo = new Kinetic.Image(
-        x: 0, y: 0, image: @photo_obj,
-        width: @size.width, height:@size.height)
-      @photo_layer.add(@photo)
-      @ready = true
-      @photo.on('mousedown', ->
-        if not ui.s.panning
-          ui.unselect_poly()
-      )
-      @draw()
-      on_load?()

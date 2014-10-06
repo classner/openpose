@@ -1,6 +1,6 @@
 # UI for one scribble
 class ScribbleUI
-  constructor: (@id, @scribble, @stage) ->
+  constructor: (@id, @scribble, @stage, @stage_group) ->
     @line = null
 
     @stroke_scale = 1.0 / @stage.get_zoom_factor()
@@ -8,7 +8,7 @@ class ScribbleUI
   update: (ui, redraw=true) ->
     @add_line()
     if redraw
-      @stage.draw()
+      @stage_group.draw()
 
   add_line: ->
     if @line?
@@ -20,11 +20,11 @@ class ScribbleUI
       @line = new Kinetic.Line(
         points: @scribble.points, opacity: 0, stroke: color,
         strokeWidth: 3 * @stroke_scale, lineJoin: "round")
-      @stage.add(@line, 0.5)
+      @stage_group.add(@line, 0.5)
 
   remove_all: -> @remove_line()
 
-  remove_line: -> @stage.remove(@line); @line = null
+  remove_line: -> @stage_group.remove(@line); @line = null
 
   # update stroke scale
   update_zoom: (ui, inv_zoom_factor, redraw=true) ->

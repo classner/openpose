@@ -40,44 +40,78 @@ class ControllerState
     @btn_edit = if args.btn_edit? then args.btn_edit else '#btn-edit'
     @btn_toggle = if args.btn_toggle? then args.btn_toggle else '#btn-toggle'
     @btn_close = if args.btn_close? then args.btn_close else '#btn-close'
+    @btn_next = if args.btn_next? then args.btn_next else '#btn-next'
+    @btn_prev = if args.btn_prev? then args.btn_prev else '#btn-prev'
     @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
     @btn_delete = if args.btn_delete? then args.btn_delete else '#btn-delete'
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
-    @init()
-
-  init: ->
-    # gui elements
-    @stage_ui = new StageUI(@ui, @args)
-    @closed_polys = []  # PolygonUI elements
-    @closed_scribbles = [] # ScribbleUI elements
-
+    @closed = ({polys: [], scribbles: []} for i in @contents)
     @open_poly = null
     @sel_poly = null
     @open_scribble = null
 
     @saved_point = null  # start of drag
 
+    # gui elements
+    @stage_ui = new StageUI(@ui, @args)
+
+    @photo_groups = (new StageUIGroup(@stage_ui) for i in @contents)
+
+    @content_index = 0
+    @seen_photos = 1
+
+    @init_photo_group()
+
+  next_image: ->
+    @photo_groups[@content_index].hide()
+    @content_index++
+    @photo_groups[@content_index].show()
+
+    if not @photo_groups.seen?
+      @photo_groups.seen = true
+      @seen_photos++
+
+      @init_photo_group()
+
+    @update_buttons()
+
+  prev_image: ->
+    @photo_groups[@content_index].hide()
+    @content_index--
+    @photo_groups[@content_index].show()
+
+    @update_buttons()
+
+  init_photo_group: ->
     if @contents[@content_index]?.image?['2048']?
       url = @contents[@content_index].image['2048']
 
       @set_photo(url)
 
+  segmentation_overlay_url: ->
+    @photo_groups[@content_index].segmentation_overlay_url
+
   set_segmentation_overlay: (url) =>
-    @stage_ui.set_segmentation_overlay(url, @, =>
-      @segmentation_overlay_url = url
+    @photo_groups[@content_index].set_segmentation_overlay(url, @ui, =>
+      @photo_groups[@content_index].segmentation_overlay_url = url
+      @loading = false
+      @update_buttons()
       console.log "loaded background"
     )
 
   request_new_segmentation_overlay: =>
     @segmentation_overlay_request.abort() if @segmentation_overlay_request?
 
+    @disable_buttons()
+    @loading = true
+
     @segmentation_overlay_request = $.ajax(
       type: "POST"
       url: window.get_segmentation_url()
       contentType: "application/x-www-form-urlencoded; charset=UTF-8"
       dataType: "text"
-      data: @get_submit_data()
+      data: @get_scribble_data()
       success: (data, status, jqxhr) =>
         overlay_url = "data:image/jpeg;base64," + data
         @set_segmentation_overlay(overlay_url)
@@ -87,27 +121,18 @@ class ControllerState
         @segmentation_overlay_request = null
     )
 
-  set_photo: (photo_url) =>
-    @disable_buttons()
-    @loading = true
-    @stage_ui.set_photo(photo_url, @, =>
-      console.log "loaded photo_url: #{photo_url}"
-      @loading = false
-      @update_buttons()
-      @request_new_segmentation_overlay()
-    )
-
-  # return data that will be submitted
-  get_submit_data: =>
+  get_scribble_data: =>
     scribble_list = []
-    for scribble in @closed_scribbles
+    for scribble in @closed[@content_index].scribbles
       points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
 
-      # calculate the points with respect to a frame with the right aspact ratio
-      factor = Math.max(@stage_ui.size.width, @stage_ui.size.height)
+      group = @photo_groups[@content_index]
 
-      x_max = @stage_ui.size.width / factor
-      y_max = @stage_ui.size.height / factor
+      # calculate the points with respect to a frame with the right aspact ratio
+      factor = Math.max(group.size.width, group.size.height)
+
+      x_max = group.size.width / factor
+      y_max = group.size.height / factor
 
       for p in scribble.scribble.points
         points_scaled.points.push([
@@ -116,29 +141,71 @@ class ControllerState
         ])
       scribble_list.push(points_scaled)
 
-    poly_list = []
-    for poly in @closed_polys
-      points_scaled = []
-      for p in poly.poly.points
-        points_scaled.push(Math.max(0, Math.min(1,
-          p.x / @stage_ui.size.width)))
-        points_scaled.push(Math.max(0, Math.min(1,
-          p.y / @stage_ui.size.height)))
-      poly_list.push(points_scaled)
+    results = {}
+    photo_id = @contents[@content_index].id
+    results[photo_id] = {scribbles: scribble_list}
 
+    version: '1.0'
+    results: JSON.stringify(results)
+
+  set_photo: (photo_url) =>
+    @disable_buttons()
+    @loading = true
+    @photo_groups[@content_index].set_photo(photo_url, @ui, =>
+      console.log "loaded photo_url: #{photo_url}"
+      @request_new_segmentation_overlay()
+    )
+
+  # return data that will be submitted
+  get_submit_data: =>
     results = {}
     time_ms = {}
     time_active_ms = {}
-    photo_id = @contents[@content_index].id
-    results[photo_id] = {}
-    results[photo_id].poly = poly_list
-    results[photo_id].scribbles = scribble_list
-    time_ms[photo_id] = {}
-    time_ms[photo_id].poly = (p.time_ms for p in @closed_polys)
-    time_ms[photo_id].scribbles = (s.time_ms for s in @closed_scribbles)
-    time_active_ms[photo_id] = {}
-    time_active_ms[photo_id].poly = (p.time_active_ms for p in @closed_polys)
-    time_active_ms[photo_id].scribbles = (s.time_active_ms for s in @closed_scribbles)
+
+    for content, index in @contents
+      scribble_list = []
+      for scribble in @closed[index].scribbles
+        points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
+
+        group = @photo_groups[index]
+
+        # calculate the points with respect to a frame with the right aspact ratio
+        factor = Math.max(group.size.width, group.size.height)
+
+        x_max = group.size.width / factor
+        y_max = group.size.height / factor
+
+        for p in scribble.scribble.points
+          points_scaled.points.push([
+            Math.max(0, Math.min(x_max, p.x / factor)),
+            Math.max(0, Math.min(y_max, p.y / factor)),
+          ])
+        scribble_list.push(points_scaled)
+
+      poly_list = []
+      for poly in @closed[index].polys
+        points_scaled = []
+        for p in poly.poly.points
+          points_scaled.push(Math.max(0, Math.min(1,
+            p.x / group.size.width)))
+          points_scaled.push(Math.max(0, Math.min(1,
+            p.y / group.size.height)))
+        poly_list.push(points_scaled)
+
+      photo_id = content.id
+      results[photo_id] = {}
+      results[photo_id].poly = poly_list
+      results[photo_id].scribbles = scribble_list
+      time_ms[photo_id] = {}
+      time_ms[photo_id].poly =
+        (p.time_ms for p in @closed[index].polys)
+      time_ms[photo_id].scribbles =
+        (s.time_ms for s in @closed[index].scribbles)
+      time_active_ms[photo_id] = {}
+      time_active_ms[photo_id].poly =
+        (p.time_active_ms for p in @closed[index].polys)
+      time_active_ms[photo_id].scribbles =
+        (s.time_active_ms for s in @closed[index].scribbles)
 
     version: '1.0'
     results: JSON.stringify(results)
@@ -147,10 +214,10 @@ class ControllerState
     action_log: @log.get_submit_data()
 
   # redraw the stage
-  draw: => @stage_ui.draw()
+  draw: => @photo_groups[@content_index].draw()
 
   # get mouse position (after taking zoom into account)
-  mouse_pos: => @stage_ui.mouse_pos()
+  mouse_pos: => @photo_groups[@content_index].mouse_pos()
 
   # zoom in/out by delta
   zoom_delta: (delta) =>
@@ -168,9 +235,9 @@ class ControllerState
 
   update_zoom: (redraw=true) =>
     inv_f = 1.0 / @stage_ui.get_zoom_factor()
-    for poly in @closed_polys
+    for poly in @closed[@content_index].polys
       poly.update_zoom(@ui, inv_f, false)
-    for scribble in @closed_scribbles
+    for scribble in @closed[@content_index].scribbles
       scribble.update_zoom(@ui, inv_f, false)
 
     @open_poly?.update_zoom(@ui, inv_f, false)
@@ -205,7 +272,8 @@ class ControllerState
     console.log is_foreground
 
     scribble = new Scribble(points, is_foreground)
-    @open_scribble = new ScribbleUI(@closed_scribbles.length, scribble, @stage_ui)
+    @open_scribble = new ScribbleUI(@closed[@content_index].scribbles.length,
+      scribble, @stage_ui, @photo_groups[@content_index])
     @open_scribble.timer = new ActiveTimer()
     @open_scribble.timer.start()
     @update_buttons()
@@ -218,23 +286,24 @@ class ControllerState
     @open_scribble.time_ms = @open_scribble.timer.time_ms()
     @open_scribble.time_active_ms = @open_scribble.timer.time_active_ms()
 
-    @closed_scribbles.push(@open_scribble)
+    @closed[@content_index].scribbles.push(@open_scribble)
     @open_scribble = null
 
     scribble
 
   remove_scribble: ->
-    scribble = @closed_scribbles.pop()
+    scribble = @closed[@content_index].scribbles.pop()
 
     scribble.remove_all()
     null
 
   insert_scribble: (points, is_foreground, id, time_ms, time_active_ms) ->
     scribble = new Scribble(points, is_foreground)
-    scribble_ui = new ScribbleUI(id, scribble, @stage_ui)
+    scribble_ui = new ScribbleUI(id, scribble, @stage_ui,
+      @photo_groups[@content_index])
     scribble_ui.time_ms = time_ms
     scribble_ui.time_active_ms = time_active_ms
-    @closed_scribbles.splice(id, 0, scribble_ui)
+    @closed[@content_index].scribbles.splice(id, 0, scribble_ui)
     @update_buttons()
     scribble_ui
 
@@ -244,7 +313,8 @@ class ControllerState
     console.log points
     @open_poly.remove_all() if @open_poly?
     poly = new Polygon(points)
-    @open_poly = new PolygonUI(@closed_polys.length, poly, @stage_ui)
+    @open_poly = new PolygonUI(@closed[@content_index].polys.length, poly,
+      @stage_ui, @photo_groups[@content_index])
     @open_poly.timer = new ActiveTimer()
     @open_poly.timer.start()
     @update_buttons()
@@ -254,22 +324,23 @@ class ControllerState
   insert_closed_poly: (points, id, time_ms, time_active_ms) ->
     poly = new Polygon(points)
     poly.close()
-    closed_poly = new PolygonUI(id, poly, @stage_ui)
+    closed_poly = new PolygonUI(id, poly, @stage_ui,
+      @photo_groups[@content_index])
     closed_poly.time_ms = time_ms
     closed_poly.time_active_ms = time_active_ms
-    @closed_polys.splice(id, 0, closed_poly)
+    @closed[@content_index].polys.splice(id, 0, closed_poly)
     @update_buttons()
     closed_poly
 
   # return polygon id
   get_poly: (id) ->
-    for p in @closed_polys
+    for p in @closed[@content_index].polys
       if p.id == id
         return p
     return null
 
   # return number of polygons
-  num_polys: -> @closed_polys.length
+  num_polys: -> @closed[@content_index].polys.length
 
   # delete the open polygon
   remove_open_poly: ->
@@ -283,7 +354,7 @@ class ControllerState
       @open_poly.time_active_ms = @open_poly.timer.time_active_ms()
       poly = @open_poly
       @open_poly.poly.close()
-      @closed_polys.push(@open_poly)
+      @closed[@content_index].polys.push(@open_poly)
       @open_poly = null
       @update_buttons()
       poly
@@ -301,7 +372,7 @@ class ControllerState
   # re-open the most recently closed polygon
   unclose_poly: ->
     if @mode == Mode.draw and not @open_poly? and @num_polys() > 0
-      @open_poly = @closed_polys.pop()
+      @open_poly = @closed[@content_index].polys.pop()
       @open_poly.poly.unclose()
       @update_buttons()
       @open_poly
@@ -315,9 +386,9 @@ class ControllerState
   # delete the currently selected polygon
   delete_sel_poly: ->
     if @can_delete_sel()
-      for p,i in @closed_polys
+      for p,i in @closed[@content_index].polys
         if p.id == @sel_poly.id
-          @closed_polys.splice(i, 1)
+          @closed[@content_index].polys.splice(i, 1)
           @sel_poly?.remove_all()
           @sel_poly = null
           break
@@ -350,7 +421,7 @@ class ControllerState
     @update_buttons()
     null
 
-  switch_mode: (new_mode) ->
+  abort_action: ->
     switch @mode
       when Mode.draw
         if @open_poly?
@@ -361,14 +432,21 @@ class ControllerState
       #when  Mode.scribble
         #do nothing
 
+  switch_mode: (new_mode) ->
+    @abort_action()
+
     @mode = new_mode
 
     @update_buttons()
 
   disable_buttons: ->
+    set_btn_enabled(@btn_scribble, false)
     set_btn_enabled(@btn_draw, false)
     set_btn_enabled(@btn_edit, false)
     set_btn_enabled(@btn_close, false)
+    set_btn_enabled(@btn_toggle, false)
+    set_btn_enabled(@btn_next, false)
+    set_btn_enabled(@btn_prev, false)
     set_btn_enabled(@btn_submit, false)
 
   # update cursor only
@@ -395,7 +473,7 @@ class ControllerState
   update_buttons: ->
     @update_cursor()
 
-    set_btn_enabled(@btn_submit, not @loading)
+    set_btn_enabled(@btn_submit, not @loading and @seen_photos == @contents.length)
     set_btn_enabled(@btn_draw, not @loading)
     set_btn_enabled(@btn_scribble, not @loading)
     set_btn_enabled(@btn_edit, not @loading)
@@ -403,6 +481,10 @@ class ControllerState
     set_btn_enabled(@btn_delete, @can_delete_sel())
     set_btn_enabled(@btn_zoom_reset,
       not @loading and @stage_ui.zoom_exp > 0)
+    set_btn_enabled(@btn_next,
+      not @loading and @content_index < @contents.length - 1)
+    set_btn_enabled(@btn_prev,
+      not @loading and @content_index > 0)
 
     switch @mode
       when Mode.draw

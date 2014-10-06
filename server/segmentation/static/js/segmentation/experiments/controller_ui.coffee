@@ -24,7 +24,9 @@ class ControllerUI
     $(@s.btn_scribble).on('click', =>
       if @s.mode != Mode.scribble then @switch_mode(Mode.scribble))
     $(@s.btn_toggle).on('click', =>
-      if @s.mode == Mode.scribble then @s.stage_ui.toggle_segment_layer()?.draw())
+      if @s.mode == Mode.scribble
+        @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
+    )
     #$(@s.btn_edit).on('click', =>
       #if @s.mode != Mode.edit then @switch_mode(Mode.edit))
     #$(@s.btn_close).on('click', =>
@@ -33,6 +35,10 @@ class ControllerUI
       #if not @s.loading then @delete_sel_poly())
     $(@s.btn_zoom_reset).on('click', =>
       if not @s.loading then @zoom_reset())
+    $(@s.btn_next).on('click', =>
+      if not @s.loading then @next_image())
+    $(@s.btn_prev).on('click', =>
+      if not @s.loading then @prev_image())
 
     # log instruction viewing
     $('#modal-instructions').on('show', =>
@@ -66,6 +72,12 @@ class ControllerUI
     # popup explaining the problem
     @num_failed_closes = 0
 
+  next_image: =>
+    @s.undoredo.run(new UENextImage())
+
+  prev_image: =>
+    @s.undoredo.run(new UEPrevImage())
+
   get_submit_data: =>
     @s.get_submit_data()
 
@@ -98,7 +110,8 @@ class ControllerUI
         if @s.mode != Mode.scribble then @switch_mode(Mode.scribble)
         false
       when 84 # T
-        if @s.mode == Mode.scribble then @s.stage_ui.toggle_segment_layer()?.draw()
+        if @s.mode == Mode.scribble
+          @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
         false
       when 46,8 # delete,backspace
         switch @s.mode
@@ -159,7 +172,7 @@ class ControllerUI
             @s.log.attempted(ue.entry())
         else
           @s.undoredo.run(new UECreatePolygon(
-            @s.stage_ui.mouse_pos()))
+            @s.mouse_pos()))
         @s.stage_ui.translate_mouse_click()
 
   mousedown: (e) =>
@@ -172,7 +185,7 @@ class ControllerUI
     if p? and not @s.loading and @s.mode == Mode.scribble
       #if e.button == 1 # left mouse buttons
       is_foreground = e.which == 1
-      @s.start_scribble([@s.stage_ui.mouse_pos()], is_foreground)
+      @s.start_scribble([@s.mouse_pos()], is_foreground)
 
     return not @s.panning
 
@@ -198,7 +211,7 @@ class ControllerUI
         @s.mousepos = {x: e.pageX, y: e.pageY}
 
       if @s.mode == Mode.scribble and @s.open_scribble?
-        @s.open_scribble.scribble.push_point(@s.stage_ui.mouse_pos())
+        @s.open_scribble.scribble.push_point(@s.mouse_pos())
         @s.open_scribble.update(@)
 
     return true
@@ -217,7 +230,7 @@ class ControllerUI
       if @s.open_poly?
         pts = @s.open_poly.poly.points
         if pts.length >= 2
-          @s.stage_ui.error_line(pts[0], pts[pts.length - 1])
+          @s.photo_groups[@s.content_index].error_line(pts[0], pts[pts.length - 1])
           @num_failed_closes += 1
 
       if @num_failed_closes >= 3

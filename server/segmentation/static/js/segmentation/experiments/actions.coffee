@@ -67,6 +67,16 @@ class UECreatePolygon extends UndoableEvent
   undo: (ui) -> ui.s.remove_open_poly()?.update(ui)
   entry: -> { name: "UECreatePolygon", args: { p: @p } }
 
+class UENextImage extends UndoableEvent
+  run: (ui) -> ui.s.next_image()
+  undo: (ui) -> ui.s.prev_image()
+  entry: -> { name: "UENextImage" }
+
+class UEPrevImage extends UndoableEvent
+  run: (ui) -> ui.s.prev_image()
+  undo: (ui) -> ui.s.next_image()
+  entry: -> { name: "UEPrevImage" }
+
 class UECreateScribble extends UndoableEvent
   run: (ui) ->
     ui.s.create_scribble()?.update(ui)
@@ -75,15 +85,12 @@ class UECreateScribble extends UndoableEvent
     # request
     ui.s.segmentation_overlay_request.abort() if ui.segmentation_overlay_request?
 
-    if ui.s.segmentation_overlay_url?
-      @old_overlay_url = ui.s.segmentation_overlay_url
-    else
-      @old_overlay_url = null
+    @old_overlay_url = ui.s.segmentation_overlay_url()
 
     ui.s.request_new_segmentation_overlay()
 
   undo: (ui) ->
-    [..., scribble_ui] = ui.s.closed_scribbles
+    [..., scribble_ui] = ui.s.closed[ui.s.content_index].scribbles
     @points = scribble_ui.scribble.clone_points()
     @is_foreground = scribble_ui.scribble.is_foreground
     @id = scribble_ui.id
@@ -91,12 +98,12 @@ class UECreateScribble extends UndoableEvent
     @time_active_ms = scribble_ui.time_active_ms
     ui.s.remove_scribble()
 
-    @overlay_url = ui.s.segmentation_overlay_url
-    ui.set_segmentation_overlay(@old_overlay_url)
+    @overlay_url = ui.s.segmentation_overlay_url()
+    ui.s.set_segmentation_overlay(@old_overlay_url)
   redo: (ui) ->
     ui.s.insert_scribble(@points, @is_foreground, @id, @time_ms, @time_active_ms)?.update(ui)
 
-    ui.set_segmentation_overlay(@overlay_url)
+    ui.s.set_segmentation_overlay(@overlay_url)
   entry: -> { name: "UECreateScribble", args: { pts: @pts } }
 
 class UEClosePolygon extends UndoableEvent
@@ -137,13 +144,13 @@ class UEDeletePolygon extends UndoableEvent
     @time_active_ms = ui.s.sel_poly.time_active_ms
     @sel_poly_id = ui.s.sel_poly.id
     ui.s.delete_sel_poly()
-    for p,i in ui.s.closed_polys
+    for p,i in ui.s.closed[ui.s.content_index].polys
       p.id = i
       p.update(ui)
   undo: (ui) ->
     ui.s.insert_closed_poly(@points, @sel_poly_id,
       @time_ms, @time_active_ms)
-    for p,i in ui.s.closed_polys
+    for p,i in ui.s.closed[ui.s.content_index].polys
       p.id = i
       p.update(ui)
     ui.s.select_poly(ui, @sel_poly_id)

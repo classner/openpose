@@ -1,6 +1,6 @@
 # UI for one polygon
 class PolygonUI
-  constructor: (@id, @poly, @stage) ->
+  constructor: (@id, @poly, @stage, @stage_group) ->
     # @stage is an instance of StageUI
     @line = null
     @fill = null
@@ -32,24 +32,24 @@ class PolygonUI
       @add_fill(ui)
       @add_text()
     if redraw
-      @stage.draw()
+      @stage_group.draw()
 
   # remove UI elements
-  remove_line: -> @stage.remove(@line); @line = null
-  remove_fill: -> @stage.remove(@fill); @fill = null
-  remove_text: -> @stage.remove(@text); @text = null
+  remove_line: -> @stage_group.remove(@line); @line = null
+  remove_fill: -> @stage_group.remove(@fill); @fill = null
+  remove_text: -> @stage_group.remove(@text); @text = null
   remove_hover: ->
-    @stage.remove(@hover_fill); @hover_fill = null
-    @stage.remove(@hover_line); @hover_line = null
+    @stage_group.remove(@hover_fill); @hover_fill = null
+    @stage_group.remove(@hover_line); @hover_line = null
   remove_anchors: -> if @anchors?
     if @anchors.length < 8
       for a in @anchors
-        @stage.remove(a, 0.4)
+        @stage_group.remove(a, 0.4)
     else
       for a in @anchors
-        @stage.remove(a, 0)
+        @stage_group.remove(a, 0)
     @anchors = null
-    @stage.draw()
+    @stage_group.draw()
   remove_all: ->
     @remove_line()
     @remove_fill()
@@ -72,7 +72,7 @@ class PolygonUI
         if not ui.s.panning
           ui.select_poly(@id)
       )
-      @stage.add(@fill, 0.4)
+      @stage_group.add(@fill, 0.4)
 
   # add text label
   add_text: ->
@@ -91,7 +91,7 @@ class PolygonUI
         x: pos.x, y: pos.y, align: 'left',
         fontSize: 10 * @stroke_scale,
         fontFamily: 'Verdana', fontStyle: 'bold')
-      @stage.add(@text, 1.0)
+      @stage_group.add(@text, 1.0)
 
   add_line: ->
     if @line?
@@ -101,7 +101,7 @@ class PolygonUI
       @line = new Kinetic.Line(
         points: @poly.points, opacity: 0, stroke: "#00F",
         strokeWidth: 3 * @stroke_scale, lineJoin: "round")
-      @stage.add(@line, 0.5)
+      @stage_group.add(@line, 0.5)
 
   add_hover: (p) ->
     @add_hover_fill(p)
@@ -114,7 +114,7 @@ class PolygonUI
     else
       @hover_fill = new Kinetic.Polygon(
         points: hover_points, opacity: 0, fill: "#00F")
-      @stage.add(@hover_fill, 0.15)
+      @stage_group.add(@hover_fill, 0.15)
 
   add_hover_line: (p) ->
     hover_points = [clone_pt(p), @poly.points[@poly.num_points() - 1]]
@@ -125,7 +125,7 @@ class PolygonUI
       @hover_line = new Kinetic.Line(
         points: hover_points, opacity: 0, stroke: "#00F",
         strokeWidth: 3 * @stroke_scale, lineCap: "round")
-      @stage.add(@hover_line, 0.5)
+      @stage_group.add(@hover_line, 0.5)
 
     if @poly.can_push_point(p)
       @hover_line.setStroke("#00F")
@@ -158,13 +158,13 @@ class PolygonUI
         if v.removing != true
           $('canvas').css('cursor', 'pointer')
           v.setStrokeWidth(4 * @stroke_scale)
-          @stage.draw()
+          @stage_group.draw()
       )
       v.on('mouseout',  do (v) => =>
         if v.removing != true
           $('canvas').css('cursor', 'default')
           v.setStrokeWidth(2 * @stroke_scale)
-          @stage.draw()
+          @stage_group.draw()
       )
       v.on('mousedown', do (i) => =>
         if v.removing != true
@@ -194,7 +194,7 @@ class PolygonUI
       )
 
       if @poly.points.length < 8
-        @stage.add(v, 0.5, 0.4)
+        @stage_group.add(v, 0.5, 0.4)
       else
-        @stage.add(v, 0.5, 0)
+        @stage_group.add(v, 0.5, 0)
       @anchors.push(v)

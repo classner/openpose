@@ -37,9 +37,7 @@ def task(request, dataset_id='all'):
         time_ms = json.loads(data[u'time_ms'])
         time_active_ms = json.loads(data[u'time_active_ms'])
 
-        assert(len(results) == 1)
-
-        img_id = results.keys()[0]
+        photo_ids = results.keys()
 
         experiment, _ = Experiment.objects.get_or_create(slug=u'segment_person',
                 variant=u'')
@@ -47,7 +45,7 @@ def task(request, dataset_id='all'):
         user, _ = UserProfile.objects.get_or_create(user=request.user)
 
         PersonSegmentation.mturk_submit(user,
-                Photo.objects.filter(id=img_id), results, time_ms,
+                Photo.objects.filter(id__in=photo_ids), results, time_ms,
                 time_active_ms, experiment, u'1.0')
 
         return json_success_response()
@@ -71,7 +69,8 @@ def task(request, dataset_id='all'):
 
         if imgs:
             # pick a random non annotated picture
-            contents = [imgs[np.random.randint(len(imgs))]]
+            #contents = [imgs[np.random.randint(len(imgs))]]
+            contents = imgs[0:2]
 
             context = {
                 # the current task
