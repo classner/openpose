@@ -92,7 +92,7 @@ DB_PORT=5432
 DB_PASS=password
 
 # URL under which the app will be hosted
-APP_URL=/
+APP_URL=
 
 
 ######

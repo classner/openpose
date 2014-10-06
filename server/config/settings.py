@@ -15,12 +15,12 @@ LANGUAGE_CODE = 'en-us'
 
 # allowed languages for an account
 ACCOUNT_LANGUAGES = (('en-us', 'English'),)
-ACCOUNT_SIGNUP_REDIRECT_URL = APP_URL
-ACCOUNT_LOGIN_REDIRECT_URL = APP_URL
-ACCOUNT_LOGOUT_REDIRECT_URL = APP_URL
+ACCOUNT_SIGNUP_REDIRECT_URL = APP_URL + '/'
+ACCOUNT_LOGIN_REDIRECT_URL = APP_URL + '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = APP_URL + '/'
 
 # tempory hack
-LOGIN_URL = APP_URL + "account/login"
+LOGIN_URL = APP_URL + "/account/login"
 
 SITE_ID = 1
 
@@ -50,10 +50,10 @@ MEDIA_ROOT = os.path.join(DATA_DIR, 'media')
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = APP_URL + 'media/'
+MEDIA_URL = APP_URL + '/media/'
 
 # temporary hack-fix for django-admin-tools
-ADMIN_MEDIA_PREFIX = APP_URL + 'static/admin/'
+ADMIN_MEDIA_PREFIX = APP_URL + '/static/admin/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -67,7 +67,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 # NOTE: In a few places, this is hard-coded.  So you should search through the
 # entire codebase for accidental uses of '/static/' if you ever want to change
 # this.
-STATIC_URL = APP_URL + 'static/'
+STATIC_URL = APP_URL + '/static/'
 
 # force all script urls be relative to this URL
 FORCE_SCRIPT_NAME = APP_URL

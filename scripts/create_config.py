@@ -208,7 +208,7 @@ Database Port
 
 prompt_var(
     'APP_URL',
-    default='/',
+    default='',
     message='''
     URL under which the app will be hosted.
 ''')
