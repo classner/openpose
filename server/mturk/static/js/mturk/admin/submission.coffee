@@ -4,10 +4,10 @@ $('#content-container').on('click', '.action-show-reject', ->
 )
 
 $('#content-container').on('click', '.action-review', ->
-  parent = $(@).parent('.admin-actions')
-  assignment_id = parent.attr('data-assignment')
+  parent = $(@).parents('.admin-actions')[0]
+  assignment_id = $(parent).attr('data-assignment')
   action = $(@).attr('data-action')
-  message = parent.find(".feedback-#{action}").val()
+  message = $(parent).find(".feedback-#{action}").val()
 
   $.ajax(
     type: 'POST',
@@ -17,9 +17,9 @@ $('#content-container').on('click', '.action-review', ->
       assignment_id: assignment_id
       action: action
       message: message
-    success: (data, status) =>
+    success: (data, status) ->
       if data.result == 'success'
-        $(@).parent('.admin-actions').html("<p>Success</p>")
+        $(parent).html("<p>Success</p>")
       else
         window.show_modal_error("Error contacting server (#{data})")
     error: ->

@@ -62,20 +62,20 @@
 
 		<hr/>
 		<div class="admin-actions" data-assignment="{{ entry.id }}">
-			<textarea rows="3" class="span3 feedback-approve" type="text" placeholder="Thank you!"></textarea>
+			<textarea rows="3" class="span3 feedback-approve feedback-auto-approve" type="text" placeholder="Thank you!"></textarea>
 			{% if entry.status == 'S' %}
 			<button class="btn btn-success action-review" data-action="approve">Approve</button>&nbsp;
 			<button class="btn btn-success action-review" data-action="auto-approve">Auto-approve Worker</button>
 
 			<button class="btn btn-danger action-show-reject" style="margin-top:20px">Reject / block</button>
 			<div class="admin-actions-reject" style="display:none; margin-top: 20px">
-				<textarea rows="3" class="span3 feedback-reject" type="text" placeholder="I'm sorry but you made too many mistakes on this task: {{ entry.hit.hit_type.title }}."></textarea>
+				<textarea rows="3" class="span3 feedback-reject feedback-block" type="text" placeholder="I'm sorry but you made too many mistakes on this task: {{ entry.hit.hit_type.title }}."></textarea>
 				<button class="btn btn-danger action-review" data-action="reject">Reject</button>&nbsp;
 				<button class="btn btn-danger action-review" data-action="block">Block Worker</button>
 			</div>
 
 			{% elif entry.status == 'R' %}
-			<button class="btn action-review" data-action="approve">Approve (un-reject)
+			<button class="btn action-review" data-action="approve">Approve (un-reject)</button>
 			{% endif %}
 		</div>
 
