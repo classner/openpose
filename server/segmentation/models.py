@@ -45,45 +45,49 @@ class PersonSegmentation(ResultBase):
         if unicode(version) != u'1.0':
             raise ValueError("Unknown version: %s" % version)
 
-        photo = hit_contents[0]
-        scribbles = results[str(photo.id)][u'scribbles']
-        time_ms_list = time_ms[str(photo.id)][u'scribbles']
-        time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
+        new_objects_list = []
+        for photo in hit_contents:
+            scribbles = results[str(photo.id)][u'scribbles']
+            time_ms_list = time_ms[str(photo.id)][u'scribbles']
+            time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
 
-        if len(scribbles) != len(time_ms_list):
-            raise ValueError("Result length mismatch (%s polygons, %s times)" % (
-                len(scribbles), len(time_ms_list)))
+            if len(scribbles) != len(time_ms_list):
+                raise ValueError("Result length mismatch (%s polygons, %s times)" % (
+                    len(scribbles), len(time_ms_list)))
 
-        slug = experiment.slug
-        if slug != u'segment_person':
-            raise ValueError("Unknown slug: %s" % slug)
+            slug = experiment.slug
+            if slug != u'segment_person':
+                raise ValueError("Unknown slug: %s" % slug)
 
-        # check if the scribbles make sense
-        for scribble in scribbles:
-            for point in scribble[u'points']:
-                if len(point) != 2:
-                    raise ValueError("Point with more than 2 coordinates")
+            # check if the scribbles make sense
+            for scribble in scribbles:
+                for point in scribble[u'points']:
+                    if len(point) != 2:
+                        raise ValueError("Point with more than 2 coordinates")
 
-        # generate the segmentation image
-        overlay_img = calc_pose_overlay_img(photo, scribbles)
-        with transaction.atomic():
-            with NamedTemporaryFile(prefix=u'segmentation_' + photo.name + u'_', suffix=u'.png') as f:
-                overlay_img.save(f, u"PNG")
-                f.seek(0)
-                segmentation = ImageFile(f)
+            # generate the segmentation image
+            overlay_img = calc_pose_overlay_img(photo, scribbles)
+            with transaction.atomic():
+                with NamedTemporaryFile(prefix=u'segmentation_' + photo.name + u'_', suffix=u'.png') as f:
+                    overlay_img.save(f, u"PNG")
+                    f.seek(0)
+                    segmentation = ImageFile(f)
 
-                new_obj, created = photo.scribbles.get_or_create(
-                    user=user,
-                    segmentation=segmentation,
-                    mturk_assignment=mturk_assignment,
-                    time_ms=recursive_sum(time_ms),
-                    time_active_ms=recursive_sum(time_active_ms),
-                    # (repr gives more float digits)
-                    scribbles=json.dumps(scribbles),
-                    num_scribbles=len(scribbles),
-                )
+                    new_obj, created = photo.scribbles.get_or_create(
+                        user=user,
+                        segmentation=segmentation,
+                        mturk_assignment=mturk_assignment,
+                        time_ms=recursive_sum(time_ms),
+                        time_active_ms=recursive_sum(time_active_ms),
+                        # (repr gives more float digits)
+                        scribbles=json.dumps(scribbles),
+                        num_scribbles=len(scribbles),
+                    )
+
+                    if created:
+                        new_objects_list.append(new_obj)
 
         if created:
-            return {get_content_tuple(photo): [new_obj]}
+            return {get_content_tuple(photo): new_objects_list}
         else:
             return {}
