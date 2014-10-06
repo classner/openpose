@@ -28,6 +28,7 @@ nginx
 nodejs
 npm
 openssl
+postgresql-client
 python-dev
 python-opencv
 python-pip
@@ -37,4 +38,5 @@ software-properties-common
 supervisor
 sudo
 swig
+vim
 zlib1g-dev
