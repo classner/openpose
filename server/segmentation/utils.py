@@ -53,8 +53,6 @@ def calc_overlay_img(imgImage, scribbles):
     background_prediction_label = 0
 
     rect = (margin, margin, width-margin, height-margin)
-    print width
-    print height
 
     scribbles_map = np.zeros(img.shape[:2], dtype=np.uint8)
     grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_RECT)
