@@ -68,8 +68,8 @@ class ControllerState
     @content_index++
     @photo_groups[@content_index].show()
 
-    if not @photo_groups.seen?
-      @photo_groups.seen = true
+    if not @photo_groups[@content_index].seen?
+      @photo_groups[@content_index].seen = true
       @seen_photos++
 
       @init_photo_group()
