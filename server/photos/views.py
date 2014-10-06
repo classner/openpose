@@ -123,6 +123,7 @@ def photo_detail(request, pk):
     nav_section_keys = [
         ("photo", 'Photo'),
         ("parse_pose", 'Pose'),
+        ("segmentation", 'Segmentation'),
     ]
     nav_sections = [
         {

@@ -32,7 +32,7 @@ class PersonSegmentation(ResultBase):
         return '%s scribbles in segmentation' % self.num_scribbles
 
     def get_thumb_template(self):
-        return 'submitted_segmentation_thumb.html'
+        return 'segmentation/segmentation_thumb.html'
 
     def publishable(self):
         return self.photo.publishable()

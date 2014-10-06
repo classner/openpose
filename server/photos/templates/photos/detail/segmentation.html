@@ -1,0 +1,6 @@
+<h2 style="margin-top:30px">Segmentation</h2>
+{% if photo.scribbles.all %}
+  {% include "grid.html" with span="span4" rowsize="3" thumb_template="segmentation/segmentation_thumb.html" entries=photo.scribbles.all %}
+{% else %}
+  <p>This photo has not been annotated, yet.</p>
+{% endif %}

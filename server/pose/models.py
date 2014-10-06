@@ -17,7 +17,7 @@ class ParsePose(ResultBase):
         return u'pose annotation'
 
     def get_thumb_template(self):
-        return 'submitted_parse_pose_thumb.html'
+        return 'person/parse_person_thumb.html'
 
     def publishable(self):
         return self.photo.publishable()
