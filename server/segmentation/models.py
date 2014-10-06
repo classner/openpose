@@ -45,8 +45,9 @@ class PersonSegmentation(ResultBase):
         if unicode(version) != u'1.0':
             raise ValueError("Unknown version: %s" % version)
 
-        new_objects_list = []
+        new_content = {}
         for photo in hit_contents:
+            new_objects_list = []
             scribbles = results[str(photo.id)][u'scribbles']
             time_ms_list = time_ms[str(photo.id)][u'scribbles']
             time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
@@ -87,7 +88,6 @@ class PersonSegmentation(ResultBase):
                     if created:
                         new_objects_list.append(new_obj)
 
-        if created:
-            return {get_content_tuple(photo): new_objects_list}
-        else:
-            return {}
+            new_content[get_content_tuple(photo)] = new_objects_list
+
+        return new_content
