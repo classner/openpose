@@ -4,9 +4,6 @@ $('#content-container').on('click', '.action-show-reject', ->
 )
 
 $('#content-container').on('click', '.action-review', ->
-  window.show_modal_error('TODO')
-  return
-
   parent = $(@).parent('.admin-actions')
   assignment_id = parent.attr('data-assignment')
   action = $(@).attr('data-action')
@@ -31,9 +28,6 @@ $('#content-container').on('click', '.action-review', ->
 )
 
 $('#content-container').on('click', '.action-block', ->
-  window.show_modal_error('TODO')
-  return
-
   assignment_id = $(@).parent('.admin-actions').attr('data-assignment')
   message = parent.find(".feedback-reject").val()
 
@@ -56,9 +50,6 @@ $('#content-container').on('click', '.action-block', ->
 )
 
 $('#content-container').on('click', '.action-auto-approve', ->
-  window.show_modal_error('TODO')
-  return
-
   assignment_id = $(@).parent('.admin-actions').attr('data-assignment')
   message = parent.find(".feedback-approve").val()
 
