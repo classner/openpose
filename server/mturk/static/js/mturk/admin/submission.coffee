@@ -17,51 +17,7 @@ $('#content-container').on('click', '.action-review', ->
       assignment_id: assignment_id
       action: action
       message: message
-    success: (data, status) ->
-      if data.result == 'success'
-        $(@).parent('.admin-actions').html("<p>Success</p>")
-      else
-        window.show_modal_error("Error contacting server (#{data})")
-    error: ->
-      window.show_modal_error("Error contacting server")
-  )
-)
-
-$('#content-container').on('click', '.action-block', ->
-  assignment_id = $(@).parent('.admin-actions').attr('data-assignment')
-  message = parent.find(".feedback-reject").val()
-
-  $.ajax(
-    type: 'POST',
-    url: window.location,
-    dataType: 'json'
-    data:
-      assignment_id: assignment_id,
-      action: 'block',
-      message: message
-    success: (data, status) ->
-      if data.result == 'success'
-        $(@).parent('.admin-actions').html("<p>Success</p>")
-      else
-        window.show_modal_error("Error contacting server (#{data})")
-    error: ->
-      window.show_modal_error("Error contacting server")
-  )
-)
-
-$('#content-container').on('click', '.action-auto-approve', ->
-  assignment_id = $(@).parent('.admin-actions').attr('data-assignment')
-  message = parent.find(".feedback-approve").val()
-
-  $.ajax(
-    type: 'POST',
-    url: window.location,
-    dataType: 'json'
-    data:
-      assignment_id: assignment_id,
-      action: 'auto-approve',
-      message: message,
-    success: (data, status) ->
+    success: (data, status) =>
       if data.result == 'success'
         $(@).parent('.admin-actions').html("<p>Success</p>")
       else
