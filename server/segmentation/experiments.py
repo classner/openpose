@@ -30,7 +30,7 @@ def configure_experiments():
         out_content_type_model=PersonSegmentation,
         out_content_attr='photo',
         content_filter={
-            'photo__scribbles__isnull': True,
+            'scribbles__isnull': True,
             },
         title='Carefully segment a person',
         description='Given an image, your job is to segment a person from an image.',
