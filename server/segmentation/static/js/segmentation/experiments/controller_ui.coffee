@@ -21,8 +21,8 @@ class ControllerUI
     # init buttons
     #$(@s.btn_draw).on('click', =>
       #if @s.mode != Mode.draw then @switch_mode(Mode.draw))
-    $(@s.btn_scribble).on('click', =>
-      if @s.mode != Mode.scribble then @switch_mode(Mode.scribble))
+    #$(@s.btn_scribble).on('click', =>
+      #if @s.mode != Mode.scribble then @switch_mode(Mode.scribble))
     $(@s.btn_toggle).on('click', =>
       if @s.mode == Mode.scribble
         @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
@@ -106,9 +106,9 @@ class ControllerUI
       #when 65 # A
         #if @s.mode != Mode.edit then @switch_mode(Mode.edit)
         #false
-      when 83 # S
-        if @s.mode != Mode.scribble then @switch_mode(Mode.scribble)
-        false
+      #when 83 # S
+        #if @s.mode != Mode.scribble then @switch_mode(Mode.scribble)
+        #false
       when 84 # T
         if @s.mode == Mode.scribble
           @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()

@@ -440,9 +440,9 @@ class ControllerState
     @update_buttons()
 
   disable_buttons: ->
-    set_btn_enabled(@btn_scribble, false)
-    set_btn_enabled(@btn_draw, false)
-    set_btn_enabled(@btn_edit, false)
+    #set_btn_enabled(@btn_scribble, false)
+    #set_btn_enabled(@btn_draw, false)
+    #set_btn_enabled(@btn_edit, false)
     set_btn_enabled(@btn_close, false)
     set_btn_enabled(@btn_toggle, false)
     set_btn_enabled(@btn_next, false)
@@ -474,9 +474,9 @@ class ControllerState
     @update_cursor()
 
     set_btn_enabled(@btn_submit, not @loading and @seen_photos == @contents.length)
-    set_btn_enabled(@btn_draw, not @loading)
-    set_btn_enabled(@btn_scribble, not @loading)
-    set_btn_enabled(@btn_edit, not @loading)
+    #set_btn_enabled(@btn_draw, not @loading)
+    #set_btn_enabled(@btn_scribble, not @loading)
+    #set_btn_enabled(@btn_edit, not @loading)
     set_btn_enabled(@btn_toggle, not @loading)
     set_btn_enabled(@btn_delete, @can_delete_sel())
     set_btn_enabled(@btn_zoom_reset,
@@ -486,13 +486,13 @@ class ControllerState
     set_btn_enabled(@btn_prev,
       not @loading and @content_index > 0)
 
-    switch @mode
-      when Mode.draw
-        $(@btn_draw).button('toggle')
-        set_btn_enabled(@btn_close, @can_close())
-      when Mode.scribble
-        $(@btn_scribble).button('toggle')
-        set_btn_enabled(@btn_close, false)
-      when Mode.edit
-        $(@btn_edit).button('toggle')
-        set_btn_enabled(@btn_close, false)
+    #switch @mode
+      #when Mode.draw
+        #$(@btn_draw).button('toggle')
+        #set_btn_enabled(@btn_close, @can_close())
+      #when Mode.scribble
+        #$(@btn_scribble).button('toggle')
+        #set_btn_enabled(@btn_close, false)
+      #when Mode.edit
+        #$(@btn_edit).button('toggle')
+        #set_btn_enabled(@btn_close, false)
