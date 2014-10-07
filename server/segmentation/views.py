@@ -78,6 +78,7 @@ def task(request, dataset_id='all'):
                     [c.get_entry_dict() for c in contents]),
                 u'content_id_json': json.dumps(
                     [{'id': c.id} for c in contents]),
+                u'contents': contents,
 
                 # if 'true', ask the user a feedback survey at the end and promise
                 # payment to complete it.  Must be 'true' or 'false'.
