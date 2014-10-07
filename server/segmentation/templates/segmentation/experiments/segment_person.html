@@ -6,6 +6,9 @@
 <style>
 	canvas { border: 1px solid #969696; }
 	body { padding: 0 }
+  #num-images {
+    text-decoration: underline;
+  }
 </style>
 {% endblock %}
 
@@ -13,7 +16,9 @@
 <div id="mt-top-nohover">
 	<div id="mt-instructions">
 		<span>
-			Instructions: carefully trace around the person and inside the person to complete the task.
+      Instructions: carefully trace inside and around the person.
+      Work on <span id="num-images">{{ contents|length|apnumber }}
+        image{{ contents|length|pluralize }}</span> to complete the task.
 		</span>
 		<span class="pull-right">
 			<button type="button" id='btn-submit' class="btn btn-primary" disabled="disabled">Submit</button>
