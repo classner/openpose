@@ -182,7 +182,7 @@ class ControllerUI
     @s.update_cursor()
 
     p = @s.mouse_pos()
-    if p? and not @s.loading and @s.mode == Mode.scribble
+    if p? and not @s.loading and not @s.panning and @s.mode == Mode.scribble
       #if e.button == 1 # left mouse buttons
       is_foreground = e.which == 1
       @s.start_scribble([@s.mouse_pos()], is_foreground)
@@ -194,7 +194,7 @@ class ControllerUI
     if @s.modal_count > 0 then return true
     @s.update_cursor()
 
-    if @s.mode == Mode.scribble and @s.open_scribble
+    if not @s.panning and @s.mode == Mode.scribble and @s.open_scribble
       @s.undoredo.run(new UECreateScribble())
 
     return not @s.panning
