@@ -71,7 +71,7 @@ def calc_overlay_img(imgImage, scribbles):
         for s in range(1, points.shape[0]):
             draw.line((points[s-1, 0] * scale, points[s-1, 1] * scale,
                     points[s, 0] * scale, points[s, 1] * scale),
-                    fill=fill, width=2)
+                    fill=fill, width=1)
 
     # strage: this should have been done by the frame, but somehow there is a
     # tendency to lean right. I have not good explanation for that
