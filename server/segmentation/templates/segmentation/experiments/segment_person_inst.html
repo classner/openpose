@@ -14,17 +14,14 @@
 <div class="row">
 	<div class="span6">
 		<div class="hero-unit">
-			<h2>Your task is to draw polygons around regions that have a single type of material or texture.</h2>
-			<p style="color:#f00"><span class="label label-important">Note:</span> the shape does not have to be a flat surface; please make the regions as large as possible.</p>
-			<p>Different polygons can contain different materials, but each polygon must contain only one substance or texture.</p>
-			<p>Each polygon must exactly follow the material boundary.  Please adjust your shapes before submitting.</p>
+			<h2>Your task is to carefully trace the inside and the outside a person.</h2>
+      <p>All the clothes that a person wears (including hats, gloves, shoes)
+      belong to the inside. Everything else should be marked as outside (such
+      as bats, rackets, balls).</p>
 		</div>
 	</div>
 	<div class="span6">
-		<div class="thumbnail">
-			<img src="{{ content.image_1024.url }}" alt=""/>
-			<p class="caption">This will be your photograph.</p>
-		</div>
+    {% include "grid.html" with span="span3" rowsize="2" thumb_template="segmentation/experiments/instruction_thumb.html" entries=contents %}
 	</div>
 </div>
 
