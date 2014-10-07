@@ -69,8 +69,8 @@ def task(request, dataset_id='all'):
 
         if imgs:
             # pick a random non annotated picture
-            #contents = [imgs[np.random.randint(len(imgs))]]
-            contents = imgs[0:2]
+            contents = [imgs[np.random.randint(len(imgs))]]
+            #contents = imgs[0:2]
 
             context = {
                 # the current task
