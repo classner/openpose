@@ -21,12 +21,16 @@ class Command(BaseCommand):
 
             scribbles = json.loads(segmentation.scribbles)
 
-            old_factor = max(width, height)
-            new_factor = height
+            old_factor = float(max(width, height))
+            new_factor = float(height)
 
-            for scribble in scribbles:
-                for point in scribble[u'points']:
-                    point[0] = point[0] * old_factor / new_factor
-                    point[1] = point[1] * old_factor / new_factor
+            for i in xrange(len(scribbles)):
+                for j in xrange(len(scribbles[i][u'points'])):
+                    scribbles[i][u'points'][j][0] *= old_factor / new_factor
+                    scribbles[i][u'points'][j][1] *= old_factor / new_factor
+
+            new_scribbles = json.dumps(scribbles)
+
+            segmentation.scribbles = new_scribbles
 
             segmentation.save()
