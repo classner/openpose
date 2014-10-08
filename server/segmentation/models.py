@@ -37,6 +37,25 @@ class PersonSegmentation(ResultBase):
     def publishable(self):
         return self.photo.publishable()
 
+    def scribbles_svg_path(self):
+        """ Returns submitted scribbles as SVG path """
+        scribbles = json.loads(self.scribbles)
+
+        data = [[], []]
+        for scribble in scribbles:
+            if scribble[u'is_foreground']:
+                set_index = 0
+            else:
+                set_index = 1
+
+            for i,point in enumerate(scribble[u'points']):
+                if i == 0:
+                    data[set_index].append(u'M %f %f ' % (point[0], point[1]))
+                else:
+                    data[set_index].append(u'L %f %f ' % (point[0], point[1]))
+
+        return {u'foreground': ''.join(data[0]), u'background': ''.join(data[1])}
+
     @staticmethod
     def mturk_submit(user, hit_contents, results, time_ms, time_active_ms,
                      experiment, version, mturk_assignment=None, **kwargs):
