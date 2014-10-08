@@ -122,6 +122,24 @@ class ControllerState
     )
 
   get_scribble_data: =>
+    scribble_list = @get_scribble_list()
+
+    results = {}
+    photo_id = @contents[@content_index].id
+    results[photo_id] = {scribbles: scribble_list}
+
+    version: '2.0'
+    results: JSON.stringify(results)
+
+  set_photo: (photo_url) =>
+    @disable_buttons()
+    @loading = true
+    @photo_groups[@content_index].set_photo(photo_url, @ui, =>
+      console.log "loaded photo_url: #{photo_url}"
+      @request_new_segmentation_overlay()
+    )
+
+  get_scribble_list: =>
     scribble_list = []
     for scribble in @closed[@content_index].scribbles
       points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
@@ -129,7 +147,7 @@ class ControllerState
       group = @photo_groups[@content_index]
 
       # calculate the points with respect to a frame with the right aspact ratio
-      factor = Math.max(group.size.width, group.size.height)
+      factor = group.size.height
 
       x_max = group.size.width / factor
       y_max = group.size.height / factor
@@ -141,20 +159,7 @@ class ControllerState
         ])
       scribble_list.push(points_scaled)
 
-    results = {}
-    photo_id = @contents[@content_index].id
-    results[photo_id] = {scribbles: scribble_list}
-
-    version: '1.0'
-    results: JSON.stringify(results)
-
-  set_photo: (photo_url) =>
-    @disable_buttons()
-    @loading = true
-    @photo_groups[@content_index].set_photo(photo_url, @ui, =>
-      console.log "loaded photo_url: #{photo_url}"
-      @request_new_segmentation_overlay()
-    )
+    return scribble_list
 
   # return data that will be submitted
   get_submit_data: =>
@@ -163,24 +168,7 @@ class ControllerState
     time_active_ms = {}
 
     for content, index in @contents
-      scribble_list = []
-      for scribble in @closed[index].scribbles
-        points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
-
-        group = @photo_groups[index]
-
-        # calculate the points with respect to a frame with the right aspact ratio
-        factor = Math.max(group.size.width, group.size.height)
-
-        x_max = group.size.width / factor
-        y_max = group.size.height / factor
-
-        for p in scribble.scribble.points
-          points_scaled.points.push([
-            Math.max(0, Math.min(x_max, p.x / factor)),
-            Math.max(0, Math.min(y_max, p.y / factor)),
-          ])
-        scribble_list.push(points_scaled)
+      scribble_list = @get_scribble_list()
 
       poly_list = []
       for poly in @closed[index].polys
@@ -207,7 +195,7 @@ class ControllerState
       time_active_ms[photo_id].scribbles =
         (s.time_active_ms for s in @closed[index].scribbles)
 
-    version: '1.0'
+    version: '2.0'
     results: JSON.stringify(results)
     time_ms: JSON.stringify(time_ms)
     time_active_ms: JSON.stringify(time_active_ms)

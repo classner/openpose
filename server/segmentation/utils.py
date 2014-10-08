@@ -41,7 +41,7 @@ def calc_overlay_img(imgImage, scribbles):
 
     img = np.asarray(imgImage)
 
-    scale = max(width, height)
+    scale = height
 
     bgd_model = np.zeros((1, 65), np.float64)
     fgd_model = np.zeros((1, 65), np.float64)

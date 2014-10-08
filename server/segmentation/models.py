@@ -61,7 +61,7 @@ class PersonSegmentation(ResultBase):
                      experiment, version, mturk_assignment=None, **kwargs):
         """ Add new instances from a mturk HIT after the user clicks [submit] """
 
-        if unicode(version) != u'1.0':
+        if unicode(version) != u'2.0':
             raise ValueError("Unknown version: %s" % version)
 
         new_objects = {}

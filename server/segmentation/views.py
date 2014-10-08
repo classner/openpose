@@ -46,7 +46,7 @@ def task(request, dataset_id='all'):
 
         PersonSegmentation.mturk_submit(user,
                 Photo.objects.filter(id__in=photo_ids), results, time_ms,
-                time_active_ms, experiment, u'1.0')
+                time_active_ms, experiment, data[u'version'])
 
         return json_success_response()
     else:
@@ -106,13 +106,10 @@ def segmentation(request):
     bytes_io = StringIO()
     data = request.REQUEST
 
-    if not ('results' in data):
-        return json_error_response('No results')
+    results = json.loads(data[u'results'])
 
-    try:
-        results = json.loads(data[u'results'])
-    except ValueError:
-        return json_error_response(u'JSON parse error')
+    if unicode(data[u'version']) != u'2.0':
+        raise ValueError("Unknown version: %s" % version)
 
     # for not really needed here...
     for img_id, annotations in results.items():
