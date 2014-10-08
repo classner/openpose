@@ -60,6 +60,17 @@ def calc_overlay_img(imgImage, scribbles):
     scribbles_map_img = Image.fromarray(scribbles_map)
     draw = ImageDraw.Draw(scribbles_map_img)
 
+    # strage: this should have been done by the frame, but somehow there is a
+    # tendency to lean right. I have not good explanation for that
+    draw.line((margin, margin, width-margin, margin),
+            fill=background_scribble_label, width=margin)
+    draw.line((width-margin, margin, width-margin, height-margin),
+            fill=background_scribble_label, width=margin)
+    draw.line((width-margin, height-margin, margin, height-margin),
+            fill=background_scribble_label, width=margin)
+    draw.line((margin, height-margin, margin, margin),
+            fill=background_scribble_label, width=margin)
+
     for scribble in scribbles:
         points = np.array(scribble[u'points'])
 
@@ -72,17 +83,6 @@ def calc_overlay_img(imgImage, scribbles):
             draw.line((points[s-1, 0] * scale, points[s-1, 1] * scale,
                     points[s, 0] * scale, points[s, 1] * scale),
                     fill=fill, width=1)
-
-    # strage: this should have been done by the frame, but somehow there is a
-    # tendency to lean right. I have not good explanation for that
-    draw.line((margin, margin, width-margin, margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((width-margin, margin, width-margin, height-margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((width-margin, height-margin, margin, height-margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((margin, height-margin, margin, margin),
-            fill=background_scribble_label, width=margin)
 
     scribbles_map = np.asarray(scribbles_map_img)
 
