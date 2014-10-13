@@ -75,19 +75,6 @@ class SegmentationViewGroup
     @object_layer.add(el)
     @remove(el)
 
-  add_loading: -> if not @k_loading?
-    @k_loading = new Kinetic.Text(
-      x: 30, y: 30, text: "Loading...", align: "left",
-      fontSize: 32, fontFamily: "Helvetica,Verdana,Ariel",
-      textFill: "#000")
-    @add(@k_loading)
-    @draw()
-
-  remove_loading: -> if @k_loading?
-    @remove(@k_loading)
-    @k_loading = null
-    @draw()
-
   set_segmentation_overlay: (overlay_url, ui, on_load) ->
     if overlay_url?
       overlay_obj = new Image()
@@ -109,11 +96,9 @@ class SegmentationViewGroup
         @overlay = null
 
   set_photo: (photo_url, ui, on_load) ->
-    @add_loading()
     @photo_obj = new Image()
     @photo_obj.src = photo_url
     @photo_obj.onload = do() => =>
-      @remove_loading()
       @size = compute_dimensions(@photo_obj, @view.bbox)
       #@stage.setWidth(@size.width)
       #@stage.setHeight(@size.height)
@@ -152,11 +137,53 @@ class SegmentationView
       width: @size.width,
       height: @size.height)
 
-    #@stage.on('mouseout', => @object_layer.draw())
-    #@stage.on('mousemove', ->
-      #if not ui.panning
-        #ui.update()
-    #)
+    @svg_container = d3.select("##{args.container_id}")
+      .append("svg")
+        .attr("class", 'svg-container')
+        .attr("width", @size.width)
+        .attr("height", @size.height)
+        .attr("style", 'position: absolute; top: 0; left: 0')
+
+    @svg_message = @svg_container
+      .append('g')
+      .style('opacity', 1e-6)
+
+    @svg_message.append('rect')
+      .attr('class', 'message')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', @size.width)
+      .attr('height', 115)
+      .style('opacity', 0.7)
+
+    @svg_message.append('text')
+      .attr('class', 'message')
+      .attr('y', 10)
+
+  set_message: (message) ->
+    if @cur_message != message
+      add_message = =>
+        if message?
+          text = @svg_message.select('text')
+          text.selectAll('tspan').remove()
+          for m in message
+            text.append('tspan')
+              .attr('x', 20)
+              .attr('dy', '1.3em')
+              .text(m)
+          @svg_message
+            .transition()
+              .duration(250)
+              .style('opacity', 1)
+              .each('end', => @cur_message = message)
+      if @cur_message?
+        @cur_message = null
+        @svg_message.transition()
+          .duration(250)
+          .style('opacity', 1e-6)
+          .each('end', add_message)
+      else
+        add_message()
 
   add_to_stage: (o) ->
     @stage.add(o)
