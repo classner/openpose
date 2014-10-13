@@ -10,7 +10,6 @@ class ControllerState
   constructor: (@ui, @contents, @args) ->
     @loading = true
 
-    @content_index = 0
 
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
@@ -46,6 +45,12 @@ class ControllerState
     @btn_delete = if args.btn_delete? then args.btn_delete else '#btn-delete'
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
+    # gui elements
+    @stage_ui = new StageUI(@ui, @args)
+
+    @reset(@contents)
+
+  reset: (@contents) ->
     @closed = ({polys: [], scribbles: []} for i in @contents)
     @open_poly = null
     @sel_poly = null
@@ -53,8 +58,11 @@ class ControllerState
 
     @saved_point = null  # start of drag
 
-    # gui elements
-    @stage_ui = new StageUI(@ui, @args)
+    if @photo_groups?
+      for group in @photo_groups
+        group.destroy()
+
+      @photo_groups = null
 
     @photo_groups = (new StageUIGroup(@stage_ui) for i in @contents)
 

@@ -62,6 +62,11 @@ class StageUIGroup
     @overlay_layer.draw()
     @object_layer.draw()
 
+  destroy: ->
+    @photo_layer.destroy()
+    @overlay_layer.destroy()
+    @object_layer.destroy()
+
   error_line: (p1, p2) ->
     el = new Kinetic.Line(
       points: [clone_pt(p1), clone_pt(p2)], opacity: 0.5,
