@@ -2,6 +2,7 @@
 {% compress js %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.hotkeys.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/kinetic-v4.3.3.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/d3.v3.min.js"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/util.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/geom.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/actions.coffee"></script>
@@ -18,4 +19,3 @@ window.get_segmentation_url = function() {
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/polygon_ui.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/scribble_ui.coffee"></script>
 {% endcompress %}
-<script src='http://d3js.org/d3.v3.min.js'></script>
