@@ -1,5 +1,5 @@
 class SegmentationModel
-  constructor: (@ui, @stage_ui, @args) ->
+  constructor: (@ui, @view, @args) ->
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
     @log = new ActionLog()
@@ -17,7 +17,7 @@ class SegmentationModel
 
       @photo_groups = null
 
-    @photo_groups = (new SegmentationViewGroup(@stage_ui) for i in @contents)
+    @photo_groups = (new SegmentationViewGroup(@view) for i in @contents)
 
     @content_index = 0
     @seen_photos = 1
@@ -145,7 +145,7 @@ class SegmentationModel
 
     scribble = new Scribble(points, is_foreground)
     @open_scribble = new ScribbleUI(@closed[@content_index].scribbles.length,
-      scribble, @stage_ui, @photo_groups[@content_index])
+      scribble, @view, @photo_groups[@content_index])
     @open_scribble.timer = new ActiveTimer()
     @open_scribble.timer.start()
     @open_scribble
@@ -177,7 +177,7 @@ class SegmentationModel
 
   insert_scribble: (points, is_foreground, id, time_ms, time_active_ms) ->
     scribble = new Scribble(points, is_foreground)
-    scribble_ui = new ScribbleUI(id, scribble, @stage_ui,
+    scribble_ui = new ScribbleUI(id, scribble, @view,
       @photo_groups[@content_index])
     scribble_ui.time_ms = time_ms
     scribble_ui.time_active_ms = time_active_ms

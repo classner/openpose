@@ -152,8 +152,13 @@ class SegmentationController
   blur: (e) =>
     @panning = false
     @is_mousedown = false
+
+    if not @panning and @s.open_scribble
+      @s.undoredo.run(new UECreateScribble())
+
     if @modal_count > 0 then return true
     @update_cursor()
+
     return true
 
   wheel: (e) =>
@@ -194,7 +199,7 @@ class SegmentationController
     if @modal_count > 0 then return true
     if @is_mousedown
       if @panning
-        scale = 1.0 / @s.stage_ui.get_zoom_factor()
+        scale = 1.0 / @view.get_zoom_factor()
         @translate_delta(
           scale * (@mousepos.x - e.pageX),
           scale * (@mousepos.y - e.pageY),

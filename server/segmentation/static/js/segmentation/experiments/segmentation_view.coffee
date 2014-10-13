@@ -1,18 +1,18 @@
 class SegmentationViewGroup
-  constructor: (@stage_ui) ->
+  constructor: (@view) ->
     @photo_layer = new Kinetic.Layer()
-    @stage_ui.add_to_stage(@photo_layer)
+    @view.add_to_stage(@photo_layer)
     @photo_layer.setZIndex(0)
     @overlay_layer = new Kinetic.Layer()
-    @stage_ui.add_to_stage(@overlay_layer)
+    @view.add_to_stage(@overlay_layer)
     @overlay_layer.setZIndex(1)
     @object_layer = new Kinetic.Layer()
-    @stage_ui.add_to_stage(@object_layer)
+    @view.add_to_stage(@object_layer)
     @object_layer.setZIndex(2)
 
     @overlay_layer_visible = true
 
-    @size = @stage_ui.size
+    @size = @view.size
 
   toggle_segment_layer: ->
     @overlay_layer_visible = !@overlay_layer_visible
@@ -114,7 +114,7 @@ class SegmentationViewGroup
     @photo_obj.src = photo_url
     @photo_obj.onload = do() => =>
       @remove_loading()
-      @size = compute_dimensions(@photo_obj, @stage_ui.bbox)
+      @size = compute_dimensions(@photo_obj, @view.bbox)
       #@stage.setWidth(@size.width)
       #@stage.setHeight(@size.height)
       @photo = new Kinetic.Image(
@@ -126,7 +126,7 @@ class SegmentationViewGroup
       on_load?()
 
   mouse_pos: ->
-    p = @stage_ui.mouse_pos()
+    p = @view.mouse_pos()
 
     if not p?
       return p
