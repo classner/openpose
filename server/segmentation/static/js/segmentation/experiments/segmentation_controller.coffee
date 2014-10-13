@@ -1,15 +1,11 @@
 # Main control logic for the UI.  Actions in this class delegate through
 # undo/redo and check whether something is feasible.
 class SegmentationController
-  constructor: (contents, args) ->
+  constructor: (args) ->
     # gui elements
     @view = new SegmentationView(@ui, args)
 
-    @s = new SegmentationModel(@, @view, contents, args)
-
-    @s.reset(contents, =>
-      @request_new_segmentation_overlay()
-    )
+    @s = new SegmentationModel(@, @view, args)
 
     # disable right click
     $(document).on('contextmenu', (e) =>
@@ -30,15 +26,6 @@ class SegmentationController
     @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
-    # enabled when shift is held to drag the viewport around
-    @panning = false
-
-    # mouse state (w.r.t document page)
-    @is_mousedown = false
-    @mousepos = null
-
-    # if nonzero, a modal is visible
-    @modal_count = 0
 
     # init buttons
     $(@btn_toggle).on('click', =>
@@ -50,9 +37,6 @@ class SegmentationController
       if not @loading then @next_image())
     $(@btn_prev).on('click', =>
       if not @loading then @prev_image())
-
-    @loading = true
-    @disable_buttons()
 
     # log instruction viewing
     $('#modal-instructions').on('show', =>
@@ -81,6 +65,24 @@ class SegmentationController
       .on('keydown', @keydown)
       .on('keyup', @keyup)
       .on('blur', @blur)
+
+  reset: (contents) ->
+    # enabled when shift is held to drag the viewport around
+    @panning = false
+
+    # mouse state (w.r.t document page)
+    @is_mousedown = false
+    @mousepos = null
+
+    # if nonzero, a modal is visible
+    @modal_count = 0
+
+    @loading = true
+    @disable_buttons()
+
+    @s.reset(contents, =>
+      @request_new_segmentation_overlay()
+    )
 
   next_image: =>
     @s.undoredo.run(new UENextImage())

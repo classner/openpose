@@ -5,7 +5,8 @@ $( ->
     'container_id': 'mt-container'
   }
 
-  window.controller_ui = new SegmentationController(window.mt_contents, args)
+  window.controller_ui = new SegmentationController(args)
+  window.controller_ui.reset(window.mt_contents)
 )
 
 btn_submit = ->
