@@ -2,7 +2,14 @@
 # undo/redo and check whether something is feasible.
 class SegmentationController
   constructor: (contents, args) ->
-    @s = new SegmentationModel(@, contents, args)
+    # gui elements
+    @view = new SegmentationView(@ui, args)
+
+    @s = new SegmentationModel(@, @view, contents, args)
+
+    @s.reset(contents, =>
+      @request_new_segmentation_overlay()
+    )
 
     # disable right click
     $(document).on('contextmenu', (e) =>
@@ -16,16 +23,36 @@ class SegmentationController
       .on('mousemove', @mousemove)
       .on('selectstart', -> false)
 
+    # buttons
+    @btn_toggle = if args.btn_toggle? then args.btn_toggle else '#btn-toggle'
+    @btn_next = if args.btn_next? then args.btn_next else '#btn-next'
+    @btn_prev = if args.btn_prev? then args.btn_prev else '#btn-prev'
+    @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
+    @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
+
+    # enabled when shift is held to drag the viewport around
+    @panning = false
+
+    # mouse state (w.r.t document page)
+    @is_mousedown = false
+    @mousepos = null
+
+    # if nonzero, a modal is visible
+    @modal_count = 0
+
     # init buttons
-    $(@s.btn_toggle).on('click', =>
+    $(@btn_toggle).on('click', =>
       @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
     )
-    $(@s.btn_zoom_reset).on('click', =>
-      if not @s.loading then @zoom_reset())
-    $(@s.btn_next).on('click', =>
-      if not @s.loading then @next_image())
-    $(@s.btn_prev).on('click', =>
-      if not @s.loading then @prev_image())
+    $(@btn_zoom_reset).on('click', =>
+      if not @loading then @zoom_reset())
+    $(@btn_next).on('click', =>
+      if not @loading then @next_image())
+    $(@btn_prev).on('click', =>
+      if not @loading then @prev_image())
+
+    @loading = true
+    @disable_buttons()
 
     # log instruction viewing
     $('#modal-instructions').on('show', =>
@@ -38,11 +65,11 @@ class SegmentationController
     # keep track of modal state
     # (since we want to allow scrolling)
     $('.modal').on('show', =>
-      @s.modal_count += 1
+      @modal_count += 1
       true
     )
     $('.modal').on('hide', =>
-      @s.modal_count -= 1
+      @modal_count -= 1
       true
     )
 
@@ -55,37 +82,35 @@ class SegmentationController
       .on('keyup', @keyup)
       .on('blur', @blur)
 
-    # keep track of invalid close attempts to show a
-    # popup explaining the problem
-    @num_failed_closes = 0
-
   next_image: =>
     @s.undoredo.run(new UENextImage())
+    @update_buttons()
 
   prev_image: =>
     @s.undoredo.run(new UEPrevImage())
+    @update_buttons()
 
   get_submit_data: =>
     @s.get_submit_data()
 
   keydown: (e) =>
-    if @s.modal_count > 0 then return true
+    if @modal_count > 0 then return true
     switch e.keyCode
       when 37 # left
-        @s.translate_delta(-20, 0)
+        @translate_delta(-20, 0)
         false
       when 38 # up
-        @s.translate_delta(0, -20)
+        @translate_delta(0, -20)
         false
       when 39 # right
-        @s.translate_delta(20, 0)
+        @translate_delta(20, 0)
         false
       when 40 # down
-        @s.translate_delta(0, 20)
+        @translate_delta(0, 20)
         false
       when 32 # space
-        @s.panning = true
-        @s.update_cursor()
+        @panning = true
+        @update_cursor()
         false
       when 84 # T
         @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
@@ -93,93 +118,153 @@ class SegmentationController
       else
         true
 
+  request_new_segmentation_overlay: =>
+    @segmentation_overlay_request.abort() if @segmentation_overlay_request?
+
+    @disable_buttons()
+    @loading = true
+
+    @segmentation_overlay_request = $.ajax(
+      type: "POST"
+      url: window.get_segmentation_url()
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
+      dataType: "text"
+      data: @s.get_scribble_data()
+      success: (data, status, jqxhr) =>
+        overlay_url = "data:image/jpeg;base64," + data
+        @s.set_segmentation_overlay(overlay_url, =>
+          @loading = false
+          @update_buttons()
+        )
+      error: (jqxhr, status, error) ->
+        @loading = false
+        console.log status
+      complete: =>
+        @segmentation_overlay_request = null
+    )
+
   keyup: (e) =>
-    @s.panning = false
-    if @s.modal_count > 0 then return true
-    @s.update_cursor()
+    @panning = false
+    if @modal_count > 0 then return true
+    @update_cursor()
     return true
 
   blur: (e) =>
-    @s.panning = false
-    @s.mousedown = false
-    if @s.modal_count > 0 then return true
-    @s.update_cursor()
+    @panning = false
+    @is_mousedown = false
+    if @modal_count > 0 then return true
+    @update_cursor()
     return true
 
   wheel: (e) =>
-    if @s.modal_count > 0 then return true
+    if @modal_count > 0 then return true
     oe = e.originalEvent
     if oe.wheelDelta?
-      @s.zoom_delta(oe.wheelDelta)
+      @zoom_delta(oe.wheelDelta)
     else
-      @s.zoom_delta(oe.detail * -60)
+      @zoom_delta(oe.detail * -60)
     window.scrollTo(0, 0)
     stop_event(e)
 
-  zoom_reset: (e) =>
-    @s.zoom_reset()
-
   mousedown: (e) =>
-    if @s.modal_count > 0 then return true
-    @s.mousedown = true
-    @s.mousepos = {x: e.pageX, y: e.pageY}
-    @s.update_cursor()
+    if @modal_count > 0 then return true
+    @is_mousedown = true
+    @mousepos = {x: e.pageX, y: e.pageY}
+    @update_cursor()
 
     p = @s.mouse_pos()
-    if p? and not @s.loading and not @s.panning
+    if p? and not @loading and not @panning
       #if e.button == 1 # left mouse buttons
       is_foreground = e.which == 1
       @s.start_scribble([@s.mouse_pos()], is_foreground)
 
-    return not @s.panning
+    return not @panning
 
   mouseup: (e) =>
-    @s.mousedown = false
-    if @s.modal_count > 0 then return true
-    @s.update_cursor()
+    @is_mousedown = false
+    if @modal_count > 0 then return true
+    @update_cursor()
 
-    if not @s.panning and @s.open_scribble
+    if not @panning and @s.open_scribble
       @s.undoredo.run(new UECreateScribble())
 
-    return not @s.panning
+    return not @panning
 
   mousemove: (e) =>
-    if @s.modal_count > 0 then return true
-    if @s.mousedown
-      if @s.panning
+    if @modal_count > 0 then return true
+    if @is_mousedown
+      if @panning
         scale = 1.0 / @s.stage_ui.get_zoom_factor()
-        @s.stage_ui.translate_delta(
-          scale * (@s.mousepos.x - e.pageX),
-          scale * (@s.mousepos.y - e.pageY),
+        @translate_delta(
+          scale * (@mousepos.x - e.pageX),
+          scale * (@mousepos.y - e.pageY),
           false)
-        @s.mousepos = {x: e.pageX, y: e.pageY}
 
-      if @s.open_scribble?
-        @s.open_scribble.scribble.push_point(@s.mouse_pos())
-        @s.open_scribble.update(@)
+        @mousepos = {x: e.pageX, y: e.pageY}
+      else
+        @s.push_point(@s.mouse_pos())
 
     return true
 
   update: =>
-    @s.open_scribble?.update(@)
+    @s.update()
 
-  start_drag_point: (i) =>
-    p = @s.sel_poly.poly.get_pt(i)
-    @s.drag_valid_point = clone_pt(p)
-    @s.drag_start_point = clone_pt(p)
+  disable_buttons: ->
+    set_btn_enabled(@btn_toggle, false)
+    set_btn_enabled(@btn_next, false)
+    set_btn_enabled(@btn_prev, false)
+    set_btn_enabled(@btn_submit, false)
 
-  revert_drag_point: (i) =>
-    @s.undoredo.run(new UEDragVertex(i,
-      @s.drag_start_point, @s.drag_valid_point))
+  # update cursor only
+  update_cursor: ->
+    if @panning
+      if $.browser.webkit
+        if @is_mousedown
+          $('canvas').css('cursor', '-webkit-grabing')
+        else
+          $('canvas').css('cursor', '-webkit-grab')
+      else
+        if @is_mousedown
+          $('canvas').css('cursor', '-moz-grabing')
+        else
+          $('canvas').css('cursor', '-moz-grab')
+    else
+      $('canvas').css('cursor', 'crosshair')
 
-  progress_drag_point: (i, p) =>
-    @s.sel_poly.poly.set_point(i, p)
-    if @drag_valid(i) then @s.drag_valid_point = clone_pt(p)
+  # update buttons and cursor
+  update_buttons: ->
+    @update_cursor()
 
-  finish_drag_point: (i, p) =>
-    @s.undoredo.run(new UEDragVertex(i, @s.drag_start_point, p))
-    @s.drag_valid_point = null
-    @s.drag_start_point = null
+    set_btn_enabled(@btn_submit, not @loading and @s.seen_photos == @s.contents.length)
+    set_btn_enabled(@btn_toggle, not @loading)
+    set_btn_enabled(@btn_zoom_reset,
+      not @loading and @view.zoom_exp > 0)
+    set_btn_enabled(@btn_next,
+      not @loading and @s.content_index < @s.contents.length - 1)
+    set_btn_enabled(@btn_prev,
+      not @loading and @s.content_index > 0)
 
-  drag_valid: (i) =>
-    not @s.sel_poly.poly.self_intersects_at_index(i)
+  # zoom in/out by delta
+  zoom_delta: (delta) =>
+    @zoomed_adjust = false
+    @view.zoom_delta(delta)
+    @update_buttons()
+    @update_zoom()
+
+  # reset to 1.0 zoom
+  zoom_reset: (e) =>
+    @zoomed_adjust = false
+    @view.zoom_reset()
+    @update_buttons()
+    @update_zoom()
+
+  update_zoom: (redraw=true) =>
+    inv_f = 1.0 / @get_zoom_factor()
+    @s.update_zoom(inv_f, redraw)
+
+  get_zoom_factor: =>
+    @view.get_zoom_factor()
+
+  translate_delta: (x, y) =>
+    @view.translate_delta(x, y)
+

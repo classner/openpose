@@ -1,72 +1,3 @@
-# Control encapsulated into UndoableEvent objects
-class UEToggleMode extends UndoableEvent
-  constructor: (@mode) ->
-    @open_points = null
-    @sel_poly_id = null
-    @sel_mode = null
-
-  run: (ui) ->
-    @sel_mode = ui.s.mode
-
-    switch @sel_mode
-      when Mode.draw
-        if ui.s.open_poly?
-          @open_points = ui.s.open_poly.poly.clone_points()
-      when Mode.edit
-        @sel_poly_id = ui.s.sel_poly?.id
-
-    ui.s.switch_mode(@mode)
-    ui.s.update_buttons()
-
-  redo: (ui) ->
-    ui.s.switch_mode(@mode)
-    ui.s.update_buttons()
-
-  undo: (ui) ->
-    ui.s.switch_mode(@sel_mode)
-
-    switch @sel_mode
-      when Mode.draw
-        if @open_points?
-          ui.s.create_poly(@open_points)?.update(ui)
-      when Mode.edit
-        if @sel_poly_id?
-          ui.s.select_poly(ui, @sel_poly_id)?.update(ui)
-
-  entry: -> { name: "UEToggleMode", args: { mode: @mode } }
-
-class UERemoveOpenPoly extends UndoableEvent
-  constructor: ->
-    @open_points = null
-
-  run: (ui) ->
-    if ui.s.open_poly?
-      @open_points = ui.s.open_poly.poly.clone_points()
-    ui.s.remove_open_poly()
-    ui.s.update_buttons()
-
-  redo: (ui) ->
-    ui.s.remove_open_poly()
-    ui.s.update_buttons()
-
-  undo: (ui) ->
-    if @open_points?
-      ui.s.create_poly(@open_points)?.update(ui)
-
-  entry: -> { name: "UERemoveOpenPoly" }
-
-class UEPushPoint extends UndoableEvent
-  constructor: (p) -> @p = clone_pt(p)
-  run: (ui) -> ui.s.push_point(@p)?.update(ui)
-  undo: (ui) -> ui.s.pop_point()?.update(ui)
-  entry: -> { name: "UEPushPoint", args: { p: @p } }
-
-class UECreatePolygon extends UndoableEvent
-  constructor: (p) -> @p = clone_pt(p)
-  run: (ui) -> ui.s.create_poly([@p])?.update(ui)
-  undo: (ui) -> ui.s.remove_open_poly()?.update(ui)
-  entry: -> { name: "UECreatePolygon", args: { p: @p } }
-
 class UENextImage extends UndoableEvent
   run: (ui) -> ui.s.next_image()
   undo: (ui) -> ui.s.prev_image()
@@ -87,7 +18,7 @@ class UECreateScribble extends UndoableEvent
 
     @old_overlay_url = ui.s.segmentation_overlay_url()
 
-    ui.s.request_new_segmentation_overlay()
+    ui.request_new_segmentation_overlay()
 
   undo: (ui) ->
     [..., scribble_ui] = ui.s.closed[ui.s.content_index].scribbles

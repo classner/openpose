@@ -57,7 +57,7 @@ class UndoRedo
   can_redo: -> @redo_stack.length > 0
 
   update_buttons: ->
-    @ui.s.update_buttons()
+    @ui.update_buttons()
     if @btn_undo? then set_btn_enabled(@btn_undo, @can_undo())
     if @btn_redo? then set_btn_enabled(@btn_redo, @can_redo())
 

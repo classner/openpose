@@ -1,35 +1,11 @@
 class SegmentationModel
-  constructor: (@ui, @contents, @args) ->
-    @loading = true
-
+  constructor: (@ui, @stage_ui, @args) ->
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
     @log = new ActionLog()
     @log.action($.extend(true, {name:'init'}, args))
 
-    # enabled when shift is held to drag the viewport around
-    @panning = false
-
-    # mouse state (w.r.t document page)
-    @mousedown = false
-    @mousepos = null
-
-    # if nonzero, a modal is visible
-    @modal_count = 0
-
-    # buttons
-    @btn_toggle = if args.btn_toggle? then args.btn_toggle else '#btn-toggle'
-    @btn_next = if args.btn_next? then args.btn_next else '#btn-next'
-    @btn_prev = if args.btn_prev? then args.btn_prev else '#btn-prev'
-    @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
-    @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
-
-    # gui elements
-    @stage_ui = new SegmentationView(@ui, @args)
-
-    @reset(@contents)
-
-  reset: (@contents) ->
+  reset: (@contents, on_load) ->
     @closed = ({scribbles: []} for i in @contents)
     @open_scribble = null
 
@@ -46,7 +22,12 @@ class SegmentationModel
     @content_index = 0
     @seen_photos = 1
 
-    @init_photo_group()
+    @init_photo_group(on_load)
+
+  push_point: (p) ->
+    if @open_scribble
+      @open_scribble.scribble.push_point(p)
+      @open_scribble.update(@ui)
 
   next_image: ->
     @photo_groups[@content_index].hide()
@@ -59,51 +40,28 @@ class SegmentationModel
 
       @init_photo_group()
 
-    @update_buttons()
-
   prev_image: ->
     @photo_groups[@content_index].hide()
     @content_index--
     @photo_groups[@content_index].show()
 
-    @update_buttons()
-
-  init_photo_group: ->
+  init_photo_group: (on_load) ->
     if @contents[@content_index]?.image?['2048']?
       url = @contents[@content_index].image['2048']
 
-      @set_photo(url)
+      @set_photo(url, on_load)
+    else if on_load?
+      on_load()
 
   segmentation_overlay_url: ->
     @photo_groups[@content_index].segmentation_overlay_url
 
-  set_segmentation_overlay: (url) =>
+  set_segmentation_overlay: (url, on_load) =>
     @photo_groups[@content_index].set_segmentation_overlay(url, @ui, =>
       @photo_groups[@content_index].segmentation_overlay_url = url
-      @loading = false
-      @update_buttons()
       console.log "loaded background"
-    )
 
-  request_new_segmentation_overlay: =>
-    @segmentation_overlay_request.abort() if @segmentation_overlay_request?
-
-    @disable_buttons()
-    @loading = true
-
-    @segmentation_overlay_request = $.ajax(
-      type: "POST"
-      url: window.get_segmentation_url()
-      contentType: "application/x-www-form-urlencoded; charset=UTF-8"
-      dataType: "text"
-      data: @get_scribble_data()
-      success: (data, status, jqxhr) =>
-        overlay_url = "data:image/jpeg;base64," + data
-        @set_segmentation_overlay(overlay_url)
-      error: (jqxhr, status, error) ->
-        console.log status
-      complete: =>
-        @segmentation_overlay_request = null
+      on_load() if on_load?
     )
 
   get_scribble_data: =>
@@ -116,13 +74,14 @@ class SegmentationModel
     version: '2.0'
     results: JSON.stringify(results)
 
-  set_photo: (photo_url) =>
-    @disable_buttons()
-    @loading = true
+  set_photo: (photo_url, on_load) =>
     @photo_groups[@content_index].set_photo(photo_url, @ui, =>
       console.log "loaded photo_url: #{photo_url}"
-      @request_new_segmentation_overlay()
+      on_load() if on_load?
     )
+
+  update: ->
+    @open_scribble?.update(@ui)
 
   get_scribble_list: =>
     scribble_list = []
@@ -178,34 +137,6 @@ class SegmentationModel
   # get mouse position (after taking zoom into account)
   mouse_pos: => @photo_groups[@content_index].mouse_pos()
 
-  # zoom in/out by delta
-  zoom_delta: (delta) =>
-    @zoomed_adjust = false
-    @stage_ui.zoom_delta(delta)
-    @update_buttons()
-    @update_zoom()
-
-  # reset to 1.0 zoom
-  zoom_reset: =>
-    @zoomed_adjust = false
-    @stage_ui.zoom_reset()
-    @update_buttons()
-    @update_zoom()
-
-  update_zoom: (redraw=true) =>
-    inv_f = 1.0 / @stage_ui.get_zoom_factor()
-    for scribble in @closed[@content_index].scribbles
-      scribble.update_zoom(@ui, inv_f, false)
-
-    if redraw
-      @draw()
-
-  get_zoom_factor: =>
-    @stage_ui.get_zoom_factor()
-
-  translate_delta: (x, y) =>
-    @stage_ui.translate_delta(x, y)
-
   # start a scribble
   start_scribble: (points, is_foreground) ->
     console.log 'start_scribble'
@@ -217,7 +148,6 @@ class SegmentationModel
       scribble, @stage_ui, @photo_groups[@content_index])
     @open_scribble.timer = new ActiveTimer()
     @open_scribble.timer.start()
-    @update_buttons()
     @open_scribble
 
   create_scribble: ->
@@ -232,6 +162,13 @@ class SegmentationModel
 
     scribble
 
+  update_zoom: (inv_f, redraw) ->
+    for scribble in @closed[@content_index].scribbles
+      scribble.update_zoom(@ui, inv_f, false)
+
+    if redraw
+      @draw()
+
   remove_scribble: ->
     scribble = @closed[@content_index].scribbles.pop()
 
@@ -245,40 +182,5 @@ class SegmentationModel
     scribble_ui.time_ms = time_ms
     scribble_ui.time_active_ms = time_active_ms
     @closed[@content_index].scribbles.splice(id, 0, scribble_ui)
-    @update_buttons()
     scribble_ui
 
-  disable_buttons: ->
-    set_btn_enabled(@btn_toggle, false)
-    set_btn_enabled(@btn_next, false)
-    set_btn_enabled(@btn_prev, false)
-    set_btn_enabled(@btn_submit, false)
-
-  # update cursor only
-  update_cursor: ->
-    if @panning
-      if $.browser.webkit
-        if @mousedown
-          $('canvas').css('cursor', '-webkit-grabing')
-        else
-          $('canvas').css('cursor', '-webkit-grab')
-      else
-        if @mousedown
-          $('canvas').css('cursor', '-moz-grabing')
-        else
-          $('canvas').css('cursor', '-moz-grab')
-    else
-      $('canvas').css('cursor', 'crosshair')
-
-  # update buttons and cursor
-  update_buttons: ->
-    @update_cursor()
-
-    set_btn_enabled(@btn_submit, not @loading and @seen_photos == @contents.length)
-    set_btn_enabled(@btn_toggle, not @loading)
-    set_btn_enabled(@btn_zoom_reset,
-      not @loading and @stage_ui.zoom_exp > 0)
-    set_btn_enabled(@btn_next,
-      not @loading and @content_index < @contents.length - 1)
-    set_btn_enabled(@btn_prev,
-      not @loading and @content_index > 0)

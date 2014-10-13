@@ -153,10 +153,10 @@ class SegmentationView
       height: @size.height)
 
     #@stage.on('mouseout', => @object_layer.draw())
-    @stage.on('mousemove', ->
-      if not ui.s.panning
-        ui.update()
-    )
+    #@stage.on('mousemove', ->
+      #if not ui.panning
+        #ui.update()
+    #)
 
   add_to_stage: (o) ->
     @stage.add(o)
