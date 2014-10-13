@@ -99,10 +99,6 @@ class SegmentationViewGroup
             x:0, y: 0, image: overlay_obj,
             width: @size.width, height: @size.height)
           @add_to_layer(@overlay, @overlay_layer, 0.5)
-          @overlay.on('mousedown', ->
-            if not ui.s.panning
-              ui.unselect_poly()
-          )
         @draw()
         on_load?()
 
@@ -126,10 +122,6 @@ class SegmentationViewGroup
         width: @size.width, height:@size.height)
       @photo_layer.add(@photo)
       @ready = true
-      @photo.on('mousedown', ->
-        if not ui.s.panning
-          ui.unselect_poly()
-      )
       @draw()
       on_load?()
 
