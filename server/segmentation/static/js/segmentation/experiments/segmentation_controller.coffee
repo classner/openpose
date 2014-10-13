@@ -80,12 +80,19 @@ class SegmentationController
     @loading = true
     @disable_buttons()
 
-    @s.reset(contents, =>
-      @request_new_segmentation_overlay()
+    @s.reset(contents, (new_image) =>
+      if new_image
+        @request_new_segmentation_overlay()
     )
 
   next_image: =>
-    @s.undoredo.run(new UENextImage())
+    @loading = true;
+    @disable_buttons()
+
+    @s.undoredo.run(new UENextImage((new_image) =>
+      if (new_image)
+        @request_new_segmentation_overlay()
+    ))
     @update_buttons()
 
   prev_image: =>

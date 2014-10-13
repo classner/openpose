@@ -29,7 +29,7 @@ class SegmentationModel
       @open_scribble.scribble.push_point(p)
       @open_scribble.update(@ui)
 
-  next_image: ->
+  next_image: (on_load) ->
     @photo_groups[@content_index].hide()
     @content_index++
     @photo_groups[@content_index].show()
@@ -38,7 +38,9 @@ class SegmentationModel
       @photo_groups[@content_index].seen = true
       @seen_photos++
 
-      @init_photo_group()
+      @init_photo_group(on_load)
+    else
+      on_load(false) if on_load?
 
   prev_image: ->
     @photo_groups[@content_index].hide()
@@ -51,7 +53,7 @@ class SegmentationModel
 
       @set_photo(url, on_load)
     else if on_load?
-      on_load()
+      on_load(false)
 
   segmentation_overlay_url: ->
     @photo_groups[@content_index].segmentation_overlay_url
@@ -77,7 +79,7 @@ class SegmentationModel
   set_photo: (photo_url, on_load) =>
     @photo_groups[@content_index].set_photo(photo_url, @ui, =>
       console.log "loaded photo_url: #{photo_url}"
-      on_load() if on_load?
+      on_load(true) if on_load?
     )
 
   update: ->
