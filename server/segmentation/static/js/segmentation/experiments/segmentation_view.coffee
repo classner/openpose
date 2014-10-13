@@ -1,4 +1,4 @@
-class StageUIGroup
+class SegmentationViewGroup
   constructor: (@stage_ui) ->
     @photo_layer = new Kinetic.Layer()
     @stage_ui.add_to_stage(@photo_layer)
@@ -143,7 +143,7 @@ class StageUIGroup
       y: Math.min(p.y, @size.height)
 
 # Wrapper for Kinetic.Stae
-class StageUI
+class SegmentationView
   constructor: (ui, args) ->
     # maximum possible size
     @bbox = {width: args.width, height: args.height}

@@ -1,8 +1,8 @@
 # Main control logic for the UI.  Actions in this class delegate through
 # undo/redo and check whether something is feasible.
-class ControllerUI
+class SegmentationController
   constructor: (contents, args) ->
-    @s = new ControllerState(@, contents, args)
+    @s = new SegmentationModel(@, contents, args)
 
     # disable right click
     $(document).on('contextmenu', (e) =>

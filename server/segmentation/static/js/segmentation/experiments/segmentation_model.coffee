@@ -4,12 +4,9 @@ Mode =
   scribble: 1
   edit: 2
 
-# Holds UI state; when something is modified, any dirty items are returned.
-# an instance of this is held by ControllerUI
-class ControllerState
+class SegmentationModel
   constructor: (@ui, @contents, @args) ->
     @loading = true
-
 
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
@@ -46,7 +43,7 @@ class ControllerState
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
     # gui elements
-    @stage_ui = new StageUI(@ui, @args)
+    @stage_ui = new SegmentationView(@ui, @args)
 
     @reset(@contents)
 
@@ -64,7 +61,7 @@ class ControllerState
 
       @photo_groups = null
 
-    @photo_groups = (new StageUIGroup(@stage_ui) for i in @contents)
+    @photo_groups = (new SegmentationViewGroup(@stage_ui) for i in @contents)
 
     @content_index = 0
     @seen_photos = 1
