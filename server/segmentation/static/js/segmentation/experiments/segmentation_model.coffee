@@ -80,8 +80,26 @@ class SegmentationModel
     @photo_groups[@content_index].set_photo(photo_url, @ui, =>
       console.log "loaded photo_url: #{photo_url}"
 
+      size = @photo_groups[@content_index].size
+
+      pose = @contents[@content_index]?.parse_pose
+      if pose?
+        # only take the first pose annotation
+        for p in pose[0]
+          part = new Kinetic.Circle(
+            {
+              radius: 4
+              fill: 'red'
+              stroke: 'black'
+              strokeWidth: 1
+              x: p[0] * size.height
+              y: p[1] * size.height
+            }
+          )
+
+          @photo_groups[@content_index].add(part)
+
       if @contents[@content_index]?.scribbles
-        size = @photo_groups[@content_index].size
         scribbles = @contents[@content_index].scribbles
 
         for scribble in scribbles

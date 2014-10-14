@@ -1,0 +1,19 @@
+<script>
+(function () {
+ var i;
+ var pose = [
+ {% for photo in contents %}
+ [
+ {% for pose in photo.parse_pose.all %}
+ {{pose.vertices | safe}},
+ {% endfor %}
+ ],
+ {% endfor %}
+ ];
+
+ for (i = 0; i<window.mt_contents.length; i++) {
+   window.mt_contents[i].parse_pose = pose[i];
+ }
+
+ }) ();
+</script>

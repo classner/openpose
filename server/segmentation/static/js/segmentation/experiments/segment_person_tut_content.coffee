@@ -1,4 +1,8 @@
 window.mt_tut_contents = do() ->
+  pose = [
+    [[0.13990208443201213, 0.8291298595576175], [0.24467384638180145, 0.6798300987791678], [0.3114658446247922, 0.4768348100014508], [0.3992121952577408, 0.47814445702582314], [0.45552701730575257, 0.6510178642429756], [0.3900446660871342, 0.7099519803397321], [0.3049176095029304, 0.3930174004416193], [0.24860278745491862, 0.36682445995417196], [0.318014079746654, 0.25157552180940373], [0.49088748696380635, 0.2659816390774998], [0.5537505441336801, 0.3471797545885865], [0.5445830149630735, 0.47945410405019556], [0.40314113633085796, 0.2620526980043826], [0.4149279595502093, 0.15335199498147614]]
+  ]
+
   scribbles = [{"points": [[0.3413654618473896, 0.6224899598393574],
     [0.3413654618473896, 0.6265060240963856],
     [0.3413654618473896, 0.6345381526104418],
@@ -749,6 +753,7 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'parse_pose': pose
         }
       ]
     },
@@ -763,6 +768,7 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'parse_pose': pose
         }
       ]
     },
@@ -777,6 +783,7 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'parse_pose': pose
         }
       ]
     },
@@ -791,6 +798,7 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'parse_pose': pose
         }
       ]
     },
@@ -806,6 +814,7 @@ window.mt_tut_contents = do() ->
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
           'scribbles': [scribbles[0]]
+          'parse_pose': pose
         }
       ]
     },
@@ -821,6 +830,7 @@ window.mt_tut_contents = do() ->
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
           'scribbles': [scribbles[0], scribbles[1]]
+          'parse_pose': pose
         }
       ]
     },
@@ -836,6 +846,7 @@ window.mt_tut_contents = do() ->
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
           'scribbles': scribbles
+          'parse_pose': pose
         }
       ]
     },
@@ -858,6 +869,7 @@ window.mt_tut_contents = do() ->
           'id': 4
           'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
           scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
+          'parse_pose': pose
         }
       ],
     }

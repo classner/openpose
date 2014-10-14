@@ -51,6 +51,8 @@
 {% block scripts %}{{ block.super }}
 
 {% include "mturk/content_json_script.html" %}
+{# this extents the content structure from above #}
+{% include "segmentation/experiments/segment_person_pose_content.html" %}
 {% include "segmentation/experiments/segment_person_scripts.html" %}
 
 {# note: common/util.coffee is already included in poly/scripts.html #}
