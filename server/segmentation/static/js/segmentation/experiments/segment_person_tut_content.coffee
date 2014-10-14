@@ -845,8 +845,9 @@ window.mt_tut_contents = do() ->
         'mouse button) and a background line (with the right mouse button) to',
         'finish the task.  Zooming with your mouse wheel might help you.'
       ],
-      message_correct: 'Correct!  Click "Next" to continue.',
-      message_error: 'Try again.  The parts of the mask that need a fix are marked in red.',
+      message_correct: ['Correct!  Click "Next" to continue.'],
+      message_error: ['Try again.  The parts of the mask that need a fix are marked in red.'],
+      expected_mask_url: '/media/segmentation/segmentation_im0002_JXUg0D.png',
       content: [
         {
           'image':

@@ -27,7 +27,11 @@ class SegmentPersonTutorial
       @loading_finish()
 
     if @content.expected_mask_url?
-      load_image(@content.expected_mask_url, next)
+      load_image(@content.expected_mask_url, (@expected_mask) =>
+        @expected_mask_data = @image_data(@expected_mask)
+
+        next()
+      )
     else
       next()
 
@@ -48,19 +52,45 @@ class SegmentPersonTutorial
       @loading = false
     ))
 
+  image_data: (img) ->
+    canvas = $('<canvas/>')[0]
+    canvas.width = img.width
+    canvas.height = img.height
+    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height)
+    canvas.getContext('2d').getImageData(0, 0, img.width, img.height)
+
+  mask_to_url: (mask) ->
+    canvas = $('<canvas/>')[0]
+    canvas.width = mask.width;
+    canvas.height = mask.height;
+    canvas.getContext('2d').putImageData(mask, 0, 0)
+    canvas.toDataURL('image/jpeg')
+
   # check for errors and return whether errors were checked
   check_for_mistakes: () ->
     if @expected_mask
       correct = true
 
+      mask_data = @image_data(@ui.s.photo_groups[@ui.s.content_index].overlay_obj)
+
+      error_count = 0
+      for i in [0...mask_data.data.length/4 - 1]
+        if Math.abs(mask_data.data[4 * i] - @expected_mask_data.data[4 * i]) > 30
+          error_count++
+          mask_data.data[4 * i + 0] = 255
+          mask_data.data[4 * i + 1] = 0
+          mask_data.data[4 * i + 2] = 0
+
+      ratio = (error_count / (mask_data.data.length/4 - 1))
+      correct = ratio < 0.0009
+
       if correct
         @showing_correct_message = true
-        @content.message = @content.message_correct
-        @ui.update_ui(@content)
+        @ui.view.set_message(@content.message_correct)
       else
-        @content.message = @content.message_error
-        @ui.reset_zoom()
-        @ui.update_ui(@content)
+        @ui.view.set_message([@content.message_error[0], '' + ratio])
+        @ui.s.set_segmentation_overlay(@mask_to_url(mask_data))
+
       return true
     return false
 
