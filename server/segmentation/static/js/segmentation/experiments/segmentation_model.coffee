@@ -79,6 +79,19 @@ class SegmentationModel
   set_photo: (photo_url, on_load) =>
     @photo_groups[@content_index].set_photo(photo_url, @ui, =>
       console.log "loaded photo_url: #{photo_url}"
+
+      if @contents[@content_index]?.scribbles
+        size = @photo_groups[@content_index].size
+        scribbles = @contents[@content_index].scribbles
+
+        for scribble in scribbles
+          @start_scribble((
+            {
+              'x': p[0] * size.height
+              'y': p[1] * size.height
+            } for p in scribble.points), scribble.is_foreground)
+          @create_scribble()?.update(@ui)
+
       on_load(true) if on_load?
     )
 

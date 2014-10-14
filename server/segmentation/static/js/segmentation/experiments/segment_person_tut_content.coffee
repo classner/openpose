@@ -737,13 +737,6 @@ window.mt_tut_contents = do() ->
     ], "is_foreground": false}
   ]
 
-  scribbles = (
-    {
-      'is_foreground': scribble['is_foreground']
-      'points': ({x: p[0], y: p[1]} for p in scribble.points)
-    } for scribble in scribbles
-  )
-
   return [
     {
       message_tut: [
@@ -812,9 +805,9 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'scribbles': [scribbles[0]]
         }
       ]
-      'scribbles': [scribbles[0]]
     },
     {
       message_tut: [
@@ -827,9 +820,9 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'scribbles': [scribbles[0], scribbles[1]]
         }
       ]
-      'scribbles': [scribbles[0], scribbles[1]]
     },
     {
       message_tut: [
@@ -842,9 +835,9 @@ window.mt_tut_contents = do() ->
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'scribbles': scribbles
         }
       ]
-      'scribbles': scribbles
     },
     {
       message_tut: [
@@ -854,13 +847,13 @@ window.mt_tut_contents = do() ->
       ],
       message_correct: 'Correct!  Click "Next" to continue.',
       message_error: 'Try again.  The parts of the mask that need a fix are marked in red.',
-      'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
-      scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
       content: [
         {
           'image':
             {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
           'id': 4
+          'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
+          scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
         }
       ],
     }

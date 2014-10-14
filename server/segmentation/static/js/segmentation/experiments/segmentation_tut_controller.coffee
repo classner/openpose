@@ -46,21 +46,6 @@ class SegmentPersonTutorial
       set_btn_enabled('#btn-tut-reset', true)
       set_btn_enabled('#btn-tut-back', @cur_idx > 0)
       @loading = false
-
-      size = @ui.s.photo_groups[@ui.s.content_index].size
-
-      if @content.scribbles?
-        for scribble in @content.scribbles
-          @ui.s.start_scribble(
-            (
-              {
-                'x': p.x * size.height
-                'y': p.y * size.height
-              } for p in scribble.points
-            ), scribble.is_foreground)
-          @ui.s.create_scribble()?.update(@ui)
-
-        @ui.request_new_segmentation_overlay()
     ))
 
   # check for errors and return whether errors were checked
