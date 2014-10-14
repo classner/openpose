@@ -10,7 +10,7 @@ class SegmentPersonTutorial
     $('#btn-tut-reset').on('click', @btn_reset)
 
     if @contents.length > 0
-      @set_idx(7)
+      @set_idx(0)
 
   btn_submit: =>
     if @submit_enabled
@@ -33,6 +33,7 @@ class SegmentPersonTutorial
         next()
       )
     else
+      @expected_mask = null
       next()
 
   loading_start: =>
@@ -82,13 +83,13 @@ class SegmentPersonTutorial
           mask_data.data[4 * i + 2] = 0
 
       ratio = (error_count / (mask_data.data.length/4 - 1))
-      correct = ratio < 0.0009
+      correct = ratio < 0.002
 
       if correct
         @showing_correct_message = true
         @ui.view.set_message(@content.message_correct)
       else
-        @ui.view.set_message([@content.message_error[0], '' + ratio])
+        @ui.view.set_message(@content.message_error)
         @ui.s.set_segmentation_overlay(@mask_to_url(mask_data))
 
       return true

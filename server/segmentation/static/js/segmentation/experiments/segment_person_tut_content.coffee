@@ -754,9 +754,9 @@ window.mt_tut_contents = do() ->
     },
     {
       message_tut: [
-        'In this task, you are going to draw lines onto an image to guide an',
-        'algorithm to cut out a person from the image.  First, we will show you',
-        'some examples.'
+        'In this task, you are going to draw lines inside and outside a person.',
+        'The person is marked with red dots on the body.',
+        'First, we will show you some examples.'
       ]
       content: [
         {
@@ -769,7 +769,7 @@ window.mt_tut_contents = do() ->
     {
       message_tut: [
         'We will display some parts of the image brighter and some darker.  The',
-        'bright part should align with the person.  Click "Show/Hide" to switch',
+        'bright part should align with the person.  Click "Hide/Show Mask" to switch',
         'the mask on and off. Try it yourself.'
       ],
       content: [
@@ -782,9 +782,9 @@ window.mt_tut_contents = do() ->
     },
     {
       message_tut: [
-        'In case where the mask is not aligned with the person you can add',
-        'foreground and background lines to guide the algorithm.  Please note the',
-        'white part between the legs of the player.'
+        'In case where the mask is wrong you can add foreground and'
+        'background lines to guide the algorithm.',
+        'Please note the white part between the legs of the player.'
       ]
       content: [
         {
@@ -798,7 +798,7 @@ window.mt_tut_contents = do() ->
       message_tut: [
         'The added background scribble (in green; press and hold right mouse',
         'button) changes the mask.  Background scribbles are always outside of'
-        'the central person.  Let\'s see some person scribbles...'
+        'the central person.'
       ]
       content: [
         {
@@ -812,8 +812,8 @@ window.mt_tut_contents = do() ->
     {
       message_tut: [
         'This time we have added a foreground scribble (in blue; press and hold',
-        'left mouse button) to fix the mask at left side of the sport pants of',
-        'the player. Foreground are always inside the central person.',
+        'left mouse button) to fix the mask at left side of the sport pants.',
+        'Foreground are always inside the central person.',
       ]
       content: [
         {
@@ -826,8 +826,8 @@ window.mt_tut_contents = do() ->
     },
     {
       message_tut: [
-        'The finished task might look something like this.  We have added a few',
-        'lines here and there to fix the mask.',
+        'A finished HIT might look like this.',
+        'Better stay a little away from the border.',
         'Please pay special attention to hands and feet.'
       ]
       content: [
@@ -845,8 +845,11 @@ window.mt_tut_contents = do() ->
         'mouse button) and a background line (with the right mouse button) to',
         'finish the task.  Zooming with your mouse wheel might help you.'
       ],
-      message_correct: ['Correct!  Click "Next" to continue.'],
-      message_error: ['Try again.  The parts of the mask that need a fix are marked in red.'],
+      message_correct: ['Very good!  Click "Next" to continue.'],
+      message_error: [
+        'Please continue.',
+        'The parts of the mask that need a fix are marked in red.'
+      ],
       expected_mask_url: '/media/segmentation/segmentation_im0002_JXUg0D.png',
       content: [
         {
