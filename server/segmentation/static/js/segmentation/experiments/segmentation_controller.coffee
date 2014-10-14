@@ -26,7 +26,6 @@ class SegmentationController
     @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
     @btn_zoom_reset = if args.btn_zoom_reset? then args.btn_zoom_reset else '#btn-zoom-reset'
 
-
     # init buttons
     $(@btn_toggle).on('click', =>
       @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
@@ -66,7 +65,7 @@ class SegmentationController
       .on('keyup', @keyup)
       .on('blur', @blur)
 
-  reset: (contents) ->
+  reset: (contents, on_load) ->
     # enabled when shift is held to drag the viewport around
     @panning = false
 
@@ -82,7 +81,9 @@ class SegmentationController
 
     @s.reset(contents, (new_image) =>
       if new_image
-        @request_new_segmentation_overlay()
+        @request_new_segmentation_overlay(on_load)
+      else
+        on_load?()
     )
 
   next_image: =>
@@ -127,7 +128,7 @@ class SegmentationController
       else
         true
 
-  request_new_segmentation_overlay: =>
+  request_new_segmentation_overlay: (on_load) =>
     @segmentation_overlay_request.abort() if @segmentation_overlay_request?
 
     @disable_buttons()
@@ -144,10 +145,12 @@ class SegmentationController
         @s.set_segmentation_overlay(overlay_url, =>
           @loading = false
           @update_buttons()
+          on_load?()
         )
       error: (jqxhr, status, error) ->
         @loading = false
         console.log status
+        on_load?()
       complete: =>
         @segmentation_overlay_request = null
     )

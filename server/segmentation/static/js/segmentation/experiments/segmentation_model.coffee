@@ -63,7 +63,7 @@ class SegmentationModel
       @photo_groups[@content_index].segmentation_overlay_url = url
       console.log "loaded background"
 
-      on_load() if on_load?
+      on_load?()
     )
 
   get_scribble_data: =>
