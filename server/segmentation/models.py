@@ -71,7 +71,7 @@ class PersonSegmentation(ResultBase):
             time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
 
             if len(scribbles) != len(time_ms_list):
-                raise ValueError("Result length mismatch (%s polygons, %s times)" % (
+                raise ValueError("Result length mismatch (%s scribbles, %s times)" % (
                     len(scribbles), len(time_ms_list)))
 
             slug = experiment.slug

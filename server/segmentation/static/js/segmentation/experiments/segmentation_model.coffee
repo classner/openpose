@@ -67,7 +67,7 @@ class SegmentationModel
     )
 
   get_scribble_data: =>
-    scribble_list = @get_scribble_list()
+    scribble_list = @get_scribble_list(@content_index)
 
     results = {}
     photo_id = @contents[@content_index].id
@@ -116,12 +116,12 @@ class SegmentationModel
   update: ->
     @open_scribble?.update(@ui)
 
-  get_scribble_list: =>
+  get_scribble_list: (index) =>
     scribble_list = []
-    for scribble in @closed[@content_index].scribbles
+    for scribble in @closed[index].scribbles
       points_scaled = {points: [], is_foreground: scribble.scribble.is_foreground}
 
-      group = @photo_groups[@content_index]
+      group = @photo_groups[index]
 
       # calculate the points with respect to a frame with the right aspact ratio
       factor = group.size.height
@@ -145,7 +145,7 @@ class SegmentationModel
     time_active_ms = {}
 
     for content, index in @contents
-      scribble_list = @get_scribble_list()
+      scribble_list = @get_scribble_list(index)
 
 
       photo_id = content.id
