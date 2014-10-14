@@ -52,8 +52,11 @@
 
 {% block scripts %}{{ block.super }}
 
-{% include "mturk/content_json_script.html" %}
 {% include "segmentation/experiments/segment_person_scripts.html" %}
+
+<script>
+window.static_url = "{{ STATIC_URL | safe }}";
+</script>
 
 {# note: common/util.coffee is already included in poly/scripts.html #}
 {% compress js %}

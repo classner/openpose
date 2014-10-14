@@ -741,6 +741,10 @@ window.mt_tut_contents = do() ->
     ], "is_foreground": false}
   ]
 
+  img_url = window.static_url + "img/segmentation/mturk/tut_image_im0002.jpg"
+  expected_mask_url = window.static_url + "img/segmentation/mturk/expected_mask_im0002.png"
+  img_id = 4
+
   return [
     {
       message_tut: [
@@ -750,9 +754,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'parse_pose': pose
         }
       ]
@@ -765,9 +768,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'parse_pose': pose
         }
       ]
@@ -780,9 +782,8 @@ window.mt_tut_contents = do() ->
       ],
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'parse_pose': pose
         }
       ]
@@ -795,9 +796,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'parse_pose': pose
         }
       ]
@@ -810,9 +810,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'scribbles': [scribbles[0]]
           'parse_pose': pose
         }
@@ -826,9 +825,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'scribbles': [scribbles[0], scribbles[1]]
           'parse_pose': pose
         }
@@ -842,9 +840,8 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'scribbles': scribbles
           'parse_pose': pose
         }
@@ -861,12 +858,11 @@ window.mt_tut_contents = do() ->
         'Please continue.',
         'The parts of the mask that need a fix are marked in red.'
       ],
-      expected_mask_url: '/media/segmentation/segmentation_im0002_JXUg0D.png',
+      expected_mask_url: expected_mask_url,
       content: [
         {
-          'image':
-            {'2048': '/media/cache/photos/im0002_fPKA1QD/0957a45162c4c238f6cd24beabde706a.jpg'}
-          'id': 4
+          'image': {'2048': img_url}
+          'id': img_id
           'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
           scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
           'parse_pose': pose
