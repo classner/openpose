@@ -61,6 +61,7 @@ window.static_url = "{{ STATIC_URL | safe }}";
 {# note: common/util.coffee is already included in poly/scripts.html #}
 {% compress js %}
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/common/modals.coffee"></script>
+<script type="text/coffeescript" src="{{ STATIC_URL }}js/mturk/submit.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segmentation_tut_controller.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segment_person_tut_content.coffee"></script>
 <script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segment_person_tut.coffee"></script>
