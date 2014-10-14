@@ -1,0 +1,61 @@
+{% extends "mturk/base_fixed.html" %}
+{% load humanize %}
+{% load compress %}
+
+{% block css %}{{ block.super }}
+<style>
+	canvas { border: 1px solid #969696; }
+	body { padding: 0 }
+  #num-images {
+    text-decoration: underline;
+  }
+  #mt-container {
+    position: relative;
+  }
+  svg {
+    pointer-events: none;
+  }
+  rect.message {
+    fill: #000;
+  }
+  text.message {
+    font-family: "Muli","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 20px;
+    fill: #fff;
+    text-shadow: 1px 1px #333;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="mt-top-nohover">
+	<div id="mt-instructions">
+		<div class="btn-group">
+			<button type="button" id='btn-tut-back' class="btn btn-info" disabled="disabled">Back</button>&nbsp;
+			<button type="button" id='btn-tut-next' class="btn btn-primary" disabled="disabled">Next</button>&nbsp;
+		</div>&nbsp;
+		<button type="button" id='btn-submit' class="btn btn-primary" disabled="disabled" style="display:none">Start the task</button>
+	</div>
+
+	{% include "segmentation/experiments/segment_person_controls.html" %}
+</div>
+<div id="mt-container"></div>
+{% endblock %}
+
+{% block modals %}{{ block.super }}
+{% endblock %}
+
+{% block scripts %}{{ block.super }}
+
+{% include "mturk/content_json_script.html" %}
+{% include "segmentation/experiments/segment_person_scripts.html" %}
+
+{# note: common/util.coffee is already included in poly/scripts.html #}
+{% compress js %}
+<script type="text/coffeescript" src="{{ STATIC_URL }}js/common/modals.coffee"></script>
+<script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segmentation_tut_controller.coffee"></script>
+<script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segment_person_tut_content.coffee"></script>
+<script type="text/coffeescript" src="{{ STATIC_URL }}js/segmentation/experiments/segment_person_tut.coffee"></script>
+{% endcompress %}
+
+{% endblock %}
