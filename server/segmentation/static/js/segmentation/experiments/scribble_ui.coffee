@@ -11,15 +11,16 @@ class ScribbleUI
       @stage_group.draw()
 
   add_line: ->
+    width = 5 * @stroke_scale
     if @line?
       @line.setPoints(@scribble.points)
-      @line.setStrokeWidth(3 * @stroke_scale)
+      @line.setStrokeWidth(width)
     else
       color = if @scribble.is_foreground then "#00F" else "#0F0"
 
       @line = new Kinetic.Line(
         points: @scribble.points, opacity: 0, stroke: color,
-        strokeWidth: 3 * @stroke_scale, lineJoin: "round")
+        strokeWidth: width, lineJoin: "round")
       @stage_group.add(@line, 0.5)
 
   remove_all: -> @remove_line()
