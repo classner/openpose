@@ -13,7 +13,8 @@ source "$DIR/load_config.sh"
 echo ""
 echo "===================================================================="
 echo "Now creating docker image."
-sudo docker build -t openpose .
+REV=`git rev-parse HEAD`
+sudo docker build -t "openpose:${REV}" .
 
 # exit message
 echo "$0: done!"
