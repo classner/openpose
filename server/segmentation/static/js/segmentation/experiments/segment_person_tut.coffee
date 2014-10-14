@@ -7,11 +7,3 @@ $( ->
 
   window.controller_ui = new SegmentPersonTutorial(mt_tut_contents, args)
 )
-
-btn_submit = ->
-  window.mt_submit(window.controller_ui.get_submit_data)
-
-# wait for everything to load before allowing submit
-$(window).on('load', ->
-  $('#btn-submit').on('click', btn_submit)
-)

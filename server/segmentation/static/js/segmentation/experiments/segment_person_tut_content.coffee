@@ -854,6 +854,8 @@ window.mt_tut_contents = do() ->
       ],
       message_correct: 'Correct!  Click "Next" to continue.',
       message_error: 'Try again.  The parts of the mask that need a fix are marked in red.',
+      'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
+      scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
       content: [
         {
           'image':

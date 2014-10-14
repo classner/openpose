@@ -10,7 +10,11 @@ class SegmentPersonTutorial
     $('#btn-tut-reset').on('click', @btn_reset)
 
     if @contents.length > 0
-      @set_idx(4)
+      @set_idx(7)
+
+  btn_submit: =>
+    if @submit_enabled
+      window.mt_tutorial_complete()
 
   set_idx: (idx) ->
     @cur_idx = idx
@@ -77,11 +81,12 @@ class SegmentPersonTutorial
 
   set_submit_enabled: (b) ->
     if b
-      @ui.reset()
+      $('#mt-container').hide()
       $('#mt-done').show()
       $('#btn-submit').show()
       $('#btn-tut-next').hide()
     else
+      $('#mt-container').show()
       $('#mt-done').hide()
       $('#btn-submit').hide()
       $('#btn-tut-next').show()
@@ -94,8 +99,8 @@ class SegmentPersonTutorial
         @set_idx(@cur_idx + 1)
       else
         @cur_idx += 1
-        set_btn_enabled('#btn-next', false)
-        set_btn_enabled('#btn-back', true)
+        set_btn_enabled('#btn-tut-next', false)
+        set_btn_enabled('#btn-tut-back', true)
         @set_submit_enabled(true)
 
   btn_back: =>
