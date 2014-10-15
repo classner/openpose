@@ -47,8 +47,7 @@ class Command(BaseCommand):
                         )
 
                 annotation = annotations[:, :, i].transpose() \
-                        / np.max([photo.image_orig.width,
-                            photo.image_orig.height])
+                        / photo.image_orig.height
                 parse_annotation.pose = annotation.tolist()
                 parse_annotation.save()
             except Photo.DoesNotExist as e:
