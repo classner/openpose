@@ -13,13 +13,13 @@ def calc_pose_overlay_img(photo, scribbles):
         # just grab the first annotation
         pose = photo.parse_pose.all()[0]
 
-        annotation_scribbles = build_annotation_scribbles(pose)
+        annotation_scribbles = build_annotation_scribbles(pose, photo.aspect_ratio)
     except IndexError:
         annotation_scribbles = []
 
     return calc_overlay_img(img, annotation_scribbles + scribbles)
 
-def build_annotation_scribbles(parse_pose):
+def build_annotation_scribbles(parse_pose, aspect_ratio):
     end_points = parse_pose.end_points()
 
     foreground_annotation_scribbles = [
@@ -30,7 +30,8 @@ def build_annotation_scribbles(parse_pose):
 
     # draw a frame, we are sure that this will be background
     background_annotation_scribbles = [
-            {'points': np.array([[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]),
+            {'points': np.array([[0, 0], [0, 1], [aspect_ratio, 1],
+                [aspect_ratio, 0], [0, 0]]),
                 'is_foreground': False}
             ]
 
