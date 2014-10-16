@@ -489,6 +489,15 @@ class ExperimentWorker(EmptyModelBase):
         if save:
             self.save()
 
+    def unblock(self, all_tasks=False, save=True):
+        self.blocked = False
+        self.blocked_reason = ''
+        self.blocked_method = None
+        if save:
+            self.save()
+        if all_tasks:
+            self.worker.unblock(save=True)
+
     def block(self, reason='', method='A', all_tasks=False,
               report_to_mturk=False, save=True):
         """ Prevent a user from working on tasks in the future.  Unless
