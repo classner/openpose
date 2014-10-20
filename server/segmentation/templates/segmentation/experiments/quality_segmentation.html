@@ -1,0 +1,13 @@
+{% extends "mturk/experiments/filter_content.html" %}
+
+{% block instructions_summary %}
+Click on segmentations that are good.  Reject segmentations that do not align with the central person.
+{% endblock %}
+
+{% block instructions_extra %}
+<p>Please check if the segmentations below align with the central person.</p>
+{% endblock %}
+
+{% block counter_name %}
+object(s) are segmented to align with the central person.
+{% endblock %}

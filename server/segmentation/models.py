@@ -58,7 +58,7 @@ class PersonSegmentation(ResultBase):
 
     @staticmethod
     def mturk_submit(user, hit_contents, results, time_ms, time_active_ms,
-                     experiment, version, mturk_assignment=None, **kwargs):
+                     version, mturk_assignment=None, **kwargs):
         """ Add new instances from a mturk HIT after the user clicks [submit] """
 
         if unicode(version) != u'2.0':
@@ -73,10 +73,6 @@ class PersonSegmentation(ResultBase):
             if len(scribbles) != len(time_ms_list):
                 raise ValueError("Result length mismatch (%s scribbles, %s times)" % (
                     len(scribbles), len(time_ms_list)))
-
-            slug = experiment.slug
-            if slug != u'segment_person':
-                raise ValueError("Unknown slug: %s" % slug)
 
             # check if the scribbles make sense
             for scribble in scribbles:
@@ -105,5 +101,55 @@ class PersonSegmentation(ResultBase):
 
                     if created:
                         new_objects[get_content_tuple(photo)] = [new_obj]
+
+        return new_objects
+
+class PersonSegmentationQuality(ResultBase):
+    segmentation = models.ForeignKey(PersonSegmentation, related_name='qualities')
+    correct = models.BooleanField(default=False)
+    canttell = models.NullBooleanField()
+
+    def __unicode__(self):
+        if self.canttell:
+            return "can't tell"
+        else:
+            return 'correct' if self.correct else 'not correct'
+
+    class Meta:
+        verbose_name = "Segmentation quality vote"
+        verbose_name_plural = "Segmentation quality votes"
+
+    @staticmethod
+    def mturk_submit(user, hit_contents, results, time_ms, time_active_ms,
+            version, mturk_assignment=None, **kwargs):
+        """ Add new instances from a mturk HIT after the user clicks [submit] """
+
+        if unicode(version) != u'1.0':
+            raise ValueError("Unknown version: '%s'" % version)
+        if not hit_contents:
+            return {}
+
+        # best we can do is average
+        avg_time_ms = time_ms / len(hit_contents)
+        avg_time_active_ms = time_active_ms / len(hit_contents)
+
+        new_objects = {}
+        for shape in hit_contents:
+            selected = (
+                str(results[unicode(shape.id)]['selected']).lower() == 'true')
+            canttell = (
+                str(results[unicode(shape.id)]['canttell']).lower() == 'true')
+
+            new_obj, created = shape.qualities.get_or_create(
+                user=user,
+                mturk_assignment=mturk_assignment,
+                time_ms=avg_time_ms,
+                time_active_ms=avg_time_active_ms,
+                correct=selected,
+                canttell=canttell,
+            )
+
+            if created:
+                new_objects[get_content_tuple(shape)] = [new_obj]
 
         return new_objects

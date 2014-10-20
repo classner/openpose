@@ -1,0 +1,24 @@
+{% extends "mturk/experiments/filter_content_inst_content.html" %}
+
+{% block instructions_content_text %}
+<p>You will be shown a collection of images with a segmentation.  Click on the
+segmentations that align with the central person.</p>
+
+<div class="if-not-webkit well" style="display:none; margin-top: 40px">
+	<p><span class="label label-important">Important:</span> If you
+	cannot see a red outline around the shape on the left, please try
+	using <a href="http://google.com/chrome">Google Chrome</a> instead
+	of Firefox.</p>
+</div>
+
+<p><u>Do</u> select these:</p>
+<ul>
+	<li>A segmentation that has only one person with nothing else inside.</li>
+</ul>
+
+<p>Do <u>not</u> select these:</p>
+<ul>
+  <li>A segmentation that has more than the central person inside.</li>
+</ul>
+
+{% endblock %}
