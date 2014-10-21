@@ -126,7 +126,6 @@ def task_segment(request, dataset_id='all'):
             return response
 
         photo_filter = {
-                'scribbles': None,
                 }
 
         if dataset_id != 'all':
@@ -136,12 +135,14 @@ def task_segment(request, dataset_id='all'):
                 'dataset_id': dataset_id
                 })
 
-        imgs = Photo.objects.filter(**photo_filter)
+        imgs = (Photo.objects.filter(**photo_filter)
+                .exclude(scribbles__qualities__isnull = True)
+                .exclude(scribbles__qualities__correct = True))
 
         if imgs:
             # pick a random non annotated picture
             contents = [imgs[np.random.randint(len(imgs))]]
-            #contents = imgs[0:2]
+            #contents = [imgs[0]]
 
             context = {
                 # the current task

@@ -5,6 +5,11 @@ class SegmentationModel
     @log = new ActionLog()
     @log.action($.extend(true, {name:'init'}, args))
 
+  clear: (on_load) ->
+    for scribble in @closed[@content_index].scribbles
+      scribble.remove_all()
+    @closed[@content_index] = {scribbles: []}
+
   reset: (@contents, on_load) ->
     @closed = ({scribbles: []} for i in @contents)
     @open_scribble = null

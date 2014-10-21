@@ -21,6 +21,7 @@ class SegmentationController
 
     # buttons
     @btn_toggle = if args.btn_toggle? then args.btn_toggle else '#btn-toggle'
+    @btn_clear = if args.btn_clear? then args.btn_clear else '#btn-clear'
     @btn_next = if args.btn_next? then args.btn_next else '#btn-next'
     @btn_prev = if args.btn_prev? then args.btn_prev else '#btn-prev'
     @btn_submit = if args.btn_submit? then args.btn_submit else '#btn-submit'
@@ -29,6 +30,9 @@ class SegmentationController
     # init buttons
     $(@btn_toggle).on('click', =>
       @s.photo_groups[@s.content_index].toggle_segment_layer()?.draw()
+    )
+    $(@btn_clear).on('click', =>
+      @s.undoredo.run(new UEClearScribbles())
     )
     $(@btn_zoom_reset).on('click', =>
       if not @loading then @zoom_reset())
@@ -230,6 +234,7 @@ class SegmentationController
     set_btn_enabled(@btn_toggle, false)
     set_btn_enabled(@btn_next, false)
     set_btn_enabled(@btn_prev, false)
+    set_btn_enabled(@btn_clear, false)
     set_btn_enabled(@btn_submit, false)
 
   # update cursor only
@@ -254,6 +259,7 @@ class SegmentationController
 
     set_btn_enabled(@btn_submit, not @loading and @s.seen_photos == @s.contents.length)
     set_btn_enabled(@btn_toggle, not @loading)
+    set_btn_enabled(@btn_clear, not @loading)
     set_btn_enabled(@btn_zoom_reset,
       not @loading and @view.zoom_exp > 0)
     set_btn_enabled(@btn_next,

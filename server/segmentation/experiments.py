@@ -67,5 +67,3 @@ def external_task_extra_context(slug, context):
     if slug == 'quality_segmentation':
         context['html_yes'] = 'segmentation aligned with central person'
         context['html_no'] = 'bad segmentation'
-
-    pass

@@ -11,8 +11,22 @@
  {% endfor %}
  ];
 
+ var scribbles = [
+ {% for photo in contents %}
+ [
+ {% for scribbles in photo.scribbles.all %}
+ {{scribbles.scribbles | safe}},
+ {% endfor %}
+ ],
+ {% endfor %}
+ ];
+
+
  for (i = 0; i<window.mt_contents.length; i++) {
    window.mt_contents[i].parse_pose = pose[i];
+   if (scribbles[i].length > 0) {
+     window.mt_contents[i].scribbles = scribbles[i][0];
+   }
  }
 
  }) ();

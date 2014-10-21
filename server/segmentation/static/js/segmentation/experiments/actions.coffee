@@ -9,6 +9,25 @@ class UEPrevImage extends UndoableEvent
   undo: (ui) -> ui.s.next_image()
   entry: -> { name: "UEPrevImage" }
 
+class UEClearScribbles extends UndoableEvent
+  run: (ui) ->
+    @closed = ui.s.closed[ui.s.content_index]
+    ui.s.clear()
+    @old_overlay_url = ui.s.segmentation_overlay_url()
+    ui.request_new_segmentation_overlay()
+  undo: (ui) ->
+    ui.s.closed[ui.s.content_index] = @closed
+    for scribble in ui.s.closed[ui.s.content_index].scribbles
+      scribble.add_line()
+
+    @overlay_url = ui.s.segmentation_overlay_url()
+    ui.s.set_segmentation_overlay(@old_overlay_url)
+  redo: (ui) ->
+    @closed = ui.s.closed[ui.s.content_index]
+    ui.s.clear()
+    ui.s.set_segmentation_overlay(@overlay_url)
+  entry: -> { name: "UEClearScribbles" }
+
 class UECreateScribble extends UndoableEvent
   run: (ui) ->
     ui.s.create_scribble()?.update(ui)
