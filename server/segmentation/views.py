@@ -17,6 +17,7 @@ from cStringIO import StringIO
 
 from segmentation.utils import calc_pose_overlay_img
 
+from photos.models import Photo
 from segmentation.models import PersonSegmentation, \
         PersonSegmentationQuality
 from pose.models import ParsePose
