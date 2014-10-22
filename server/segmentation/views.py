@@ -15,7 +15,7 @@ from random import sample
 
 from cStringIO import StringIO
 
-from segmentation.utils import calc_pose_overlay_img
+from segmentation.utils import calc_person_overlay_img
 
 from segmentation.models import PersonSegmentation, \
         PersonSegmentationQuality
@@ -188,20 +188,7 @@ def segmentation(request):
 
         person = Person.objects.get(id=person_id)
 
-        parse_pose = None
-        parse_poses = list(person.parse_pose.all()[:1])
-
-        if parse_poses:
-            parse_pose = parse_poses[0]
-
-        bounding_box = None
-        if person.bounding_box:
-            bounding_box = json.loads(person.bounding_box)
-
-        overlay_img = \
-                calc_pose_overlay_img(person.photo, scribbles,
-                        parse_pose=parse_pose, bounding_box=bounding_box)
-
+        overlay_img = calc_person_overlay_img(person, scribbles)
         overlay_img.save(bytes_io, u"JPEG")
 
         return HttpResponse(

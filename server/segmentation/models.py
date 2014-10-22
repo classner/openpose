@@ -11,7 +11,7 @@ from common.models import EmptyModelBase, ResultBase
 from common.utils import get_content_tuple, recursive_sum, \
         get_opensurfaces_storage
 
-from segmentation.utils import calc_pose_overlay_img
+from segmentation.utils import calc_person_overlay_img
 
 STORAGE = get_opensurfaces_storage()
 
@@ -78,19 +78,7 @@ class PersonSegmentation(ResultBase):
                         raise ValueError("Point with more than 2 coordinates")
 
             # generate the segmentation image
-            parse_pose = None
-            parse_poses = list(person.parse_pose.all()[:1])
-
-            if parse_poses:
-                parse_pose = parse_poses[0]
-
-            bounding_box = None
-            if person.bounding_box:
-                bounding_box = json.loads(person.bounding_box)
-
-            overlay_img = calc_pose_overlay_img(person.photo, scribbles,
-                    parse_pose=parse_pose,
-                    bounding_box=bounding_box)
+            overlay_img = calc_person_overlay_img(person, scribbles)
 
             with transaction.atomic():
                 with NamedTemporaryFile(prefix=u'segmentation_' +

@@ -1,9 +1,25 @@
 import numpy as np
 
+import json
+
 from PIL import Image, ImageDraw
 
 #from multilabel import segment
 from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
+
+def calc_person_overlay_img(person, scribbles):
+    parse_pose = None
+    parse_poses = list(person.parse_pose.all()[:1])
+
+    if parse_poses:
+        parse_pose = parse_poses[0]
+
+    bounding_box = None
+    if person.bounding_box:
+        bounding_box = json.loads(person.bounding_box)
+
+    return calc_pose_overlay_img(person.photo, scribbles,
+            parse_pose=parse_pose, bounding_box=bounding_box)
 
 def calc_pose_overlay_img(photo, scribbles, parse_pose=None, bounding_box=None):
     img = photo.open_image()
