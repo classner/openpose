@@ -8,8 +8,38 @@ import scipy.sparse as sparse
 from photos.models import Photo
 from common.models import ResultBase
 
+class Person(ResultBase):
+    photo = models.ForeignKey(Photo, related_name='persons')
+
+    bounding_box = models.TextField(null=True)
+
+    def __unicode__(self):
+        return u'person'
+
+    def get_entry_dict(self):
+        """ Return a dictionary of this model containing just the fields needed
+        for javascript rendering.  """
+
+        # generating thumbnail URLs is slow, so only generate the ones
+        # that will definitely be used.
+        return {
+                'id': self.id,
+                'photo': {
+                    'fov': self.photo.fov,
+                    'aspect_ratio': self.photo.aspect_ratio,
+                    'image': {
+                        #'200': self.photo.image_200.url,
+                        #'300': self.photo.image_300.url,
+                        #'512': self.photo.image_512.url,
+                        '1024': self.photo.image_1024.url,
+                        '2048': self.photo.image_2048.url,
+                        'orig': self.photo.image_orig.url,
+                        }
+                    }
+                }
+
 class ParsePose(ResultBase):
-    photo = models.ForeignKey(Photo, related_name='parse_pose')
+    person = models.ForeignKey(Person, related_name='parse_pose')
 
     vertices = models.TextField(null=True)
 
@@ -18,9 +48,6 @@ class ParsePose(ResultBase):
 
     def get_thumb_template(self):
         return 'person/parse_person_thumb.html'
-
-    def publishable(self):
-        return self.photo.publishable()
 
     @property
     def pose(self):

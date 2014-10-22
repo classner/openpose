@@ -1,5 +1,5 @@
-<svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ entry.photo.aspect_ratio }}" viewBox="0 0 {{ entry.photo.aspect_ratio }} 1" style="width:100%">
-	<image x="0" y="0" width="{{ entry.photo.aspect_ratio }}" height="1" xlink:href="{% if large %}{{ entry.photo.image_1024.url }}{% else %}{{ entry.photo.image_512.url }}{% endif %}"/>
+<svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ entry.person.photo.aspect_ratio }}" viewBox="0 0 {{ entry.person.photo.aspect_ratio }} 1" style="width:100%">
+	<image x="0" y="0" width="{{ entry.person.photo.aspect_ratio }}" height="1" xlink:href="{% if orig %}{{ entry.person.photo.image_orig.url }}{% else %}{{ entry.person.photo.image_512.url }}{% endif %}"/>
   {% for x, y in entry.pose %}
     <circle class="pose-display0 nss" cx="{{ x }}" cy="{{ y }}" r="0.01" />
   {% endfor %}

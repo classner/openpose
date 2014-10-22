@@ -99,7 +99,7 @@ class SegmentationViewGroup
     @photo_obj = new Image()
     @photo_obj.src = photo_url
     @photo_obj.onload = do() => =>
-      @size = compute_dimensions(@photo_obj, @view.bbox)
+      @size = compute_dimensions(@photo_obj, @view.bbox, INF)
       #@stage.setWidth(@size.width)
       #@stage.setHeight(@size.height)
       @photo = new Kinetic.Image(

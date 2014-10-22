@@ -2,9 +2,9 @@
 (function () {
  var i;
  var pose = [
- {% for photo in contents %}
+ {% for person in contents %}
  [
- {% for pose in photo.parse_pose.all %}
+ {% for pose in person.parse_pose.all %}
  {{pose.vertices | safe}},
  {% endfor %}
  ],
@@ -12,9 +12,9 @@
  ];
 
  var scribbles = [
- {% for photo in contents %}
+ {% for person in contents %}
  [
- {% for scribbles in photo.scribbles.all %}
+ {% for scribbles in person.segmentations.all %}
  {{scribbles.scribbles | safe}},
  {% endfor %}
  ],
@@ -25,7 +25,8 @@
  for (i = 0; i<window.mt_contents.length; i++) {
    window.mt_contents[i].parse_pose = pose[i];
    if (scribbles[i].length > 0) {
-     window.mt_contents[i].scribbles = scribbles[i][0];
+     // take the last segmentation directly
+     window.mt_contents[i].scribbles = scribbles[i][scribbles[i].length - 1];
    }
  }
 

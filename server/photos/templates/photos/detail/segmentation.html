@@ -1,6 +1,13 @@
 <h2 style="margin-top:30px">Segmentation</h2>
-{% if photo.scribbles.all %}
-  {% include "grid.html" with span="span4" rowsize="3" thumb_template="segmentation/segmentation_thumb.html" entries=photo.scribbles.all %}
+{% if photo.persons.all %}
+  {% for person in photo.persons.all %}
+  <h3>Person<h3>
+    {% if person.segmentations.all %}
+      {% include "grid.html" with span="span4" rowsize="3" thumb_template="segmentation/segmentation_thumb.html" entries=person.segmentations.all %}
+    {% else %}
+      <p>This person has not been annotated, yet.</p>
+    {% endif %}
+  {% endfor %}
 {% else %}
   <p>This photo has not been annotated, yet.</p>
 {% endif %}

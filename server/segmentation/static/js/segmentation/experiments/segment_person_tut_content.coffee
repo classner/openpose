@@ -743,7 +743,7 @@ window.mt_tut_contents = do() ->
 
   img_url = window.static_url + "img/segmentation/mturk/tut_image_im0002.jpg"
   expected_mask_url = window.static_url + "img/segmentation/mturk/expected_mask_im0002.png"
-  img_id = 4
+  person_id = 1991
 
   return [
     {
@@ -754,8 +754,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'parse_pose': pose
         }
       ]
@@ -768,8 +770,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'parse_pose': pose
         }
       ]
@@ -782,8 +786,10 @@ window.mt_tut_contents = do() ->
       ],
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'parse_pose': pose
         }
       ]
@@ -796,8 +802,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'parse_pose': pose
         }
       ]
@@ -810,8 +818,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'scribbles': [scribbles[0]]
           'parse_pose': pose
         }
@@ -825,8 +835,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'scribbles': [scribbles[0], scribbles[1]]
           'parse_pose': pose
         }
@@ -840,8 +852,10 @@ window.mt_tut_contents = do() ->
       ]
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'scribbles': scribbles
           'parse_pose': pose
         }
@@ -861,8 +875,10 @@ window.mt_tut_contents = do() ->
       expected_mask_url: expected_mask_url,
       content: [
         {
-          'image': {'2048': img_url}
-          'id': img_id
+          'photo': {
+            'image': {'orig': img_url}
+          }
+          'id': person_id
           'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
           scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
           'parse_pose': pose

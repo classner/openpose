@@ -5,7 +5,7 @@ from common.utils import has_foreign_key
 
 from segmentation.models import PersonSegmentation
 
-from photos.models import Photo
+from pose.models import Person
 
 def configure_experiments():
     """ This function is automatically called by
@@ -26,9 +26,9 @@ def configure_experiments():
         reward=Decimal('0.02'),
         num_outputs_max=1,
         contents_per_hit=1,
-        content_type_model=Photo,
+        content_type_model=Person,
         out_content_type_model=PersonSegmentation,
-        out_content_attr='photo',
+        out_content_attr='person',
         content_filter={
             'scribbles__isnull': True,
             },

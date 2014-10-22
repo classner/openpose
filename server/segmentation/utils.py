@@ -5,19 +5,17 @@ from PIL import Image, ImageDraw
 #from multilabel import segment
 from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
 
-def calc_pose_overlay_img(photo, scribbles):
+def calc_pose_overlay_img(photo, scribbles, parse_pose=None, bounding_box=None):
     img = photo.open_image()
 
     # get the annotation
-    try:
-        # just grab the first annotation
-        pose = photo.parse_pose.all()[0]
-
-        annotation_scribbles = build_annotation_scribbles(pose, photo.aspect_ratio)
-    except IndexError:
+    if parse_pose:
+        annotation_scribbles = build_annotation_scribbles(parse_pose,
+                photo.aspect_ratio)
+    else:
         annotation_scribbles = []
 
-    return calc_overlay_img(img, annotation_scribbles + scribbles)
+    return calc_overlay_img(img, bounding_box, annotation_scribbles + scribbles)
 
 def build_annotation_scribbles(parse_pose, aspect_ratio):
     end_points = parse_pose.end_points()
@@ -37,17 +35,31 @@ def build_annotation_scribbles(parse_pose, aspect_ratio):
 
     return background_annotation_scribbles + foreground_annotation_scribbles
 
-def calc_overlay_img(imgImage, scribbles):
-    width, height = imgImage.size
-
+def calc_overlay_img(imgImage, bounding_box, scribbles):
     img = np.asarray(imgImage)
+
+    #bounding_box = None
+
+    if bounding_box:
+        scaled_bounding_box = np.round(np.array(bounding_box) *
+                img.shape[0]).astype(np.int)
+
+        img = img[scaled_bounding_box[1]:scaled_bounding_box[3],
+                scaled_bounding_box[0]:scaled_bounding_box[2], :]
+
+        offset = scaled_bounding_box[0:2]
+    else:
+        offset = np.zeros((2))
+
+
+    height, width = img.shape[0], img.shape[1]
 
     scale = height
 
     bgd_model = np.zeros((1, 65), np.float64)
     fgd_model = np.zeros((1, 65), np.float64)
 
-    margin = 3
+    margin = 1
     forground_scribble_label = 1
     background_scribble_label = 0
     forground_prediction_label = 1
@@ -63,14 +75,15 @@ def calc_overlay_img(imgImage, scribbles):
 
     # strage: this should have been done by the frame, but somehow there is a
     # tendency to lean right. I have not good explanation for that
-    draw.line((margin, margin, width-margin, margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((width-margin, margin, width-margin, height-margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((width-margin, height-margin, margin, height-margin),
-            fill=background_scribble_label, width=margin)
-    draw.line((margin, height-margin, margin, margin),
-            fill=background_scribble_label, width=margin)
+    margin = 0
+    draw.line((margin, margin, width-margin-1, margin),
+            fill=background_scribble_label, width=margin * 2 + 1)
+    draw.line((width-margin-1, margin, width-margin-1, height-margin-1),
+            fill=background_scribble_label, width=margin * 2 + 1)
+    draw.line((width-margin-1, height-margin-1, margin, height-margin-1),
+            fill=background_scribble_label, width=margin * 2 + 1)
+    draw.line((margin, height-margin-1, margin, margin),
+            fill=background_scribble_label, width=margin * 2 + 1)
 
     for scribble in scribbles:
         points = np.array(scribble[u'points'])
@@ -81,8 +94,10 @@ def calc_overlay_img(imgImage, scribbles):
             fill = background_scribble_label
 
         for s in range(1, points.shape[0]):
-            draw.line((points[s-1, 0] * scale, points[s-1, 1] * scale,
-                    points[s, 0] * scale, points[s, 1] * scale),
+            draw.line((points[s-1, 0] * scale - offset[0],
+                points[s-1, 1] * scale - offset[1],
+                points[s, 0] * scale - offset[0],
+                points[s, 1] * scale - offset[1]),
                     fill=fill, width=1)
 
     scribbles_map = np.asarray(scribbles_map_img)

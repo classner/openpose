@@ -5,7 +5,7 @@ import json
 
 from tempfile import NamedTemporaryFile
 
-from photos.models import Photo
+from pose.models import Person
 from common.models import EmptyModelBase, ResultBase
 
 from common.utils import get_content_tuple, recursive_sum, \
@@ -18,7 +18,7 @@ STORAGE = get_opensurfaces_storage()
 class PersonSegmentation(ResultBase):
     """ Person segmentation submitted by user. """
 
-    photo = models.ForeignKey(Photo, related_name='scribbles')
+    person = models.ForeignKey(Person, related_name='segmentations')
 
     segmentation = models.ImageField(upload_to='segmentation', storage=STORAGE)
 
@@ -33,9 +33,6 @@ class PersonSegmentation(ResultBase):
 
     def get_thumb_template(self):
         return 'segmentation/segmentation_thumb.html'
-
-    def publishable(self):
-        return self.photo.publishable()
 
     def scribbles_svg_path(self):
         """ Returns submitted scribbles as SVG path """
@@ -65,10 +62,10 @@ class PersonSegmentation(ResultBase):
             raise ValueError("Unknown version: %s" % version)
 
         new_objects = {}
-        for photo in hit_contents:
-            scribbles = results[str(photo.id)][u'scribbles']
-            time_ms_list = time_ms[str(photo.id)][u'scribbles']
-            time_active_ms_list = time_active_ms[str(photo.id)][u'scribbles']
+        for person in hit_contents:
+            scribbles = results[str(person.id)][u'scribbles']
+            time_ms_list = time_ms[str(person.id)][u'scribbles']
+            time_active_ms_list = time_active_ms[str(person.id)][u'scribbles']
 
             if len(scribbles) != len(time_ms_list):
                 raise ValueError("Result length mismatch (%s scribbles, %s times)" % (
@@ -81,14 +78,28 @@ class PersonSegmentation(ResultBase):
                         raise ValueError("Point with more than 2 coordinates")
 
             # generate the segmentation image
-            overlay_img = calc_pose_overlay_img(photo, scribbles)
+            parse_pose = None
+            parse_poses = list(person.parse_pose.all()[:1])
+
+            if parse_poses:
+                parse_pose = parse_poses[0]
+
+            bounding_box = None
+            if person.bounding_box:
+                bounding_box = json.loads(person.bounding_box)
+
+            overlay_img = calc_pose_overlay_img(person.photo, scribbles,
+                    parse_pose=parse_pose,
+                    bounding_box=bounding_box)
+
             with transaction.atomic():
-                with NamedTemporaryFile(prefix=u'segmentation_' + photo.name + u'_', suffix=u'.png') as f:
+                with NamedTemporaryFile(prefix=u'segmentation_' +
+                        person.photo.name + u'_', suffix=u'.png') as f:
                     overlay_img.save(f, u"PNG")
                     f.seek(0)
                     segmentation = ImageFile(f)
 
-                    new_obj, created = photo.scribbles.get_or_create(
+                    new_obj, created = person.segmentations.get_or_create(
                         user=user,
                         segmentation=segmentation,
                         mturk_assignment=mturk_assignment,
@@ -100,7 +111,7 @@ class PersonSegmentation(ResultBase):
                     )
 
                     if created:
-                        new_objects[get_content_tuple(photo)] = [new_obj]
+                        new_objects[get_content_tuple(person)] = [new_obj]
 
         return new_objects
 

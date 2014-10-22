@@ -53,8 +53,8 @@ class SegmentationModel
     @photo_groups[@content_index].show()
 
   init_photo_group: (on_load) ->
-    if @contents[@content_index]?.image?['2048']?
-      url = @contents[@content_index].image['2048']
+    if @contents[@content_index]?.photo.image?['orig']?
+      url = @contents[@content_index].photo.image['orig']
 
       @set_photo(url, on_load)
     else if on_load?

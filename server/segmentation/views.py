@@ -17,10 +17,9 @@ from cStringIO import StringIO
 
 from segmentation.utils import calc_pose_overlay_img
 
-from photos.models import Photo
 from segmentation.models import PersonSegmentation, \
         PersonSegmentationQuality
-from pose.models import ParsePose
+from pose.models import Person, ParsePose
 from mturk.views.external import external_task_browser_check
 from mturk.models import Experiment
 from accounts.models import UserProfile
@@ -113,10 +112,10 @@ def task_segment(request, dataset_id='all'):
 
         segmentation_ids = results.keys()
 
-        user, _ = UserProfile.objects.get_or_create(user=request.user)
+        user = UserProfile.objects.get(user=request.user)
 
         PersonSegmentation.mturk_submit(user,
-                Photo.objects.filter(id__in=segmentation_ids),
+                Person.objects.filter(id__in=segmentation_ids),
                 results, time_ms, time_active_ms, data[u'version'])
 
         return json_success_response()
@@ -125,24 +124,24 @@ def task_segment(request, dataset_id='all'):
         if response:
             return response
 
-        photo_filter = {
+        person_filter = {
                 }
 
         if dataset_id != 'all':
             dataset_id = int(dataset_id)
 
-            photo_filter = dict_union(photo_filter, {
-                'dataset_id': dataset_id
+            person_filter = dict_union(photo_filter, {
+                'photo__dataset_id': dataset_id
                 })
 
-        imgs = (Photo.objects.filter(**photo_filter)
-                .exclude(scribbles__qualities__isnull = True)
-                .exclude(scribbles__qualities__correct = True))
+        persons = (Person.objects.filter(**person_filter)
+                .exclude(segmentations__qualities__isnull = True)
+                .exclude(segmentations__qualities__correct = True))
 
-        if imgs:
+        if persons:
             # pick a random non annotated picture
-            contents = [imgs[np.random.randint(len(imgs))]]
-            #contents = [imgs[0]]
+            contents = [persons[np.random.randint(len(persons))]]
+            #contents = [persons[0]]
 
             context = {
                 # the current task
@@ -184,10 +183,24 @@ def segmentation(request):
         raise ValueError("Unknown version: %s" % version)
 
     # for not really needed here...
-    for img_id, annotations in results.items():
+    for person_id, annotations in results.items():
         scribbles = annotations.get(u'scribbles', [])
 
-        overlay_img = calc_pose_overlay_img(Photo.objects.get(id=img_id), scribbles)
+        person = Person.objects.get(id=person_id)
+
+        parse_pose = None
+        parse_poses = list(person.parse_pose.all()[:1])
+
+        if parse_poses:
+            parse_pose = parse_poses[0]
+
+        bounding_box = None
+        if person.bounding_box:
+            bounding_box = json.loads(person.bounding_box)
+
+        overlay_img = \
+                calc_pose_overlay_img(person.photo, scribbles,
+                        parse_pose=parse_pose, bounding_box=bounding_box)
 
         overlay_img.save(bytes_io, u"JPEG")
 

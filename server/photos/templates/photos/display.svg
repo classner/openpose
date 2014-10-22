@@ -1,3 +1,3 @@
 <svg version="1.2" class="fix-aspect" data-aspect="{{ entry.aspect_ratio }}" viewBox="0 0 {{ entry.aspect_ratio }} 1" style="width:100%">
-	<image x="0" y="0" width="{{ entry.aspect_ratio }}" height="1" xlink:href="{% if large %}{{ entry.image_200.url }}{% else %}{{ entry.image_512.url }}{% endif %}"/>
+	<image x="0" y="0" width="{{ entry.aspect_ratio }}" height="1" xlink:href="{% if orig %}{{ entry.image_orig.url }}{% else %}{{ entry.image_512.url }}{% endif %}"/>
 </svg>
