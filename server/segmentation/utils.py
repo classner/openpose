@@ -91,15 +91,32 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
 
     # strage: this should have been done by the frame, but somehow there is a
     # tendency to lean right. I have not good explanation for that
-    margin = 0
-    draw.line((margin, margin, width-margin-1, margin),
-            fill=background_scribble_label, width=margin * 2 + 1)
-    draw.line((width-margin-1, margin, width-margin-1, height-margin-1),
-            fill=background_scribble_label, width=margin * 2 + 1)
-    draw.line((width-margin-1, height-margin-1, margin, height-margin-1),
-            fill=background_scribble_label, width=margin * 2 + 1)
-    draw.line((margin, height-margin-1, margin, margin),
-            fill=background_scribble_label, width=margin * 2 + 1)
+    scribble_margin = 0
+    draw.line((
+        scribble_margin,
+        scribble_margin,
+        width-scribble_margin-1,
+        scribble_margin),
+        fill=background_scribble_label,
+        width=scribble_margin * 2 + 1)
+    draw.line((
+        width-scribble_margin-1,
+        scribble_margin, width-scribble_margin-1,
+        height-scribble_margin-1),
+        fill=background_scribble_label,
+        width=scribble_margin * 2 + 1)
+    draw.line((width-scribble_margin-1,
+        height-scribble_margin-1,
+        scribble_margin,
+        height-scribble_margin-1),
+        fill=background_scribble_label,
+        width=scribble_margin * 2 + 1)
+    draw.line((scribble_margin,
+        height-scribble_margin-1,
+        scribble_margin,
+        scribble_margin),
+        fill=background_scribble_label,
+        width=scribble_margin * 2 + 1)
 
     for scribble in scribbles:
         points = np.array(scribble[u'points'])
