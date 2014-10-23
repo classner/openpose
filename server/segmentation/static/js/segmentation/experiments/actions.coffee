@@ -45,14 +45,12 @@ class UECreateScribble extends UndoableEvent
     @points = scribble_ui.scribble.clone_points()
     @is_foreground = scribble_ui.scribble.is_foreground
     @id = scribble_ui.id
-    @time_ms = scribble_ui.time_ms
-    @time_active_ms = scribble_ui.time_active_ms
     ui.s.remove_scribble()
 
     @overlay_url = ui.s.segmentation_overlay_url()
     ui.s.set_segmentation_overlay(@old_overlay_url)
   redo: (ui) ->
-    ui.s.insert_scribble(@points, @is_foreground, @id, @time_ms, @time_active_ms)?.update(ui)
+    ui.s.insert_scribble(@points, @is_foreground, @id)?.update(ui)
 
     ui.s.set_segmentation_overlay(@overlay_url)
   entry: -> { name: "UECreateScribble", args: { pts: @pts } }
@@ -91,16 +89,13 @@ class UEUnselectPolygon extends UndoableEvent
 class UEDeletePolygon extends UndoableEvent
   run: (ui) ->
     @points = ui.s.sel_poly.poly.clone_points()
-    @time_ms = ui.s.sel_poly.time_ms
-    @time_active_ms = ui.s.sel_poly.time_active_ms
     @sel_poly_id = ui.s.sel_poly.id
     ui.s.delete_sel_poly()
     for p,i in ui.s.closed[ui.s.content_index].polys
       p.id = i
       p.update(ui)
   undo: (ui) ->
-    ui.s.insert_closed_poly(@points, @sel_poly_id,
-      @time_ms, @time_active_ms)
+    ui.s.insert_closed_poly(@points, @sel_poly_id)
     for p,i in ui.s.closed[ui.s.content_index].polys
       p.id = i
       p.update(ui)

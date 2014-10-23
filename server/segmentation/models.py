@@ -64,12 +64,8 @@ class PersonSegmentation(ResultBase):
         new_objects = {}
         for person in hit_contents:
             scribbles = results[str(person.id)][u'scribbles']
-            time_ms_list = time_ms[str(person.id)][u'scribbles']
-            time_active_ms_list = time_active_ms[str(person.id)][u'scribbles']
-
-            if len(scribbles) != len(time_ms_list):
-                raise ValueError("Result length mismatch (%s scribbles, %s times)" % (
-                    len(scribbles), len(time_ms_list)))
+            person_time_ms = time_ms[str(person.id)]
+            person_time_active_ms = time_active_ms[str(person.id)]
 
             # check if the scribbles make sense
             for scribble in scribbles:
@@ -91,8 +87,8 @@ class PersonSegmentation(ResultBase):
                         user=user,
                         segmentation=segmentation,
                         mturk_assignment=mturk_assignment,
-                        time_ms=recursive_sum(time_ms),
-                        time_active_ms=recursive_sum(time_active_ms),
+                        time_ms=person_time_ms,
+                        time_active_ms=person_time_active_ms,
                         # (repr gives more float digits)
                         scribbles=json.dumps(scribbles),
                         num_scribbles=len(scribbles),

@@ -23,34 +23,56 @@ class SegmentationModel
       @photo_groups = null
 
     @photo_groups = (new SegmentationViewGroup(@view) for i in @contents)
+    for group in @photo_groups
+      group.timer = new ActiveTimer()
+      group.time_ms = 0
+      group.time_active_ms = 0
 
     @content_index = 0
-    @seen_photos = 1
+    @seen_photos = 0
 
-    @init_photo_group(on_load)
+    @show_image_task(on_load)
 
   push_point: (p) ->
     if @open_scribble
       @open_scribble.scribble.push_point(p)
       @open_scribble.update(@ui)
 
-  next_image: (on_load) ->
-    @photo_groups[@content_index].hide()
-    @content_index++
+  show_image_task: (on_load) ->
     @photo_groups[@content_index].show()
+
+    start_timer = (new_img) =>
+      @photo_groups[@content_index].timer.start()
+
+      on_load?(new_img)
 
     if not @photo_groups[@content_index].seen?
       @photo_groups[@content_index].seen = true
       @seen_photos++
 
-      @init_photo_group(on_load)
+      @init_photo_group(start_timer)
     else
-      on_load(false) if on_load?
+      start_timer(false)
+
+  update_time: ->
+    group = @photo_groups[@content_index]
+    group.time_ms += group.timer.time_ms()
+    group.time_active_ms += group.timer.time_active_ms()
+    group.timer.start()
+
+  hide_image_task: ->
+    @update_time()
+    @photo_groups[@content_index].hide()
+
+  next_image: (on_load) ->
+    @hide_image_task()
+    @content_index++
+    @show_image_task(on_load)
 
   prev_image: ->
-    @photo_groups[@content_index].hide()
+    @hide_image_task()
     @content_index--
-    @photo_groups[@content_index].show()
+    @show_image_task()
 
   init_photo_group: (on_load) ->
     if @contents[@content_index]?.photo.image?['orig']?
@@ -155,19 +177,16 @@ class SegmentationModel
     time_ms = {}
     time_active_ms = {}
 
+    @update_time()
+
     for content, index in @contents
       scribble_list = @get_scribble_list(index)
-
 
       photo_id = content.id
       results[photo_id] = {}
       results[photo_id].scribbles = scribble_list
-      time_ms[photo_id] = {}
-      time_ms[photo_id].scribbles =
-        (s.time_ms for s in @closed[index].scribbles)
-      time_active_ms[photo_id] = {}
-      time_active_ms[photo_id].scribbles =
-        (s.time_active_ms for s in @closed[index].scribbles)
+      time_ms[photo_id] = @photo_groups[index].time_ms
+      time_active_ms[photo_id] = @photo_groups[index].time_active_ms
 
     version: '2.0'
     results: JSON.stringify(results)
@@ -190,16 +209,12 @@ class SegmentationModel
     scribble = new Scribble(points, is_foreground)
     @open_scribble = new ScribbleUI(@closed[@content_index].scribbles.length,
       scribble, @view, @photo_groups[@content_index])
-    @open_scribble.timer = new ActiveTimer()
-    @open_scribble.timer.start()
     @open_scribble
 
   create_scribble: ->
     console.log 'create_scribble'
 
     scribble = @open_scribble
-    @open_scribble.time_ms = @open_scribble.timer.time_ms()
-    @open_scribble.time_active_ms = @open_scribble.timer.time_active_ms()
 
     @closed[@content_index].scribbles.push(@open_scribble)
     @open_scribble = null
@@ -219,12 +234,10 @@ class SegmentationModel
     scribble.remove_all()
     null
 
-  insert_scribble: (points, is_foreground, id, time_ms, time_active_ms) ->
+  insert_scribble: (points, is_foreground, id) ->
     scribble = new Scribble(points, is_foreground)
     scribble_ui = new ScribbleUI(id, scribble, @view,
       @photo_groups[@content_index])
-    scribble_ui.time_ms = time_ms
-    scribble_ui.time_active_ms = time_active_ms
     @closed[@content_index].scribbles.splice(id, 0, scribble_ui)
     scribble_ui
 
