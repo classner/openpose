@@ -90,6 +90,7 @@ class ParsePose(ResultBase):
     person = models.ForeignKey(Person, related_name='parse_poses')
 
     vertices = models.TextField(null=True)
+    visible_vertices = models.TextField(null=True)
 
     def __unicode__(self):
         return u'pose annotation'
@@ -112,6 +113,17 @@ class ParsePose(ResultBase):
 
         self.vertices = json.dumps(pose_vertices)
 
+    @property
+    def visible(self):
+        return json.loads(self.visible_vertices)
+
+    @visible.setter
+    def visible(self, visible_vertices):
+        if len(visible_vertices) != 14:
+            raise ValueError('Not enough points')
+
+        self.visible_vertices = json.dumps(visible_vertices)
+
     @staticmethod
     def _build_to_endpoints():
         i = np.array([1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -130,5 +142,14 @@ class ParsePose(ResultBase):
     def end_points(self):
         annotation = np.array(self.pose)
         return ParsePose._build_to_endpoints().dot(annotation)
+
+    def visible_end_points(self):
+        annotation = np.array(self.pose)
+        to_endpoints = ParsePose._build_to_endpoints()
+        end_points = to_endpoints.dot(annotation)
+
+        visibility = to_endpoints.dot(np.array(self.visible, dtype=np.float)) > 0.99
+
+        return (end_points, visibility)
 
 

@@ -32,6 +32,7 @@ class Command(BaseCommand):
         image_name_template = 'im{0:05d}'
 
         annotations = np.transpose(annotations_file.get('joints'), [1, 0, 2])[0:2, :, :]
+        visibility = np.transpose(annotations_file.get('joints'), [1, 0, 2])[2, :, :]
 
         dataset, _ = PhotoDataset.objects.get_or_create(name='LSP ext')
 
@@ -68,4 +69,5 @@ class Command(BaseCommand):
                     person.parse_poses.create(
                             user=admin_user,
                             pose=annotation.tolist(),
+                            visible=visibility[:, i].tolist(),
                             )

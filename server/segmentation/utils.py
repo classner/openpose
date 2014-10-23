@@ -32,22 +32,16 @@ def calc_pose_overlay_img(photo, scribbles, parse_pose=None, bounding_box=None):
     return calc_overlay_img(img, bounding_box, annotation_scribbles + scribbles)
 
 def build_annotation_scribbles(parse_pose, aspect_ratio):
-    end_points = parse_pose.end_points()
+    end_points, visibility = parse_pose.visible_end_points()
 
     foreground_annotation_scribbles = [
             {'points': end_points[2*s : 2*s+2, :],
                 'is_foreground': True}
             for s in xrange(end_points.shape[0] // 2)
+            if visibility[2*s] and visibility[2*s + 1]
             ]
 
-    # draw a frame, we are sure that this will be background
-    background_annotation_scribbles = [
-            {'points': np.array([[0, 0], [0, 1], [aspect_ratio, 1],
-                [aspect_ratio, 0], [0, 0]]),
-                'is_foreground': False}
-            ]
-
-    return background_annotation_scribbles + foreground_annotation_scribbles
+    return foreground_annotation_scribbles
 
 def calc_overlay_img(imgImage, bounding_box, scribbles):
     img = np.asarray(imgImage)
@@ -90,7 +84,7 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
     draw = ImageDraw.Draw(scribbles_map_img)
 
     # strage: this should have been done by the frame, but somehow there is a
-    # tendency to lean right. I have not good explanation for that
+    # tendency to lean right. I have no good explanation for that
     scribble_margin = 0
     draw.line((
         scribble_margin,
