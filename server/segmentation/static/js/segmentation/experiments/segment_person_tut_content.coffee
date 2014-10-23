@@ -758,7 +758,7 @@ window.mt_tut_contents = do() ->
             'image': {'orig': img_url}
           }
           'id': person_id
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -774,7 +774,7 @@ window.mt_tut_contents = do() ->
             'image': {'orig': img_url}
           }
           'id': person_id
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -790,7 +790,7 @@ window.mt_tut_contents = do() ->
             'image': {'orig': img_url}
           }
           'id': person_id
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -806,7 +806,7 @@ window.mt_tut_contents = do() ->
             'image': {'orig': img_url}
           }
           'id': person_id
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -823,7 +823,7 @@ window.mt_tut_contents = do() ->
           }
           'id': person_id
           'scribbles': [scribbles[0]]
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -840,7 +840,7 @@ window.mt_tut_contents = do() ->
           }
           'id': person_id
           'scribbles': [scribbles[0], scribbles[1]]
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -857,7 +857,7 @@ window.mt_tut_contents = do() ->
           }
           'id': person_id
           'scribbles': scribbles
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ]
     },
@@ -881,7 +881,7 @@ window.mt_tut_contents = do() ->
           'id': person_id
           'scribbles': [scribbles[0], scribbles[1], scribbles[3], scribbles[4],
           scribbles[5], scribbles[6], scribbles[8], scribbles[9]]
-          'parse_pose': pose
+          'parse_poses': pose
         }
       ],
     }

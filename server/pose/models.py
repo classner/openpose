@@ -63,7 +63,7 @@ class Person(ResultBase):
                 }
 
 class ParsePose(ResultBase):
-    person = models.ForeignKey(Person, related_name='parse_pose')
+    person = models.ForeignKey(Person, related_name='parse_poses')
 
     vertices = models.TextField(null=True)
 

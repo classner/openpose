@@ -27,7 +27,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'ParsePose.person'
         db.add_column(u'pose_parsepose', 'person',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='parse_pose', null=True, to=orm['pose.Person']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='parse_poses', null=True, to=orm['pose.Person']),
                       keep_default=False)
 
 
@@ -281,7 +281,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invalid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'mturk_assignment': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['mturk.MtAssignment']"}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parse_pose'", 'null': 'True', 'to': u"orm['pose.Person']"}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parse_poses'", 'null': 'True', 'to': u"orm['pose.Person']"}),
             'photo': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parse_pose'", 'to': u"orm['photos.Photo']"}),
             'quality_method': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
             'reward': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '8', 'decimal_places': '4', 'blank': 'True'}),

@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 annotation = annotations[:, :, i].transpose() \
                         / photo.image_orig.height
 
-                person.parse_pose.create(
+                person.parse_poses.create(
                         user=admin_user,
                         pose=annotation.tolist(),
                         )

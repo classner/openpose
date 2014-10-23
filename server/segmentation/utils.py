@@ -7,7 +7,7 @@ from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
 
 def calc_person_overlay_img(person, scribbles):
     parse_pose = None
-    parse_poses = list(person.parse_pose.all()[:1])
+    parse_poses = list(person.parse_poses.all()[:1])
 
     if parse_poses:
         parse_pose = parse_poses[0]

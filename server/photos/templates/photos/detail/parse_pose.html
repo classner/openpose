@@ -2,8 +2,8 @@
 {% if photo.persons.all %}
   {% for person in photo.persons.all %}
   <h3>Person<h3>
-    {% if person.parse_pose.all %}
-      {% include "grid.html" with span="span4" rowsize="3" thumb_template="pose/parse_pose_thumb.html" entries=person.parse_pose.all %}
+    {% if person.parse_poses.all %}
+      {% include "grid.html" with span="span4" rowsize="3" thumb_template="pose/parse_pose_thumb.html" entries=person.parse_poses.all %}
     {% else %}
       <p>This person has not been annotated, yet.</p>
     {% endif %}

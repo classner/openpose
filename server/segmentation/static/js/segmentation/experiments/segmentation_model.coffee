@@ -87,7 +87,7 @@ class SegmentationModel
 
       group = @photo_groups[@content_index]
 
-      pose = @contents[@content_index]?.parse_pose
+      pose = @contents[@content_index]?.parse_poses
       if pose?
         # only take the first pose annotation
         for p in pose[0]
