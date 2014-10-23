@@ -21,7 +21,7 @@ class Migration(SchemaMigration):
             ('time_active_ms', self.gf('django.db.models.fields.IntegerField')(db_index=True, null=True, blank=True)),
             ('reward', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=4, blank=True)),
             ('photo', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['photos.Photo'])),
-            ('bounding_box', self.gf('django.db.models.fields.TextField')(null=True)),
+            ('bounding_box_data', self.gf('django.db.models.fields.TextField')(null=True)),
         ))
         db.send_create_signal(u'pose', ['Person'])
 
@@ -294,7 +294,7 @@ class Migration(SchemaMigration):
         u'pose.person': {
             'Meta': {'ordering': "['-time_ms']", 'object_name': 'Person'},
             'added': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'bounding_box': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            'bounding_box_data': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invalid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'mturk_assignment': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['mturk.MtAssignment']"}),

@@ -1,5 +1,7 @@
 import numpy as np
 
+from pose.models import AABB
+
 from PIL import Image, ImageDraw
 
 #from multilabel import segment
@@ -12,7 +14,7 @@ def calc_person_overlay_img(person, scribbles):
     if parse_poses:
         parse_pose = parse_poses[0]
 
-    bounding_box = person.bounding_box_dict
+    bounding_box = person.bounding_box
 
     return calc_pose_overlay_img(person.photo, scribbles,
             parse_pose=parse_pose, bounding_box=bounding_box)
@@ -54,20 +56,17 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
 
     if bounding_box:
         scaled_bounding_box = np.round(np.array([
-            bounding_box['x'], bounding_box['y'],
-            bounding_box['x'] + bounding_box['width'],
-            bounding_box['y'] + bounding_box['height']])
+            bounding_box.min_point[0],
+            bounding_box.min_point[1],
+            bounding_box.max_point[0],
+            bounding_box.max_point[1]])
             * img.shape[0]).astype(np.int)
 
         img = img[scaled_bounding_box[1]:scaled_bounding_box[3],
                 scaled_bounding_box[0]:scaled_bounding_box[2], :]
     else:
-        bounding_box = {
-                'x': 0, 'y': 0,
-                'width': float(img.shape[1]) / img.shape[0],
-                'height': 1,
-                }
-
+        bounding_box = AABB(np.array([0, 0]),
+                np.array([float(img.shape[1]) / img.shape[0], 1]))
 
     height, width = img.shape[0], img.shape[1]
 
@@ -129,14 +128,14 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
 
         for s in range(1, points.shape[0]):
             draw.line((
-                (points[s-1, 0] - bounding_box['x']) * width
-                / bounding_box['width'],
-                (points[s-1, 1] - bounding_box['y']) * height
-                / bounding_box['height'],
-                (points[s, 0] - bounding_box['x']) * width
-                / bounding_box['width'],
-                (points[s, 1] - bounding_box['y']) * height
-                / bounding_box['height'],
+                (points[s-1, 0] - bounding_box.min_point[0]) * width
+                / bounding_box.width(),
+                (points[s-1, 1] - bounding_box.min_point[1]) * height
+                / bounding_box.height(),
+                (points[s, 0] - bounding_box.min_point[0]) * width
+                / bounding_box.width(),
+                (points[s, 1] - bounding_box.min_point[1]) * height
+                / bounding_box.height(),
                 ),
                 fill=fill, width=1)
 

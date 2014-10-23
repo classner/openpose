@@ -8,34 +8,43 @@ import scipy.sparse as sparse
 from photos.models import Photo
 from common.models import ResultBase
 
+class AABB:
+    def __init__(self, min_point, max_point):
+        self.min_point = min_point
+        self.max_point = max_point
+
+    def width(self):
+        return self.max_point[0] - self.min_point[0]
+
+    def height(self):
+        return self.max_point[1] - self.min_point[1]
+
 class Person(ResultBase):
     photo = models.ForeignKey(Photo, related_name='persons')
 
-    bounding_box = models.TextField(null=True)
+    bounding_box_data = models.TextField(null=True)
 
     def __unicode__(self):
         return u'person'
 
     @property
-    def bounding_box_dict(self):
-        if self.bounding_box:
-            bounding_box = json.loads(self.bounding_box)
+    def bounding_box(self):
+        if self.bounding_box_data:
+            bounding_box_data = json.loads(self.bounding_box_data)
 
-            return {'x': bounding_box[0],
-                    'y': bounding_box[1],
-                    'width': bounding_box[2] - bounding_box[0],
-                    'height': bounding_box[3] - bounding_box[1]
-                    }
+            return AABB(np.array([bounding_box_data[0], bounding_box_data[1]])
+                    , np.array([bounding_box_data[2], bounding_box_data[3]]))
         else:
             return None
 
-    @bounding_box_dict.setter
-    def bounding_box_dict(self, bounding_box):
+    @bounding_box.setter
+    def bounding_box(self, bounding_box):
         if bounding_box:
-            self.bounding_box = json.dumps([bounding_box.x,
-                bounding_box.y,
-                bounding_box.x + bounding_box.width,
-                bounding_box.y + bounding_box.height])
+            self.bounding_box_data = json.dumps([
+                bounding_box.min_point[0],
+                bounding_box.min_point[1],
+                bounding_box.max_point[0],
+                bounding_box.max_point[1]])
         else:
             self.bounding_box = None
 
@@ -45,9 +54,14 @@ class Person(ResultBase):
 
         # generating thumbnail URLs is slow, so only generate the ones
         # that will definitely be used.
+        if self.bounding_box_data:
+            bounding_box = json.loads(self.bounding_box_data)
+        else:
+            bounding_box = None
+
         return {
                 'id': self.id,
-                'bounding_box': json.loads(self.bounding_box),
+                'bounding_box': bounding_box,
                 'photo': {
                     'fov': self.photo.fov,
                     'aspect_ratio': self.photo.aspect_ratio,

@@ -12,7 +12,7 @@ import scipy.io
 import json
 
 from photos.models import PhotoDataset, FlickrUser, Photo
-from pose.models import ParsePose
+from pose.models import ParsePose, AABB
 
 class Command(BaseCommand):
     args = '<annotation.mat>'
@@ -42,14 +42,12 @@ class Command(BaseCommand):
                 print '\nNot annotating photo: ', e
 
             if photo:
+                bounding_box = AABB(np.array([0, 0]),
+                        np.array([photo.aspect_ratio, 1]))
                 # create a person annotation
                 person = photo.persons.create(
                         user=admin_user,
-                        bounding_box_dict={
-                            'x': 0, 'y': 0,
-                            'width': photo.aspect_ratio,
-                            'height': 1
-                            },
+                        bounding_box=bounding_box,
                         )
 
                 annotation = annotations[:, :, i].transpose() \

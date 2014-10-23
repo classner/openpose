@@ -3,6 +3,8 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from pose.models import AABB
+import numpy as np
 
 class Migration(DataMigration):
 
@@ -12,12 +14,13 @@ class Migration(DataMigration):
 
         for pose in orm.ParsePose.objects.all():
             aspect_ratio = pose.photo.aspect_ratio
-            bounding_box = "[%f, %f, %f, %f]" % (0, 0, aspect_ratio, 1)
+            bounding_box = AABB(np.array([0, 0]), np.array([aspect_ratio, 1]))
 
             person = orm.Person.objects.create(photo=pose.photo,
-                    bounding_box=bounding_box,
                     user=admin_profile,
                     )
+            person.bounding_box = bounding_box
+            person.save()
 
             pose.person = person
             pose.save()
@@ -280,7 +283,7 @@ class Migration(DataMigration):
         u'pose.person': {
             'Meta': {'ordering': "['-time_ms']", 'object_name': 'Person'},
             'added': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'bounding_box': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            'bounding_box_data': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invalid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'mturk_assignment': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['mturk.MtAssignment']"}),
