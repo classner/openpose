@@ -3,4 +3,7 @@
   {% for x, y in entry.pose %}
     <circle class="pose-display0 nss" cx="{{ x }}" cy="{{ y }}" r="0.01" />
   {% endfor %}
+  {% with entry.person.bounding_box as bb %}
+    <rect height="{{ bb.height }}" width="{{ bb.width }}" x="{{ bb.x }}" y="{{ bb.y }}" style="fill: transparent; stroke: blue; stroke-width: 0.005"/>
+  {% endwith %}
 </svg>
