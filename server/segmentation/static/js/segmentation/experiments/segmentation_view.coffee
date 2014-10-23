@@ -127,10 +127,10 @@ class SegmentationViewGroup
         }
 
       scaled_crop = {
-        x: @crop.x * @photo_obj.height
-        y: @crop.y * @photo_obj.height
-        width: @crop.width * @photo_obj.height
-        height: @crop.height * @photo_obj.height
+        x: Math.max(0, @crop.x * @photo_obj.height)
+        y: Math.max(0, @crop.y * @photo_obj.height)
+        width: Math.min(@crop.width * @photo_obj.height, @photo_obj.width)
+        height: Math.min(@crop.height * @photo_obj.height, @photo_obj.height)
       }
 
       @size = compute_dimensions(scaled_crop, @view.bbox, INF)

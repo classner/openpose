@@ -97,8 +97,10 @@ class SegmentationController
     @s.undoredo.run(new UENextImage((new_image) =>
       if (new_image)
         @request_new_segmentation_overlay()
+      else
+        @loading = false
+        @update_buttons()
     ))
-    @update_buttons()
 
   prev_image: =>
     @s.undoredo.run(new UEPrevImage())

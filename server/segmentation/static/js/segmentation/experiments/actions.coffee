@@ -2,6 +2,7 @@ class UENextImage extends UndoableEvent
   constructor: (@on_load) ->
   run: (ui) -> ui.s.next_image(@on_load)
   undo: (ui) -> ui.s.prev_image()
+  redo: (ui) -> ui.s.next_image()
   entry: -> { name: "UENextImage" }
 
 class UEPrevImage extends UndoableEvent
