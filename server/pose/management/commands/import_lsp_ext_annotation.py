@@ -56,6 +56,19 @@ class Command(BaseCommand):
                     bounding_boxes[i][2] / photo.orig_height,
                     bounding_boxes[i][3] / photo.orig_height]))
 
+                # grow the bouding box; they mostly seem to be too small
+                grow = 0.2
+                width = bounding_box.width
+                height = bounding_box.height
+                bounding_box.min_point[0] = max(0, bounding_box.min_point[0] -
+                        width * grow)
+                bounding_box.min_point[1] = max(0, bounding_box.min_point[1] -
+                        height * grow)
+                bounding_box.max_point[0] = min(photo.aspect_ratio,
+                        bounding_box.max_point[0] + width * grow)
+                bounding_box.max_point[1] = min(1, bounding_box.max_point[1] +
+                        height * grow)
+
                 with transaction.atomic():
                     # create a person annotation
                     person = photo.persons.create(
