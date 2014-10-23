@@ -129,13 +129,13 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
         for s in range(1, points.shape[0]):
             draw.line((
                 (points[s-1, 0] - bounding_box.min_point[0]) * width
-                / bounding_box.width(),
+                / bounding_box.width,
                 (points[s-1, 1] - bounding_box.min_point[1]) * height
-                / bounding_box.height(),
+                / bounding_box.height,
                 (points[s, 0] - bounding_box.min_point[0]) * width
-                / bounding_box.width(),
+                / bounding_box.width,
                 (points[s, 1] - bounding_box.min_point[1]) * height
-                / bounding_box.height(),
+                / bounding_box.height,
                 ),
                 fill=fill, width=1)
 

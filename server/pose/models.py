@@ -13,11 +13,21 @@ class AABB:
         self.min_point = min_point
         self.max_point = max_point
 
+    @property
     def width(self):
         return self.max_point[0] - self.min_point[0]
 
+    @property
     def height(self):
         return self.max_point[1] - self.min_point[1]
+
+    @property
+    def x(self):
+        return self.min_point[0]
+
+    @property
+    def y(self):
+        return self.min_point[1]
 
 class Person(ResultBase):
     photo = models.ForeignKey(Photo, related_name='persons')
