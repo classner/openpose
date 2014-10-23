@@ -35,7 +35,7 @@ class Person(ResultBase):
     bounding_box_data = models.TextField(null=True)
 
     def __unicode__(self):
-        return u'person'
+        return u'person ' + self.photo.name
 
     @property
     def bounding_box(self):
