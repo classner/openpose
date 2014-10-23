@@ -275,16 +275,6 @@ class Experiment(MtModelBase):
             score = photo.publishable_score()
             #if photo.num_vertices:
                 #score += photo.num_vertices
-            if photo.scene_category_correct_score:
-                score += photo.scene_category_correct_score
-                if photo.scene_category.name in ('bathroom', 'staircase'):
-                    score -= 10
-            if not photo.num_intrinsic_points:
-                score += photo.num_intrinsic_points
-            if not photo.num_intrinsic_comparisons:
-                score += photo.num_intrinsic_comparisons
-            if not photo.scene_category_correct:
-                score -= 10000
             return score
         else:
             return 0
