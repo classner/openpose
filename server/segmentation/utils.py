@@ -1,7 +1,5 @@
 import numpy as np
 
-import json
-
 from PIL import Image, ImageDraw
 
 #from multilabel import segment
@@ -14,9 +12,7 @@ def calc_person_overlay_img(person, scribbles):
     if parse_poses:
         parse_pose = parse_poses[0]
 
-    bounding_box = None
-    if person.bounding_box:
-        bounding_box = json.loads(person.bounding_box)
+    bounding_box = person.bounding_box_dict
 
     return calc_pose_overlay_img(person.photo, scribbles,
             parse_pose=parse_pose, bounding_box=bounding_box)
@@ -57,15 +53,20 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
     #bounding_box = None
 
     if bounding_box:
-        scaled_bounding_box = np.round(np.array(bounding_box) *
-                img.shape[0]).astype(np.int)
+        scaled_bounding_box = np.round(np.array([
+            bounding_box['x'], bounding_box['y'],
+            bounding_box['x'] + bounding_box['width'],
+            bounding_box['y'] + bounding_box['height']])
+            * img.shape[0]).astype(np.int)
 
         img = img[scaled_bounding_box[1]:scaled_bounding_box[3],
                 scaled_bounding_box[0]:scaled_bounding_box[2], :]
-
-        offset = scaled_bounding_box[0:2]
     else:
-        offset = np.zeros((2))
+        bounding_box = {
+                'x': 0, 'y': 0,
+                'width': float(img.shape[1]) / img.shape[0],
+                'height': 1,
+                }
 
 
     height, width = img.shape[0], img.shape[1]
@@ -127,11 +128,17 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
             fill = background_scribble_label
 
         for s in range(1, points.shape[0]):
-            draw.line((points[s-1, 0] * scale - offset[0],
-                points[s-1, 1] * scale - offset[1],
-                points[s, 0] * scale - offset[0],
-                points[s, 1] * scale - offset[1]),
-                    fill=fill, width=1)
+            draw.line((
+                (points[s-1, 0] - bounding_box['x']) * width
+                / bounding_box['width'],
+                (points[s-1, 1] - bounding_box['y']) * height
+                / bounding_box['height'],
+                (points[s, 0] - bounding_box['x']) * width
+                / bounding_box['width'],
+                (points[s, 1] - bounding_box['y']) * height
+                / bounding_box['height'],
+                ),
+                fill=fill, width=1)
 
     scribbles_map = np.asarray(scribbles_map_img)
 

@@ -95,16 +95,52 @@ class SegmentationViewGroup
         @remove(@overlay)
         @overlay = null
 
-  set_photo: (photo_url, ui, on_load) ->
+  photo_to_crop: (p) ->
+    {
+      x: (p.x - @crop.x) * @size.width / @crop.width
+      y: (p.y - @crop.y) * @size.height / @crop.height
+    }
+
+  crop_to_photo: (p) ->
+    {
+      x: p.x * @crop.width / @size.width + @crop.x
+      y: p.y * @crop.height / @size.height + @crop.y
+    }
+
+  set_photo: (photo_url, bounding_box, ui, on_load) ->
     @photo_obj = new Image()
     @photo_obj.src = photo_url
     @photo_obj.onload = do() => =>
-      @size = compute_dimensions(@photo_obj, @view.bbox, INF)
+      if bounding_box?
+        @crop = {
+          x: bounding_box[0]
+          y: bounding_box[1]
+          width: (bounding_box[2] - bounding_box[0])
+          height: (bounding_box[3] - bounding_box[1])
+        }
+      else
+        @crop = {
+          x: 0
+          y: 0
+          width: @photo_obj.width / @photo_obj.height
+          height: 1
+        }
+
+      scaled_crop = {
+        x: @crop.x * @photo_obj.height
+        y: @crop.y * @photo_obj.height
+        width: @crop.width * @photo_obj.height
+        height: @crop.height * @photo_obj.height
+      }
+
+      @size = compute_dimensions(scaled_crop, @view.bbox, INF)
+
       #@stage.setWidth(@size.width)
       #@stage.setHeight(@size.height)
       @photo = new Kinetic.Image(
-        x: 0, y: 0, image: @photo_obj,
+        x: 0, y: 0, image: @photo_obj, crop: scaled_crop,
         width: @size.width, height:@size.height)
+
       @photo_layer.add(@photo)
       @ready = true
       @draw()

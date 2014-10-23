@@ -45,9 +45,11 @@ class Command(BaseCommand):
                 # create a person annotation
                 person = photo.persons.create(
                         user=admin_user,
-                        bounding_box=json.dumps(
-                            [0, 0, photo.aspect_ratio, 1]
-                            ),
+                        bounding_box_dict={
+                            'x': 0, 'y': 0,
+                            'width': photo.aspect_ratio,
+                            'height': 1
+                            },
                         )
 
                 annotation = annotations[:, :, i].transpose() \

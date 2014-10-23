@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         bounding_box_file = open(args[1], 'r')
         bounding_boxes = [
-                bounding_box_line.split(' ')[1:]
+                np.array(map(float, bounding_box_line.split(' ')[1:]))
                 for bounding_box_line in bounding_box_file]
 
         image_name_template = 'im{0:05d}'
@@ -52,7 +52,14 @@ class Command(BaseCommand):
                     # create a person annotation
                     person = photo.persons.create(
                             user=admin_user,
-                            bounding_box=json.dumps(bounding_boxes[i]),
+                            bounding_box={
+                                'x': bounding_boxes[i][0] / photo.orig_height,
+                                'y': bounding_boxes[i][1] / photo.orig_height,
+                                'width': (bounding_boxes[i][2] - bounding_boxes[i][0])
+                                / photo.orig_height,
+                                'height': (bounding_boxes[i][3] - bounding_boxes[i][1])
+                                / photo.orig_height,
+                                },
                             )
 
                     annotation = annotations[:, :, i].transpose() \

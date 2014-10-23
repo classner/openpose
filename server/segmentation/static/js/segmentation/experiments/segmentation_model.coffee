@@ -56,7 +56,7 @@ class SegmentationModel
     if @contents[@content_index]?.photo.image?['orig']?
       url = @contents[@content_index].photo.image['orig']
 
-      @set_photo(url, on_load)
+      @set_photo(url, @contents[@content_index]?.bounding_box, on_load)
     else if on_load?
       on_load(false)
 
@@ -81,24 +81,28 @@ class SegmentationModel
     version: '2.0'
     results: JSON.stringify(results)
 
-  set_photo: (photo_url, on_load) =>
-    @photo_groups[@content_index].set_photo(photo_url, @ui, =>
+  set_photo: (photo_url, bounding_box, on_load) =>
+    @photo_groups[@content_index].set_photo(photo_url, bounding_box, @ui, =>
       console.log "loaded photo_url: #{photo_url}"
 
-      size = @photo_groups[@content_index].size
+      group = @photo_groups[@content_index]
 
       pose = @contents[@content_index]?.parse_pose
       if pose?
         # only take the first pose annotation
         for p in pose[0]
+          p_ = group.photo_to_crop({
+            x: p[0]
+            y: p[1]
+          })
           part = new Kinetic.Circle(
             {
               radius: 4
               fill: 'red'
               stroke: 'black'
               strokeWidth: 1
-              x: p[0] * size.height
-              y: p[1] * size.height
+              x: p_.x
+              y: p_.y
             }
           )
 
@@ -108,11 +112,13 @@ class SegmentationModel
         scribbles = @contents[@content_index].scribbles
 
         for scribble in scribbles
-          @start_scribble((
-            {
-              'x': p[0] * size.height
-              'y': p[1] * size.height
-            } for p in scribble.points), scribble.is_foreground)
+          points = (
+            group.photo_to_crop({
+              x: p[0]
+              y: p[1]
+            }) for p in scribble.points)
+
+          @start_scribble(points, scribble.is_foreground)
           @create_scribble()?.update(@ui)
 
       on_load(true) if on_load?
@@ -128,16 +134,16 @@ class SegmentationModel
 
       group = @photo_groups[index]
 
-      # calculate the points with respect to a frame with the right aspact ratio
-      factor = group.size.height
-
-      x_max = group.size.width / factor
-      y_max = group.size.height / factor
+      max = group.crop_to_photo({
+        x: group.size.width
+        y: group.size.height
+      })
 
       for p in scribble.scribble.points
+        p_ = group.crop_to_photo(p)
         points_scaled.points.push([
-          Math.max(0, Math.min(x_max, p.x / factor)),
-          Math.max(0, Math.min(y_max, p.y / factor)),
+          Math.max(0, Math.min(max.x, p_.x)),
+          Math.max(0, Math.min(max.y, p_.y)),
         ])
       scribble_list.push(points_scaled)
 

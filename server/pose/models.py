@@ -16,6 +16,29 @@ class Person(ResultBase):
     def __unicode__(self):
         return u'person'
 
+    @property
+    def bounding_box_dict(self):
+        if self.bounding_box:
+            bounding_box = json.loads(self.bounding_box)
+
+            return {'x': bounding_box[0],
+                    'y': bounding_box[1],
+                    'width': bounding_box[2] - bounding_box[0],
+                    'height': bounding_box[3] - bounding_box[1]
+                    }
+        else:
+            return None
+
+    @bounding_box_dict.setter
+    def bounding_box_dict(self, bounding_box):
+        if bounding_box:
+            self.bounding_box = json.dumps([bounding_box.x,
+                bounding_box.y,
+                bounding_box.x + bounding_box.width,
+                bounding_box.y + bounding_box.height])
+        else:
+            self.bounding_box = None
+
     def get_entry_dict(self):
         """ Return a dictionary of this model containing just the fields needed
         for javascript rendering.  """
@@ -24,6 +47,7 @@ class Person(ResultBase):
         # that will definitely be used.
         return {
                 'id': self.id,
+                'bounding_box': json.loads(self.bounding_box),
                 'photo': {
                     'fov': self.photo.fov,
                     'aspect_ratio': self.photo.aspect_ratio,
