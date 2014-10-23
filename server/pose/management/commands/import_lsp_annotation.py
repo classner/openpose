@@ -4,10 +4,12 @@ from optparse import make_option
 from clint.textui import progress
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+from accounts.models import UserProfile
 
 import numpy as np
 import scipy.io
+
+import json
 
 from photos.models import PhotoDataset, FlickrUser, Photo
 from pose.models import ParsePose
@@ -16,18 +18,8 @@ class Command(BaseCommand):
     args = '<annotation.mat>'
     help = 'Adds LSP annotation from MAT'
 
-    option_list = BaseCommand.option_list + (
-        make_option(
-            '--delete',
-            action='store_true',
-            dest='delete',
-            default=False,
-            help='Delete photos after they are visited'),
-    )
-
     def handle(self, *args, **options):
-        admin_user = User.objects.get_or_create(
-            username='admin')[0].get_profile()
+        admin_user = UserProfile.objects.get(user__username='admin')
 
         annotations_file = scipy.io.loadmat(args[0])
 
@@ -35,20 +27,33 @@ class Command(BaseCommand):
 
         annotations = annotations_file.get('joints')[0:2, :, :]
 
+        dataset, _ = PhotoDataset.objects.get_or_create(name='LSP')
+
         for i in progress.bar(xrange(annotations.shape[2])):
             # get the right image from the dataset that is connected to this
             # annotation
+            photo = None
             try:
-                photo = Photo.objects.get(name=image_name_template.format(i + 1))
+                photo = Photo.objects.get(
+                        dataset=dataset,
+                        name=image_name_template.format(i + 1),
+                        )
+            except Photo.DoesNotExist as e:
+                print '\nNot annotating photo: ', e
 
-                parse_annotation = ParsePose(
+            if photo:
+                # create a person annotation
+                person = photo.persons.create(
                         user=admin_user,
-                        photo=photo,
+                        bounding_box=json.dumps(
+                            [0, 0, photo.aspect_ratio, 1]
+                            ),
                         )
 
                 annotation = annotations[:, :, i].transpose() \
                         / photo.image_orig.height
-                parse_annotation.pose = annotation.tolist()
-                parse_annotation.save()
-            except Photo.DoesNotExist as e:
-                print '\nNot annotating photo: ', e
+
+                person.parse_pose.create(
+                        user=admin_user,
+                        pose=annotation.tolist(),
+                        )

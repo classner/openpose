@@ -4,7 +4,7 @@ from optparse import make_option
 from clint.textui import progress
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+from accounts.models import UserProfile
 
 from photos.models import PhotoDataset, FlickrUser
 from photos.add import add_photo
@@ -25,8 +25,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        admin_user = User.objects.get_or_create(
-            username='admin')[0].get_profile()
+        admin_user = UserProfile.objects.get(user__username='admin')
 
         delete = bool(options['delete'])
 
@@ -35,7 +34,7 @@ class Command(BaseCommand):
             print 'Visiting %s: %d files' % (root, len(files))
 
             # only create a category if has at least one photo
-            dataset, _ = PhotoDataset.objects.get_or_create(name='LSP')
+            dataset, _ = PhotoDataset.objects.get_or_create(name='LSP ext')
 
             num_added = 0
             for filename in progress.bar(files):
@@ -49,11 +48,6 @@ class Command(BaseCommand):
 
                     #license = License.objects.get_or_create(
                         #user=admin_user, name='CC BY-NC-SA 2.0')[0]
-
-                    if not dataset:
-                        name = os.path.basename(root).replace('+', ' ')
-                        dataset, _ = PhotoDataset.objects \
-                            .get_or_create(name=name)
 
                     try:
                         add_photo(
