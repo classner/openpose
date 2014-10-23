@@ -56,7 +56,7 @@ class Person(ResultBase):
                 bounding_box.max_point[0],
                 bounding_box.max_point[1]])
         else:
-            self.bounding_box = None
+            self.bounding_box_data = None
 
     def get_entry_dict(self):
         """ Return a dictionary of this model containing just the fields needed

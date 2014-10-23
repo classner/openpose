@@ -3,24 +3,22 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from pose.models import AABB
-import numpy as np
+
+import json
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         """ For every ParsePose we create a Person entry for a photo. """
-        admin_profile = orm['accounts.UserProfile'].objects.get(user__username='admin')
+        admin_user = orm['accounts.UserProfile'].objects.get(user__username='admin')
 
         for pose in orm.ParsePose.objects.all():
             aspect_ratio = pose.photo.aspect_ratio
-            bounding_box = AABB(np.array([0, 0]), np.array([aspect_ratio, 1]))
 
-            person = orm.Person.objects.create(photo=pose.photo,
-                    user=admin_profile,
+            person = pose.photo.persons.create(
+                    user=admin_user,
+                    bounding_box_data=json.dumps([0, 0, aspect_ratio, 1])
                     )
-            person.bounding_box = bounding_box
-            person.save()
 
             pose.person = person
             pose.save()

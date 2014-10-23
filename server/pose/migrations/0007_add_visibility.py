@@ -4,11 +4,13 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+import json
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
         for pose in orm.ParsePose.objects.all():
-            pose.visible = [True] * 14
+            pose.visible_vertices = json.dumps([True] * 14)
             pose.save()
 
         "Write your forwards methods here."
