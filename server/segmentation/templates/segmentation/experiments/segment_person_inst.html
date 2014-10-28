@@ -15,13 +15,14 @@
 	<div class="span6">
 		<div class="hero-unit">
 			<h2>Your task is to carefully trace the inside and the outside of a person.</h2>
+	<p style="color:#f00"><span class="label label-important">Note:</span> Please, pay special attention to hands and feet.</p>
       <p>All the clothes that a person wears (including hats, gloves, shoes)
       belong to the inside. Everything else should be marked as outside (such
       as bats, rackets, balls).</p>
 		</div>
 	</div>
 	<div class="span6">
-    {% include "grid.html" with span="span3" rowsize="2" thumb_template="segmentation/experiments/instruction_thumb.html" entries=contents %}
+    {% include "grid.html" with span="span6" rowsize="2" thumb_template="segmentation/experiments/instruction_thumb.html" entries=contents %}
 	</div>
 </div>
 
