@@ -65,7 +65,7 @@ def task_quality(request, dataset_id='all'):
         if segmentations:
             # pick a random non annotated picture
             #contents = [segmentations[np.random.randint(len(segmentations))]]
-            contents = sample(segmentations, 10)
+            contents = sample(segmentations, min(50, segmentations.count()))
 
             context = {
                 # the current task
