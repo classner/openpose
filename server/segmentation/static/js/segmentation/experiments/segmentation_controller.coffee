@@ -147,8 +147,7 @@ class SegmentationController
       dataType: "text"
       data: @s.get_scribble_data()
       success: (data, status, jqxhr) =>
-        overlay_url = "data:image/jpeg;base64," + data
-        @s.set_segmentation_overlay(overlay_url, =>
+        @s.set_segmentation_overlay(data, =>
           @loading = false
           @update_buttons()
           on_load?()

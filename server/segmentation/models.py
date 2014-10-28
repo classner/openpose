@@ -3,6 +3,10 @@ from django.core.files.images import ImageFile
 
 import json
 
+from cStringIO import StringIO
+
+import base64
+
 from tempfile import NamedTemporaryFile
 
 from pose.models import Person
@@ -12,6 +16,8 @@ from common.utils import get_content_tuple, recursive_sum, \
         get_opensurfaces_storage
 
 from segmentation.utils import calc_person_overlay_img
+
+from PIL import Image
 
 STORAGE = get_opensurfaces_storage()
 
@@ -63,9 +69,10 @@ class PersonSegmentation(ResultBase):
 
         new_objects = {}
         for person in hit_contents:
-            scribbles = results[str(person.id)][u'scribbles']
-            person_time_ms = time_ms[str(person.id)]
-            person_time_active_ms = time_active_ms[str(person.id)]
+            person_id = str(person.id)
+            scribbles = results[person_id][u'scribbles']
+            person_time_ms = time_ms[person_id]
+            person_time_active_ms = time_active_ms[person_id]
 
             # check if the scribbles make sense
             for scribble in scribbles:
@@ -73,8 +80,23 @@ class PersonSegmentation(ResultBase):
                     if len(point) != 2:
                         raise ValueError("Point with more than 2 coordinates")
 
-            # generate the segmentation image
-            overlay_img = calc_person_overlay_img(person, scribbles)
+            # check if the results contain a segmentation already, if so do not
+            # recalculate the segmentation
+
+            overlay_img = None
+            if u'segmentation' in results[person_id]:
+                try:
+                    overlay_img_data = base64.standard_b64decode(
+                            results[person_id][u'segmentation'])
+                    overlay_img = Image.open(StringIO(overlay_img_data))
+                    print "reusing segmentation data"
+                except:
+                    overlay_img = None
+
+            if not overlay_img:
+                # generate the segmentation image
+                overlay_img = calc_person_overlay_img(person, scribbles)
+                print "NOT reusing segmentation data"
 
             with transaction.atomic():
                 with NamedTemporaryFile(prefix=u'segmentation_' +

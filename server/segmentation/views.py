@@ -189,7 +189,7 @@ def segmentation(request):
         person = Person.objects.get(id=person_id)
 
         overlay_img = calc_person_overlay_img(person, scribbles)
-        overlay_img.save(bytes_io, u"JPEG")
+        overlay_img.save(bytes_io, u'PNG')
 
         return HttpResponse(
                 base64.standard_b64encode(bytes_io.getvalue()),

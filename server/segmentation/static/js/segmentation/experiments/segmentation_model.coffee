@@ -82,12 +82,13 @@ class SegmentationModel
     else if on_load?
       on_load(false)
 
-  segmentation_overlay_url: ->
-    @photo_groups[@content_index].segmentation_overlay_url
+  segmentation_overlay_data: ->
+    @photo_groups[@content_index].segmentation_overlay_data
 
-  set_segmentation_overlay: (url, on_load) =>
+  set_segmentation_overlay: (data, on_load) =>
+    url = "data:image/png;base64," + data
     @photo_groups[@content_index].set_segmentation_overlay(url, @ui, =>
-      @photo_groups[@content_index].segmentation_overlay_url = url
+      @photo_groups[@content_index].segmentation_overlay_data = data
       console.log "loaded background"
 
       on_load?()
@@ -185,6 +186,7 @@ class SegmentationModel
       photo_id = content.id
       results[photo_id] = {}
       results[photo_id].scribbles = scribble_list
+      results[photo_id].segmentation = @photo_groups[index].segmentation_overlay_data
       time_ms[photo_id] = @photo_groups[index].time_ms
       time_active_ms[photo_id] = @photo_groups[index].time_active_ms
 
