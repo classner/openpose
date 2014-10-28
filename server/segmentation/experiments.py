@@ -20,24 +20,25 @@ def configure_experiments():
 
     configure_experiment(
         slug='segment_person',
+        variant='"person_fix"',
         template_dir='segmentation/experiments',
         module='segmentation.experiments',
         version=2,  # 2: intrinsic images, 1: original opensurfaces
-        reward=Decimal('0.02'),
+        reward=Decimal('0.11'),
         num_outputs_max=1,
-        contents_per_hit=1,
+        contents_per_hit=2,
         content_type_model=Person,
         out_content_type_model=PersonSegmentation,
         out_content_attr='person',
         content_filter={
-            'scribbles__isnull': True,
+            'segmentations__isnull': True,
             },
         title='Carefully segment a person',
         description='Given an image, your job is to segment a person from an image.',
         keywords='person,images,segment',
         #frame_height=8000,
         requirements={},
-        auto_add_hits=False,
+        auto_add_hits=True,
         has_tutorial=True,
     )
 
