@@ -92,6 +92,8 @@ class ParsePose(ResultBase):
     vertices = models.TextField(null=True)
     visible_vertices = models.TextField(null=True)
 
+    person_centric = models.BooleanField(default=True)
+
     def __unicode__(self):
         return u'pose annotation'
 
