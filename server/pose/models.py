@@ -86,6 +86,11 @@ class Person(ResultBase):
                     }
                 }
 
+class PartDescription:
+    def __init__(self, description, sticks):
+        self.description = description
+        self.sticks = np.array(sticks)
+
 class ParsePose(ResultBase):
     person = models.ForeignKey(Person, related_name='parse_poses')
 
@@ -93,6 +98,24 @@ class ParsePose(ResultBase):
     visible_vertices = models.TextField(null=True)
 
     person_centric = models.BooleanField(default=True)
+
+    PART_PERSON =    'P'
+    PART_HEAD =      'H'
+    PART_ARM_LEFT =  'AL'
+    PART_ARM_RIGHT = 'AR'
+    PART_TORSO =     'T'
+    PART_LEG_LEFT =  'LL'
+    PART_LEG_RIGHT = 'LR'
+
+    part_description = {
+            PART_PERSON:    PartDescription('Person',    range(10)),
+            PART_HEAD:      PartDescription('Head',      [9]),
+            PART_ARM_LEFT:  PartDescription('Arm Left',  [9]),
+            PART_ARM_RIGHT: PartDescription('Arm Right', [9]),
+            PART_TORSO:     PartDescription('Torso',     [9]),
+            PART_LEG_LEFT:  PartDescription('Leg Left',  [9]),
+            PART_LEG_RIGHT: PartDescription('Leg Right', [9]),
+            }
 
     def __unicode__(self):
         return u'pose annotation'
@@ -144,6 +167,22 @@ class ParsePose(ResultBase):
     def end_points(self):
         annotation = np.array(self.pose)
         return ParsePose._build_to_endpoints().dot(annotation)
+
+    def _points_from_sticks(self, sticks):
+        # replicate every index
+        end_point_indexes = np.kron(sticks * 2, np.array([1, 1]))
+        # get the second endpoint by increasing every second index
+        end_point_indexes[1::2] += 1
+
+        end_points, visibility = self.visible_end_points()
+
+        return (end_points[end_point_indexes, :], visibility[end_point_indexes])
+
+    def visible_part_end_points(self, part):
+        if part:
+            return self._points_from_sticks(part_description[part].sticks)
+        else:
+            return self.visible_end_points()
 
     def visible_end_points(self):
         annotation = np.array(self.pose)
