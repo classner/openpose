@@ -1,30 +1,31 @@
 import json
+import base64
+from random import sample
+from cStringIO import StringIO
+
+from PIL import Image
+
+import numpy as np
 
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
-from PIL import Image
-
-import numpy as np
-
-import base64
-
-from random import sample
-
-from cStringIO import StringIO
-
-from segmentation.utils import calc_person_overlay_img
-
-from segmentation.models import PersonSegmentation, \
-        PersonSegmentationQuality
-from pose.models import Person, ParsePose
-from mturk.views.external import external_task_browser_check
-from mturk.models import Experiment
-from accounts.models import UserProfile
 from common.utils import json_success_response, json_error_response, \
         html_error_response, dict_union
+
+from accounts.models import UserProfile
+
+from mturk.views.external import external_task_browser_check
+from mturk.models import Experiment
+
+from pose.models import Person, ParsePose
+
+from segmentation.utils import calc_person_overlay_img
+from segmentation.models import PersonSegmentation, \
+        PersonSegmentationQuality
+from segmentation.experiments import external_task_extra_context
 
 @login_required
 @ensure_csrf_cookie
@@ -87,10 +88,9 @@ def task_quality(request, dataset_id='all'):
                 u'instructions': 'segmentation/experiments/quality_segmentation_inst_content.html',
 
                 u'content_thumb_template': 'segmentation/experiments/quality_segmentation_thumb.html',
-
-                u'html_yes': 'segmentation aligned with central person',
-                u'html_no': 'bad segmentation',
             }
+
+            external_task_extra_context('segment_quality', context)
 
             return render(request, u'segmentation/experiments/quality_segmentation.html', context)
         else:

@@ -65,6 +65,6 @@ def external_task_extra_context(slug, context):
     """ Add extra context for each task (called by
     ``mturk.views.external.external_task_GET``) """
 
-    if slug == 'quality_segmentation':
-        context['html_yes'] = 'segmentation aligned with central person'
-        context['html_no'] = 'bad segmentation'
+    if slug == 'segment_quality':
+        context[u'html_yes'] = 'segmentation aligned with central person'
+        context[u'html_no'] = 'bad segmentation'
