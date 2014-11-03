@@ -1,11 +1,12 @@
 from decimal import Decimal
+
 from django.conf import settings
 
 from common.utils import has_foreign_key
 
-from segmentation.models import PersonSegmentation
-
 from pose.models import Person
+
+from segmentation.models import PersonSegmentation
 
 def configure_experiments():
     """ This function is automatically called by
