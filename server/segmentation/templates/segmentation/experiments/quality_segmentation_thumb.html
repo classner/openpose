@@ -3,8 +3,10 @@
 		{% include "segmentation/segmentation.svg" with orig="True" %}
 	</div>
 	<div class="span6">
-    <svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ entry.person.photo.aspect_ratio }}" viewBox="0 0 {{ entry.person.photo.aspect_ratio }} 1" style="width:100%">
-      <image x="0" y="0" width="{{ entry.person.photo.aspect_ratio }}" height="1" xlink:href="{{ entry.person.photo.image_orig.url }}"/>
-    </svg>
+    {% with entry.task.person.photo as photo %}
+      <svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ photo.aspect_ratio }}" viewBox="0 0 {{ photo.aspect_ratio }} 1" style="width:100%">
+        <image x="0" y="0" width="{{ photo.aspect_ratio }}" height="1" xlink:href="{{ photo.image_orig.url }}"/>
+      </svg>
+    {% endwith %}
 	</div>
 </div>

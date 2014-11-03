@@ -1,30 +1,84 @@
-from django.db import models, transaction
-from django.core.files.images import ImageFile
-
 import json
-
 from cStringIO import StringIO
-
 import base64
-
 from tempfile import NamedTemporaryFile
-
-from pose.models import Person
-from common.models import EmptyModelBase, ResultBase
-
-from common.utils import get_content_tuple, recursive_sum, \
-        get_opensurfaces_storage
-
-from segmentation.utils import calc_person_overlay_img
 
 from PIL import Image
 
+from django.db import models, transaction
+from django.core.files.images import ImageFile
+
+from common.models import EmptyModelBase, ResultBase
+from common.utils import get_content_tuple, recursive_sum, \
+        get_opensurfaces_storage
+
+from pose.models import ParsePose, Person
+
+from segmentation.utils import calc_person_overlay_img
+
 STORAGE = get_opensurfaces_storage()
+
+class PersonSegmentationTask(EmptyModelBase):
+    """ A segmentation task. """
+
+    person = models.ForeignKey(Person, related_name='segmentation_tasks')
+
+    parse_pose = models.ForeignKey(ParsePose,
+            related_name='segmentation_tasks', blank=True, null=True)
+
+    part = models.CharField(
+            max_length=2, choices=map(
+                lambda (k, p): (k, p.description),
+                ParsePose.part_description.iteritems()),
+            null=True, blank=True)
+
+    def get_entry_dict(self):
+        """ Return a dictionary of this model containing just the fields needed
+        for javascript rendering.  """
+
+        # generating thumbnail URLs is slow, so only generate the ones
+        # that will definitely be used.
+        if self.person.bounding_box_data:
+            bounding_box = json.loads(self.person.bounding_box_data)
+        else:
+            bounding_box = None
+
+        # if there is already a segmentation we take the newest one and add the
+        # scribbles here
+        scribbles = None
+        responses = self.responses.all().order_by('-added')
+        if responses:
+            scribbles = json.loads(responses[0].scribbles)
+
+        parse_pose, visible = self.parse_pose.visible_part_end_points(self.part)
+        parts = [ p
+                for i, p in enumerate(parse_pose.tolist())
+                if visible[i]
+                ]
+
+        return {
+                u'id': self.id,
+                u'bounding_box': bounding_box,
+                u'parse_pose': parts,
+                u'scribbles': scribbles,
+                u'photo': {
+                    u'fov': self.person.photo.fov,
+                    u'aspect_ratio': self.person.photo.aspect_ratio,
+                    u'image': {
+                        #'200': self.photo.image_200.url,
+                        #'300': self.photo.image_300.url,
+                        #'512': self.photo.image_512.url,
+                        #'1024': self.photo.image_1024.url,
+                        #'2048': self.photo.image_2048.url,
+                        u'orig': self.person.photo.image_orig.url,
+                        }
+                    }
+                }
 
 class PersonSegmentation(ResultBase):
     """ Person segmentation submitted by user. """
 
-    person = models.ForeignKey(Person, related_name='segmentations')
+    task = models.ForeignKey(PersonSegmentationTask, related_name='responses')
 
     segmentation = models.ImageField(upload_to='segmentation', storage=STORAGE)
 
@@ -35,7 +89,8 @@ class PersonSegmentation(ResultBase):
     num_scribbles = models.IntegerField(null=True)
 
     def __unicode__(self):
-        return '%s scribbles in segmentation' % self.num_scribbles
+        return ('%s scribbles in segmentation for part %s' %
+                (self.num_scribbles, self.task.part))
 
     def get_thumb_template(self):
         return 'segmentation/segmentation_thumb.html'
@@ -68,11 +123,11 @@ class PersonSegmentation(ResultBase):
             raise ValueError("Unknown version: %s" % version)
 
         new_objects = {}
-        for person in hit_contents:
-            person_id = str(person.id)
-            scribbles = results[person_id][u'scribbles']
-            person_time_ms = time_ms[person_id]
-            person_time_active_ms = time_active_ms[person_id]
+        for task in hit_contents:
+            task_id = str(task.id)
+            scribbles = results[task_id][u'scribbles']
+            person_time_ms = time_ms[task_id]
+            person_time_active_ms = time_active_ms[task_id]
 
             # check if the scribbles make sense
             for scribble in scribbles:
@@ -84,28 +139,28 @@ class PersonSegmentation(ResultBase):
             # recalculate the segmentation
 
             overlay_img = None
-            if u'segmentation' in results[person_id]:
+            if u'segmentation' in results[task_id]:
                 try:
                     overlay_img_data = base64.standard_b64decode(
-                            results[person_id][u'segmentation'])
+                            results[task_id][u'segmentation'])
                     overlay_img = Image.open(StringIO(overlay_img_data))
-                    print "reusing segmentation data"
+                    print("reusing segmentation data")
                 except:
                     overlay_img = None
 
             if not overlay_img:
                 # generate the segmentation image
-                overlay_img = calc_person_overlay_img(person, scribbles)
-                print "NOT reusing segmentation data"
+                overlay_img = calc_person_overlay_img(task, scribbles)
+                print("NOT reusing segmentation data")
 
             with transaction.atomic():
                 with NamedTemporaryFile(prefix=u'segmentation_' +
-                        person.photo.name + u'_', suffix=u'.png') as f:
+                        task.person.photo.name + u'_', suffix=u'.png') as f:
                     overlay_img.save(f, u"PNG")
                     f.seek(0)
                     segmentation = ImageFile(f)
 
-                    new_obj, created = person.segmentations.get_or_create(
+                    new_obj, created = task.responses.get_or_create(
                         user=user,
                         segmentation=segmentation,
                         mturk_assignment=mturk_assignment,
@@ -117,7 +172,7 @@ class PersonSegmentation(ResultBase):
                     )
 
                     if created:
-                        new_objects[get_content_tuple(person)] = [new_obj]
+                        new_objects[get_content_tuple(task)] = [new_obj]
 
         return new_objects
 

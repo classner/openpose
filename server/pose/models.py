@@ -58,33 +58,6 @@ class Person(ResultBase):
         else:
             self.bounding_box_data = None
 
-    def get_entry_dict(self):
-        """ Return a dictionary of this model containing just the fields needed
-        for javascript rendering.  """
-
-        # generating thumbnail URLs is slow, so only generate the ones
-        # that will definitely be used.
-        if self.bounding_box_data:
-            bounding_box = json.loads(self.bounding_box_data)
-        else:
-            bounding_box = None
-
-        return {
-                'id': self.id,
-                'bounding_box': bounding_box,
-                'photo': {
-                    'fov': self.photo.fov,
-                    'aspect_ratio': self.photo.aspect_ratio,
-                    'image': {
-                        #'200': self.photo.image_200.url,
-                        #'300': self.photo.image_300.url,
-                        #'512': self.photo.image_512.url,
-                        '1024': self.photo.image_1024.url,
-                        '2048': self.photo.image_2048.url,
-                        'orig': self.photo.image_orig.url,
-                        }
-                    }
-                }
 
 class PartDescription:
     def __init__(self, description, sticks):
@@ -99,7 +72,6 @@ class ParsePose(ResultBase):
 
     person_centric = models.BooleanField(default=True)
 
-    PART_PERSON =    'P'
     PART_HEAD =      'H'
     PART_ARM_LEFT =  'AL'
     PART_ARM_RIGHT = 'AR'
@@ -108,7 +80,6 @@ class ParsePose(ResultBase):
     PART_LEG_RIGHT = 'LR'
 
     part_description = {
-            PART_PERSON:    PartDescription('Person',    range(10)),
             PART_HEAD:      PartDescription('Head',      [9]),
             PART_ARM_LEFT:  PartDescription('Arm Left',  [9]),
             PART_ARM_RIGHT: PartDescription('Arm Right', [9]),
@@ -180,7 +151,7 @@ class ParsePose(ResultBase):
 
     def visible_part_end_points(self, part):
         if part:
-            return self._points_from_sticks(part_description[part].sticks)
+            return self._points_from_sticks(self.part_description[part].sticks)
         else:
             return self.visible_end_points()
 

@@ -1,6 +1,7 @@
-<svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ entry.person.photo.aspect_ratio }}" viewBox="0 0 {{ entry.person.photo.aspect_ratio }} 1" style="width:100%">
-	<image x="0" y="0" width="{{ entry.person.photo.aspect_ratio }}" height="1" xlink:href="{% if orig %}{{ entry.person.photo.image_orig.url }}{% else %}{{ entry.person.photo.image_512.url }}{% endif %}"/>
-  {% with entry.person.bounding_box as bb %}
+{% with entry.task.person.photo as photo %}
+<svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ photo.aspect_ratio }}" viewBox="0 0 {{ photo.aspect_ratio }} 1" style="width:100%">
+	<image x="0" y="0" width="{{ photo.aspect_ratio }}" height="1" xlink:href="{% if orig %}{{ photo.image_orig.url }}{% else %}{{ photo.image_512.url }}{% endif %}"/>
+  {% with entry.task.person.bounding_box as bb %}
   <image x="{{ bb.x }}" y="{{ bb.y }}" width="{{ bb.width }}" height="{{ bb.height }}" xlink:href="{{ entry.segmentation.url }}" opacity="0.6"/>
   {% endwith %}
 
@@ -10,4 +11,4 @@
   <path fill="transparent" stroke="blue" stroke-width="0.002" d="{{ path_d.background|safe }}"/>
   {% endwith %}
 </svg>
-
+{% endwith %}

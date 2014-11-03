@@ -99,7 +99,9 @@ class SegmentationModel
 
     results = {}
     photo_id = @contents[@content_index].id
-    results[photo_id] = {scribbles: scribble_list}
+    results[photo_id] = {
+      scribbles: scribble_list
+    }
 
     version: '2.0'
     results: JSON.stringify(results)
@@ -110,10 +112,10 @@ class SegmentationModel
 
       group = @photo_groups[@content_index]
 
-      pose = @contents[@content_index]?.parse_poses
+      pose = @contents[@content_index]?.parse_pose
       if pose?
         # only take the first pose annotation
-        for p in pose[0]
+        for p in pose
           p_ = group.photo_to_crop({
             x: p[0]
             y: p[1]

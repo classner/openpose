@@ -6,7 +6,7 @@ from common.utils import has_foreign_key
 
 from pose.models import Person
 
-from segmentation.models import PersonSegmentation
+from segmentation.models import PersonSegmentationTask
 
 def configure_experiments():
     """ This function is automatically called by
@@ -28,7 +28,7 @@ def configure_experiments():
         reward=Decimal('0.11'),
         num_outputs_max=1,
         contents_per_hit=2,
-        content_type_model=Person,
+        content_type_model=PersonSegmentationTask,
         out_content_type_model=PersonSegmentation,
         out_content_attr='person',
         content_filter={

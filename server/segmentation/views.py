@@ -20,11 +20,11 @@ from accounts.models import UserProfile
 from mturk.views.external import external_task_browser_check
 from mturk.models import Experiment
 
-from pose.models import Person, ParsePose
+from pose.models import ParsePose
 
 from segmentation.utils import calc_person_overlay_img
 from segmentation.models import PersonSegmentation, \
-        PersonSegmentationQuality
+        PersonSegmentationQuality, PersonSegmentationTask
 from segmentation.experiments import external_task_extra_context
 
 @login_required
@@ -40,12 +40,12 @@ def task_quality(request, dataset_id='all'):
         time_ms = json.loads(data[u'time_ms'])
         time_active_ms = json.loads(data[u'time_active_ms'])
 
-        photo_ids = results.keys()
+        ids = results.keys()
 
         user, _ = UserProfile.objects.get_or_create(user=request.user)
 
         PersonSegmentationQuality.mturk_submit(user,
-                PersonSegmentation.objects.filter(id__in=photo_ids), results,
+                PersonSegmentation.objects.filter(id__in=ids), results,
                 time_ms, time_active_ms, data[u'version'])
 
         return json_success_response()
@@ -58,7 +58,7 @@ def task_quality(request, dataset_id='all'):
             dataset_id = int(dataset_id)
 
             segmentations_filter = dict_union(segmentations_filter, {
-                'photo__dataset_id': dataset_id
+                'task__person__photo__dataset_id': dataset_id
                 })
 
         segmentations = PersonSegmentation.objects.filter(**segmentations_filter)
@@ -110,12 +110,12 @@ def task_segment(request, dataset_id='all'):
         time_ms = json.loads(data[u'time_ms'])
         time_active_ms = json.loads(data[u'time_active_ms'])
 
-        segmentation_ids = results.keys()
+        ids = results.keys()
 
         user = UserProfile.objects.get(user=request.user)
 
         PersonSegmentation.mturk_submit(user,
-                Person.objects.filter(id__in=segmentation_ids),
+                PersonSegmentationTask.objects.filter(id__in=ids),
                 results, time_ms, time_active_ms, data[u'version'])
 
         return json_success_response()
@@ -124,24 +124,24 @@ def task_segment(request, dataset_id='all'):
         if response:
             return response
 
-        person_filter = {
+        task_filter = {
+                #'responses__isnull': True
                 }
 
         if dataset_id != 'all':
             dataset_id = int(dataset_id)
 
-            person_filter = dict_union(photo_filter, {
-                'photo__dataset_id': dataset_id
+            task_filter = dict_union(photo_filter, {
+                'person__photo__dataset_id': dataset_id
                 })
 
-        persons = (Person.objects.filter(**person_filter)
-                .exclude(segmentations__qualities__isnull = True)
-                .exclude(segmentations__qualities__correct = True))
+        tasks = (PersonSegmentationTask.objects.filter(**task_filter)
+                .exclude(responses__qualities__isnull = True)
+                .exclude(responses__qualities__correct = True))
 
-        if persons:
+        if tasks:
             # pick a random non annotated picture
-            contents = [persons[np.random.randint(len(persons))]]
-            #contents = [persons[0]]
+            contents = [tasks[np.random.randint(len(tasks))]]
 
             context = {
                 # the current task
@@ -183,12 +183,13 @@ def segmentation(request):
         raise ValueError("Unknown version: %s" % version)
 
     # for not really needed here...
-    for person_id, annotations in results.items():
+    for id_, annotations in results.items():
         scribbles = annotations.get(u'scribbles', [])
+        part = annotations.get(u'part', None)
 
-        person = Person.objects.get(id=person_id)
+        task = PersonSegmentationTask.objects.get(id=id_)
 
-        overlay_img = calc_person_overlay_img(person, scribbles)
+        overlay_img = calc_person_overlay_img(task, scribbles)
         overlay_img.save(bytes_io, u'PNG')
 
         return HttpResponse(

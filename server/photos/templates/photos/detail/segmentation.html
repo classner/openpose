@@ -2,11 +2,13 @@
 {% if photo.persons.all %}
   {% for person in photo.persons.all %}
   <h3>Person<h3>
-    {% if person.segmentations.all %}
-      {% include "grid.html" with span="span4" rowsize="3" thumb_template="segmentation/segmentation_thumb.html" entries=person.segmentations.all %}
-    {% else %}
-      <p>This person has not been annotated, yet.</p>
-    {% endif %}
+    {% for segmentation_task in person.segmentation_tasks.all %}
+      {% if segmentation_task.responses.all %}
+        {% include "grid.html" with span="span4" rowsize="3" thumb_template="segmentation/segmentation_thumb.html" entries=segmentation_task.responses.all %}
+      {% else %}
+        <p>This person has not been annotated, yet.</p>
+      {% endif %}
+    {% endfor %}
   {% endfor %}
 {% else %}
   <p>This photo has not been annotated, yet.</p>

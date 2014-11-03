@@ -7,32 +7,28 @@ from PIL import Image, ImageDraw
 #from multilabel import segment
 from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
 
-def calc_person_overlay_img(person, scribbles):
-    parse_pose = None
-    parse_poses = list(person.parse_poses.all()[:1])
+def calc_person_overlay_img(task, scribbles):
+    parse_pose = task.parse_pose
+    bounding_box = task.person.bounding_box
 
-    if parse_poses:
-        parse_pose = parse_poses[0]
+    return calc_pose_overlay_img(task.person.photo, scribbles,
+            parse_pose=parse_pose, part=task.part, bounding_box=bounding_box)
 
-    bounding_box = person.bounding_box
-
-    return calc_pose_overlay_img(person.photo, scribbles,
-            parse_pose=parse_pose, bounding_box=bounding_box)
-
-def calc_pose_overlay_img(photo, scribbles, parse_pose=None, bounding_box=None):
+def calc_pose_overlay_img(photo, scribbles, parse_pose=None, part=None,
+        bounding_box=None):
     img = photo.open_image()
 
     # get the annotation
     if parse_pose:
-        annotation_scribbles = build_annotation_scribbles(parse_pose,
+        annotation_scribbles = build_annotation_scribbles(parse_pose, part,
                 photo.aspect_ratio)
     else:
         annotation_scribbles = []
 
     return calc_overlay_img(img, bounding_box, annotation_scribbles + scribbles)
 
-def build_annotation_scribbles(parse_pose, aspect_ratio):
-    end_points, visibility = parse_pose.visible_end_points()
+def build_annotation_scribbles(parse_pose, part, aspect_ratio):
+    end_points, visibility = parse_pose.visible_part_end_points(part)
 
     foreground_annotation_scribbles = [
             {'points': end_points[2*s : 2*s+2, :],
