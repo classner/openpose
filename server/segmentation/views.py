@@ -99,7 +99,7 @@ def task_quality(request, dataset_id='all'):
 
 @login_required()
 @ensure_csrf_cookie
-def task_segment(request, dataset_id='all'):
+def task_segment(request, dataset_id='all', part=None):
     # replace this with a fetch from your database
     if request.method == 'POST':
         data = request.REQUEST
@@ -125,19 +125,24 @@ def task_segment(request, dataset_id='all'):
             return response
 
         task_filter = {
-                #'responses__isnull': True
+                'responses__isnull': True
                 }
 
         if dataset_id != 'all':
             dataset_id = int(dataset_id)
 
-            task_filter = dict_union(photo_filter, {
+            task_filter = dict_union(task_filter, {
                 'person__photo__dataset_id': dataset_id
                 })
 
-        tasks = (PersonSegmentationTask.objects.filter(**task_filter)
-                .exclude(responses__qualities__isnull = True)
-                .exclude(responses__qualities__correct = True))
+        if part:
+            task_filter = dict_union(task_filter, {
+                'part': part
+                })
+
+        tasks = (PersonSegmentationTask.objects.filter(**task_filter))
+                #.exclude(responses__qualities__isnull = True)
+                #.exclude(responses__qualities__correct = True))
 
         if tasks:
             # pick a random non annotated picture

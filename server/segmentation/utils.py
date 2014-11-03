@@ -4,6 +4,8 @@ from pose.models import AABB
 
 from PIL import Image, ImageDraw
 
+from imagekit.utils import open_image
+
 #from multilabel import segment
 from cv2 import grabCut, GC_INIT_WITH_RECT, GC_INIT_WITH_MASK
 
@@ -11,11 +13,23 @@ def calc_person_overlay_img(task, scribbles):
     parse_pose = task.parse_pose
     bounding_box = task.person.bounding_box
 
+    # check if the person already has a segmentation that we can use to improve
+    # the quality
+    segmentation = None
+    tasks = task.person.segmentation_tasks.filter(
+            responses__qualities__correct=True, part__isnull=True)
+    if tasks:
+        response = tasks[0].responses.filter(qualities__correct=True)[0]
+        segmentation = open_image(response.segmentation)
+    else:
+        print('no task')
+
     return calc_pose_overlay_img(task.person.photo, scribbles,
-            parse_pose=parse_pose, part=task.part, bounding_box=bounding_box)
+            parse_pose=parse_pose, part=task.part, bounding_box=bounding_box,
+            segmentation=segmentation)
 
 def calc_pose_overlay_img(photo, scribbles, parse_pose=None, part=None,
-        bounding_box=None):
+        bounding_box=None, segmentation=None):
     img = photo.open_image()
 
     # get the annotation
@@ -25,7 +39,8 @@ def calc_pose_overlay_img(photo, scribbles, parse_pose=None, part=None,
     else:
         annotation_scribbles = []
 
-    return calc_overlay_img(img, bounding_box, annotation_scribbles + scribbles)
+    return calc_overlay_img(img, bounding_box, annotation_scribbles +
+            scribbles, segmentation)
 
 def build_annotation_scribbles(parse_pose, part, aspect_ratio):
     end_points, visibility = parse_pose.visible_part_end_points(part)
@@ -39,7 +54,7 @@ def build_annotation_scribbles(parse_pose, part, aspect_ratio):
 
     return foreground_annotation_scribbles
 
-def calc_overlay_img(imgImage, bounding_box, scribbles):
+def calc_overlay_img(imgImage, bounding_box, scribbles, segmentationImage):
     img = np.asarray(imgImage)
 
     #bounding_box = None
@@ -74,6 +89,7 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
     rect = (margin, margin, width-margin, height-margin)
 
     scribbles_map = np.zeros(img.shape[:2], dtype=np.uint8)
+
     grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_RECT)
 
     scribbles_map_img = Image.fromarray(scribbles_map)
@@ -129,7 +145,13 @@ def calc_overlay_img(imgImage, bounding_box, scribbles):
                 ),
                 fill=fill, width=1)
 
-    scribbles_map = np.asarray(scribbles_map_img)
+    scribbles_map = np.asarray(scribbles_map_img).copy()
+
+    if segmentationImage:
+        segmentation = np.asanyarray(segmentationImage)
+        scribbles_map[segmentation == 0] = background_scribble_label
+    else:
+        print('NO segmentation')
 
     grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_MASK)
 

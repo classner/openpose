@@ -13,8 +13,12 @@ urlpatterns = patterns(
     url(r'^quality$',
         task_quality, name='segmentation.task_quality'),
 
+    url(r'^task/(?P<dataset_id>\w+)/(?P<part>\w+)$',
+        task_segment),
+
     url(r'^task/(?P<dataset_id>\w+)$',
         task_segment),
+
 
     url(r'^quality/(?P<dataset_id>\w+)$',
         task_quality),
