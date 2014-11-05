@@ -1,9 +1,11 @@
 class SegmentationModel
-  constructor: (@ui, @view, @args) ->
+  constructor: (@ui, @view, args) ->
     # action log and undo/redo
     @undoredo = new UndoRedo(ui, args)
     @log = new ActionLog()
     @log.action($.extend(true, {name:'init'}, args))
+
+    @part_field = args?.part_field
 
   clear: (on_load) ->
     for scribble in @closed[@content_index].scribbles
@@ -43,6 +45,9 @@ class SegmentationModel
 
     start_timer = (new_img) =>
       @photo_groups[@content_index].timer.start()
+
+      if @part_field? and @contents[@content_index].part_name?
+        $("##{@part_field}").text(@contents[@content_index].part_name)
 
       on_load?(new_img)
 

@@ -9,6 +9,9 @@
   #num-images {
     text-decoration: underline;
   }
+  #part-name {
+    text-decoration: underline;
+  }
   #mt-container {
     position: relative;
   }
@@ -31,7 +34,8 @@
 <div id="mt-top-nohover">
 	<div id="mt-instructions">
 		<span>
-      Instructions: carefully trace the inside and outside the person.
+      Instructions: carefully trace the inside and outside the
+      <span id="part-name">person</span>.
       Work on <span id="num-images">{{ contents|length|apnumber }}
         image{{ contents|length|pluralize }}</span> to complete the task.
 		</span>

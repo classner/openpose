@@ -56,11 +56,16 @@ class PersonSegmentationTask(EmptyModelBase):
                 if visible[i]
                 ]
 
+        part_name = None
+        if self.part:
+            part_name = ParsePose.part_description[self.part].description
+
         return {
                 u'id': self.id,
                 u'bounding_box': bounding_box,
                 u'parse_pose': parts,
                 u'scribbles': scribbles,
+                u'part_name': part_name,
                 u'photo': {
                     u'fov': self.person.photo.fov,
                     u'aspect_ratio': self.person.photo.aspect_ratio,
