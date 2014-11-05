@@ -5,6 +5,7 @@ from django.conf import settings
 from common.utils import has_foreign_key
 
 from pose.models import Person
+from photo.models import Photo
 
 from segmentation.models import PersonSegmentationTask
 
@@ -19,13 +20,14 @@ def configure_experiments():
     sandbox = settings.MTURK_SANDBOX
     production = not sandbox
 
+    # full person annotation
     configure_experiment(
         slug='segment_person',
         variant='"person_fix"',
         template_dir='segmentation/experiments',
         module='segmentation.experiments',
         version=2,  # 2: intrinsic images, 1: original opensurfaces
-        reward=Decimal('0.11'),
+        reward=Decimal('0.14'),
         num_outputs_max=1,
         contents_per_hit=2,
         content_type_model=PersonSegmentationTask,
@@ -33,6 +35,7 @@ def configure_experiments():
         out_content_attr='person',
         content_filter={
             'segmentations__isnull': True,
+            'part__isnull': True,
             },
         title='Carefully segment a person',
         description='Given an image, your job is to segment a person from an image.',
@@ -43,6 +46,32 @@ def configure_experiments():
         has_tutorial=True,
     )
 
+    # part annotation
+    configure_experiment(
+        slug='segment_part_person',
+        variant='',
+        template_dir='segmentation/experiments',
+        module='segmentation.experiments',
+        version=2,  # 2: intrinsic images, 1: original opensurfaces
+        reward=Decimal('0.11'),
+        num_outputs_max=1,
+        contents_per_hit=3,
+        content_type_model=PersonSegmentationTask,
+        out_content_type_model=PersonSegmentation,
+        out_content_attr='person',
+        content_filter={
+            # only take tasks where we want to segment a part
+            'part__isnull': False,
+            },
+        title='Carefully segment a part of a person',
+        description='Given an image, your job is to segment a part of a person '
+            + 'from an image.',
+        keywords='person,part,images,segment',
+        #frame_height=8000,
+        requirements={},
+        auto_add_hits=True,
+        has_tutorial=True,
+    )
 
 def update_votes_cubam(show_progress=False):
     """ This function is automatically called by
@@ -61,6 +90,22 @@ def update_changed_objects(changed_objects):
 
     pass
 
+def content_priority(experiment, obj):
+    if experiment.slug == 'segment_quality':
+        return 1
+    elif experiment.slug == 'segment_person':
+        return 1
+    elif experiment.slug == 'segment_part_person':
+        task = obj
+        photo = task.person.photo
+
+        dataset = photo.dataset
+        if dataset.name == 'LSP':
+            photo_number = int(photo.name[2:])
+
+            return 30000 + photo_number
+        else:
+            return 10000 + photo.id
 
 def external_task_extra_context(slug, context):
     """ Add extra context for each task (called by
