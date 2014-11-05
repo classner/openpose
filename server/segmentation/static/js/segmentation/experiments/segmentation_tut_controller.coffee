@@ -85,7 +85,10 @@ class SegmentPersonTutorial
           mask_data.data[4 * i + 2] = 0
 
       ratio = (error_count / (mask_data.data.length/4 - 1))
-      correct = ratio < 0.002
+      threshold = 0.002
+      if @content.threshold?
+        threshold = @content.threshold
+      correct = ratio < threshold
 
       if correct
         @showing_correct_message = true
