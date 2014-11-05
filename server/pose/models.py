@@ -149,7 +149,7 @@ class ParsePose(ResultBase):
 
         return (end_points[end_point_indexes, :], visibility[end_point_indexes])
 
-    def visible_part_end_points(self, part):
+    def visible_part_end_points(self, part=None):
         if part:
             return self._points_from_sticks(self.part_description[part].sticks)
         else:

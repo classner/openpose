@@ -39,11 +39,19 @@ def calc_pose_overlay_img(photo, scribbles, parse_pose=None, part=None,
     else:
         annotation_scribbles = []
 
-    return calc_overlay_img(img, bounding_box, annotation_scribbles +
+    return calc_overlay_img(img, bounding_box, annotation_scribbles,
             scribbles, segmentation)
 
 def build_annotation_scribbles(parse_pose, part, aspect_ratio):
+    all_end_points, all_visibility = parse_pose.visible_part_end_points()
     end_points, visibility = parse_pose.visible_part_end_points(part)
+
+    background_annotation_scribbles = [
+            {'points': all_end_points[2*s : 2*s+2, :],
+                'is_foreground': False}
+            for s in xrange(all_end_points.shape[0] // 2)
+            if all_visibility[2*s] and all_visibility[2*s + 1]
+            ]
 
     foreground_annotation_scribbles = [
             {'points': end_points[2*s : 2*s+2, :],
@@ -52,9 +60,9 @@ def build_annotation_scribbles(parse_pose, part, aspect_ratio):
             if visibility[2*s] and visibility[2*s + 1]
             ]
 
-    return foreground_annotation_scribbles
+    return background_annotation_scribbles + foreground_annotation_scribbles
 
-def calc_overlay_img(imgImage, bounding_box, scribbles, segmentationImage):
+def calc_overlay_img(imgImage, bounding_box, maybe_scribbles, scribbles, segmentationImage):
     img = np.asarray(imgImage)
 
     #bounding_box = None
@@ -83,8 +91,8 @@ def calc_overlay_img(imgImage, bounding_box, scribbles, segmentationImage):
     margin = 1
     forground_scribble_label = 1
     background_scribble_label = 0
-    forground_prediction_label = 1
-    background_prediction_label = 0
+    forground_prob_label = 3
+    background_prob_label = 2
 
     rect = (margin, margin, width-margin, height-margin)
 
@@ -123,6 +131,27 @@ def calc_overlay_img(imgImage, bounding_box, scribbles, segmentationImage):
         scribble_margin),
         fill=background_scribble_label,
         width=scribble_margin * 2 + 1)
+
+    for scribble in maybe_scribbles:
+        points = np.array(scribble[u'points'])
+
+        if scribble[u'is_foreground']:
+            fill = forground_scribble_label
+        else:
+            fill = background_prob_label
+
+        for s in range(1, points.shape[0]):
+            draw.line((
+                (points[s-1, 0] - bounding_box.min_point[0]) * width
+                / bounding_box.width,
+                (points[s-1, 1] - bounding_box.min_point[1]) * height
+                / bounding_box.height,
+                (points[s, 0] - bounding_box.min_point[0]) * width
+                / bounding_box.width,
+                (points[s, 1] - bounding_box.min_point[1]) * height
+                / bounding_box.height,
+                ),
+                fill=fill, width=1)
 
     for scribble in scribbles:
         points = np.array(scribble[u'points'])
