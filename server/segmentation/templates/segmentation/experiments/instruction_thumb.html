@@ -1,5 +1,7 @@
 <div class="thumbnail">
-  <svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ entry.photo.aspect_ratio }}" viewBox="0 0 {{ entry.photo.aspect_ratio }} 1" style="width:100%">
-    <image x="0" y="0" width="{{ entry.photo.aspect_ratio }}" height="1" xlink:href="{{ entry.photo.image_orig.url }}"/>
-  </svg>
+  {% with entry.get_entry_dict as prop %}
+    <svg version="1.2" class="fix-aspect" data-id="{{ prop.id }}" data-aspect="{{ prop.photo.aspect_ratio }}" viewBox="0 0 {{ prop.photo.aspect_ratio }} 1" style="width:100%">
+      <image x="0" y="0" width="{{ prop.photo.aspect_ratio }}" height="1" xlink:href="{{ prop.photo.image.orig }}"/>
+    </svg>
+  {% endwith %}
 </div>
