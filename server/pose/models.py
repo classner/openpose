@@ -80,12 +80,12 @@ class ParsePose(ResultBase):
     PART_LEG_RIGHT = 'LR'
 
     part_description = {
-            PART_HEAD:      PartDescription('Head',      [9]),
-            PART_ARM_LEFT:  PartDescription('Arm Left',  [9]),
-            PART_ARM_RIGHT: PartDescription('Arm Right', [9]),
-            PART_TORSO:     PartDescription('Torso',     [9]),
-            PART_LEG_LEFT:  PartDescription('Leg Left',  [9]),
-            PART_LEG_RIGHT: PartDescription('Leg Right', [9]),
+            PART_HEAD:      PartDescription('head',      [9]),
+            PART_ARM_LEFT:  PartDescription('left arm',  [8, 6]),
+            PART_ARM_RIGHT: PartDescription('right arm', [7, 5]),
+            PART_TORSO:     PartDescription('torso',     [0]),
+            PART_LEG_LEFT:  PartDescription('left leg',  [4, 2]),
+            PART_LEG_RIGHT: PartDescription('right leg', [3, 1]),
             }
 
     def __unicode__(self):
