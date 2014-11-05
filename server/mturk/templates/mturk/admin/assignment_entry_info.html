@@ -56,6 +56,8 @@
 
 <p><i>Worker blocked</i>: {% if entry.worker.blocked %}<span class="label label-important">True</span>{% else %}False{% endif %}</p>
 
+<p><i>Worker auto-approve</i>: {% if entry.experiment_worker.auto_approve %}<span class="label label-success">True</span>{% else %}False{% endif %}</p>
+
 {% if entry.worker.blocked_reason %}
 	<p><i>Block reason</i>: "{{ entry.worker.blocked_reason }}"</p>
 {% endif %}
