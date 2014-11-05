@@ -5,9 +5,8 @@ from django.conf import settings
 from common.utils import has_foreign_key
 
 from pose.models import Person
-from photo.models import Photo
 
-from segmentation.models import PersonSegmentationTask
+from segmentation.models import PersonSegmentationTask, PersonSegmentation
 
 def configure_experiments():
     """ This function is automatically called by
@@ -32,9 +31,9 @@ def configure_experiments():
         contents_per_hit=2,
         content_type_model=PersonSegmentationTask,
         out_content_type_model=PersonSegmentation,
-        out_content_attr='person',
+        out_content_attr='task',
         content_filter={
-            'segmentations__isnull': True,
+            'responses__isnull': True,
             'part__isnull': True,
             },
         title='Carefully segment a person',
@@ -58,7 +57,7 @@ def configure_experiments():
         contents_per_hit=3,
         content_type_model=PersonSegmentationTask,
         out_content_type_model=PersonSegmentation,
-        out_content_attr='person',
+        out_content_attr='task',
         content_filter={
             # only take tasks where we want to segment a part
             'part__isnull': False,
