@@ -61,11 +61,13 @@ class SegmentPersonTutorial
     canvas.getContext('2d').getImageData(0, 0, img.width, img.height)
 
   mask_to_url: (mask) ->
+    url_prefix = 'data:image/png;base64,'
     canvas = $('<canvas/>')[0]
     canvas.width = mask.width;
     canvas.height = mask.height;
     canvas.getContext('2d').putImageData(mask, 0, 0)
-    canvas.toDataURL('image/jpeg')
+    url = canvas.toDataURL('image/png')
+    url.substring(url_prefix.length, url.length)
 
   # check for errors and return whether errors were checked
   check_for_mistakes: () ->
