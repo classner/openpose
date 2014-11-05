@@ -1,0 +1,147 @@
+{% load humanize %}
+<h2>What to draw</h2>
+<p>Please use your mouse to mark the areas of the image that belong to the
+<b>specified part of the central person</b> with foreground lines and the rest
+with background lines</p>
+
+<p>The specified part name (you can find it in the yellow top line) is named as
+if you were the person. So if the task is to mark the left arm then imagine you
+are the person in the image and mark your left arm. Little red dots
+additionally are drawn onto the specified part.</p>
+
+<p>Please, mark only those areas of the image where you can actually see the
+specified part.</p>
+
+<p>Everything that a person wears should be included with the person. All other
+things -- including sports gear like bats, balls -- that you would not count as
+a cloth should not be included. See some examples below.</p>
+
+<p>Add more scribbles with the use of your mouse until only parts of the image
+appear brighter that belong to the specified part of the central person.
+Person scribbles are shown as solid blue lines and non-person scribbles as
+solid green lines.</p>
+
+<p>Please work on all images to be able to submit the task.</p>
+
+<br/>
+
+<h2>Good examples</h2>
+<div class="row-fluid">
+	<div class="span4">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk_part/good_2.jpg"  alt="" />
+			<p class="caption">Carefully scribble around the right arm.</p>
+		</div>
+	</div>
+	<div class="span4">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk_part/good_3.jpg"  alt="" />
+      <p class="caption">Mark all other parts of the person with green
+      background scribbles.</p>
+		</div>
+	</div>
+	<div class="span4">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk_part/good_1.jpg"  alt="" />
+      <p class="caption">Sometimes only small portions of the part are
+      visible.</p>
+		</div>
+	</div>
+</div>
+
+<br/>
+
+<h2>Bad examples</h2>
+<p>We will reject HITs that do not follow these instructions.</p>
+<div class="row-fluid">
+	<div class="span6">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk_part/bad_1.jpg"  alt="" />
+      <p class="caption">Please, add all areas of the specified part. For
+      example do not forget hands.</p>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk_part/bad_2.jpg"  alt="" />
+      <p class="caption">Try to exclude all other areas of the person. In this
+      example the foot should not be included and should be marked with a green
+      background scribble.</p>
+		</div>
+	</div>
+</div>
+
+<br/>
+
+<h2>How to draw</h2>
+<p>Click and hold your <b>left</b> mouse button to produce a line that marks
+part of the image that belong to the <b>inside</b> of a part of the person.
+Release the button to stop drawing.</p>
+
+<p>Use the <b>right</b> button to mark <b>outside</b> parts.</p>
+
+<p>Wait for a moment after each line until the display is updated. Add more
+scribbles until only parts of the image containing the specified part of the
+central person appear brighter.</p>
+
+<h2>Switch mask on/off to see better</h2>
+<p>By pressing T or the button &quot;Hide/Show Mask&quot; you can switch the
+mask on and off. Sometimes this makes it easier to see the inside and the
+outside of the central person.</p>
+
+<p>You can add scribbles no matter if the mask is switched on or off.</p>
+
+<div class="row-fluid">
+	<div class="span4">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk/toggle_on.jpg"  alt="" />
+			<p class="caption">The mask is switched on.</p>
+		</div>
+	</div>
+	<div class="span4">
+		<div class="thumbnail">
+			<img src="{{ STATIC_URL }}img/segmentation/mturk/toggle_off.jpg"  alt="" />
+			<p class="caption">The mask is switched off.</p>
+		</div>
+	</div>
+</div>
+<br/>
+
+<h2>Zoom in to see better</h2>
+<p>Scroll with the mouse wheel to zoom in.  Click &quot;Reset Zoom&quot; or press escape to reset back to normal.</p>
+<br/>
+
+<h2>Move around in the image</h2>
+<p>Press 'space' and drag with the mouse to move around in the image (panning).  You can also move press the arrow keys to move.</p>
+<br/>
+
+<h2>Other controls</h2>
+<div class="row-fluid">
+	<div class="span12">
+		<img src="{{ STATIC_URL }}img/segmentation/mturk_part/controls.jpg" alt="" />
+	</div>
+</div>
+<div class="row-fluid">
+	<div class="span12">
+		<dl class="dl-horizontal">
+			<dt>Hide/Show Mask</dt> <dd> &quot;Hide/Show Mask&quot; or press T.</dd>
+      <dt>Undo</dt> <dd>If you make a mistake, click &quot;Undo&quot; or press
+      Ctrl-Z.</dd>
+      <dt>Redo</dt> <dd>You can also re-do an action with Ctrl-Y.</dd>
+      <dt>Clear</dt> <dd>Clear and start from the beginning.</dd>
+      <dt>Reset Zoom</dt> <dd>When zoomed in, you you can click &quot;Reset
+      Zoom&quot; to zoom out again.</dd>
+      <dt>Previous Image</dt> <dd>Press &quot;Previous Image&quot; to get to
+      the previous image.</dd>
+      <dt>Next Image</dt> <dd>Press &quot;Next Image&quot; to get to the next
+      image.</dd>
+		</dl>
+	</div>
+</div>
+<br/>
+
+<br/>
+<h2>Why are we doing this?</h2>
+<p>We are building a database of segmented people. This is part of ongoing research at Max Planck Institute for Intelligent Systems.</p>
+<p>Thank you for participating!</p>
+<br/>
