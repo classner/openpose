@@ -16,13 +16,16 @@ def calc_person_overlay_img(task, scribbles):
     # check if the person already has a segmentation that we can use to improve
     # the quality
     segmentation = None
-    tasks = task.person.segmentation_tasks.filter(
-            responses__qualities__correct=True, part__isnull=True)
-    if tasks:
-        response = tasks[0].responses.filter(qualities__correct=True)[0]
-        segmentation = open_image(response.segmentation)
-    else:
-        print('no task')
+    if task.part:
+        tasks = task.person.segmentation_tasks.filter(
+                responses__qualities__correct=True, part__isnull=True)
+        if tasks:
+            response = tasks[0].responses.filter(qualities__correct=True)[0]
+            segmentation = open_image(response.segmentation)
+        else:
+            print('no task')
+
+        # add other segmenations if they are correct
 
     return calc_pose_overlay_img(task.person.photo, scribbles,
             parse_pose=parse_pose, part=task.part, bounding_box=bounding_box,
