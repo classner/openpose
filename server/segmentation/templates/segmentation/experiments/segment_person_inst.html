@@ -6,37 +6,40 @@
 
 {% comment %}
 <div class="alert alert-success">
-	<p>I increased the maximum zoom; I hope this makes things easier.</p>
-	<p>Cheers, Sean (aka "KB").</p>
+  <p>I increased the maximum zoom; I hope this makes things easier.</p>
+  <p>Cheers, Sean (aka "KB").</p>
 </div>
 {% endcomment %}
 
 <div class="row">
-	<div class="span6">
-		<div class="hero-unit">
-			<h2>Your task is to carefully trace the inside and the outside of a person.</h2>
-	<p style="color:#f00"><span class="label label-important">Note:</span> Please, pay special attention to hands and feet.</p>
+  <div class="span6">
+    <div class="hero-unit">
+      <h2>Your task is to carefully trace the inside and the outside of a person.</h2>
+      <p style="color:#f00"><span class="label label-important">Note:</span>
+      Please, pay special attention to hands and feet.</p>
       <p>All the clothes that a person wears (including hats, gloves, shoes)
       belong to the inside. Everything else should be marked as outside (such
-      as bats, rackets, balls).</p>
-		</div>
-	</div>
-	<div class="span6">
+      as bats, rackets, balls, bars; or anything that is considerably blocking
+      the view onto the person).</p>
+    </div>
+  </div>
+  <div class="span6">
     {% include "grid.html" with span="span6" rowsize="2" thumb_template="segmentation/experiments/instruction_thumb.html" entries=contents %}
-	</div>
+  </div>
 </div>
 
 <div id="get-chrome" class="row" style="display:none">
-	<div class="span12">
-		<div class="well" style="text-align:center">
-			<h3>Note: this task works best with Google Chrome</h3>
-			<a href="http://www.google.com/chrome" class="btn btn-primary btn-large" target="_blank">Get Google Chrome</a>
-		</div>
-	</div>
+  <div class="span12">
+    <div class="well" style="text-align:center">
+      <h3>Note: this task works best with Google Chrome</h3>
+      <a href="http://www.google.com/chrome" class="btn btn-primary btn-large"
+        target="_blank">Get Google Chrome</a>
+    </div>
+  </div>
 </div>
 
 <div class="page-header">
-	<h1>Instructions</h1>
+  <h1>Instructions</h1>
 </div>
 {% include instructions %}
 {% endblock content %}
@@ -44,7 +47,7 @@
 {% block scripts %}
 <script>
 if ($.browser.chrome !== true) {
-	$('#get-chrome').show();
+  $('#get-chrome').show();
 }
 </script>
 {% endblock %}
