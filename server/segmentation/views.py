@@ -146,7 +146,7 @@ def task_segment(request, dataset_id='all', part=None):
 
         if tasks:
             # pick a random non annotated picture
-            contents = [tasks[np.random.randint(len(tasks))]]
+            contents = sample(tasks, min(1, tasks.count()))
 
             context = {
                 # the current task
