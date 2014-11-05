@@ -487,7 +487,7 @@ def external_task_POST(request, context):
                 kwargs={
                     'assignment_id': assignment.id,
                     'feedback': message,
-                }, countdown=60, retry=True, retry_policy={'max_retries': 100})
+                }, countdown=180, retry=True, retry_policy={'max_retries': 100})
             rejected_assignment = True
 
     # block if accuracy every creeps below 80% (with at least 5 errors)
@@ -509,7 +509,7 @@ def external_task_POST(request, context):
             kwargs={
                 'assignment_id': assignment.id,
                 'feedback': experiment_worker.auto_approve_message,
-            }, countdown=60, retry=True, retry_policy={'max_retries': 100})
+            }, countdown=180, retry=True, retry_policy={'max_retries': 100})
 
     if assignment_dirty:
         assignment.save()
