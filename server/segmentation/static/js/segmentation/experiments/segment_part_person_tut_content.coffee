@@ -13,7 +13,7 @@ window.mt_tut_contents = do() ->
   img_url = window.static_url + "img/segmentation/mturk_part/im01996.jpg"
   expected_mask_url = window.static_url + "img/segmentation/mturk_part/expected_mask_im01996.png"
   bounding_box = [0.15114503816793895, 0.058524173027989818, 0.62493638676844787, 0.61068702290076338]
-  person_id = 32001
+  person_id = 12001
 
   return [
     {
