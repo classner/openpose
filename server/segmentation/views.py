@@ -99,7 +99,15 @@ def task_quality(request, dataset_id='all'):
 
 @login_required()
 @ensure_csrf_cookie
-def task_segment(request, dataset_id='all', part=None):
+def task_segment_body(request, dataset_id='all'):
+    return task_segment(request, dataset_id, False)
+
+@login_required()
+@ensure_csrf_cookie
+def task_segment_part(request, dataset_id='all'):
+    return task_segment(request, dataset_id, True)
+
+def task_segment(request, dataset_id='all', part=False):
     # replace this with a fetch from your database
     if request.method == 'POST':
         data = request.REQUEST
@@ -125,7 +133,7 @@ def task_segment(request, dataset_id='all', part=None):
             return response
 
         task_filter = {
-                'responses__isnull': True
+                #'responses__isnull': True
                 }
 
         if dataset_id != 'all':
@@ -135,14 +143,20 @@ def task_segment(request, dataset_id='all', part=None):
                 'person__photo__dataset_id': dataset_id
                 })
 
-        if part:
-            task_filter = dict_union(task_filter, {
-                'part': part
-                })
+        task_filter = dict_union(task_filter, {
+            'part__isnull': not part
+            })
 
-        tasks = (PersonSegmentationTask.objects.filter(**task_filter))
-                #.exclude(responses__qualities__isnull = True)
-                #.exclude(responses__qualities__correct = True))
+        tasks = (PersonSegmentationTask.objects.filter(**task_filter)
+                .exclude(responses__qualities__isnull = True)
+                .exclude(responses__qualities__correct = True))
+
+        if part:
+            instructions = u'segmentation/experiments/segment_part_person_inst_content.html'
+            template = u'segmentation/experiments/segment_part_person.html'
+        else:
+            instructions = u'segmentation/experiments/segment_person_inst_content.html'
+            template = u'segmentation/experiments/segment_person.html'
 
         if tasks:
             # pick a random non annotated picture
@@ -165,10 +179,10 @@ def task_segment(request, dataset_id='all', part=None):
                 u'feedback_bonus': 0.02,
 
                 # template containing html for instructions
-                u'instructions': 'segmentation/experiments/segment_person_inst_content.html'
+                u'instructions': instructions
             }
 
-            return render(request, u'segmentation/experiments/segment_person.html', context)
+            return render(request, template, context)
         else:
             return html_error_response(request,
                     'All images are already segmented.')
