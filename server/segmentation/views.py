@@ -165,7 +165,7 @@ def task_segment(request, dataset_id='all', part=False):
             context = {
                 # the current task
                 u'contents_json': json.dumps(
-                    [c.get_entry_dict() for c in contents]),
+                    [c.get_entry_dict(True) for c in contents]),
                 u'content_id_json': json.dumps(
                     [{'id': c.id} for c in contents]),
                 u'contents': contents,

@@ -32,7 +32,7 @@ class PersonSegmentationTask(EmptyModelBase):
                 ParsePose.part_description.iteritems()),
             null=True, blank=True)
 
-    def get_entry_dict(self):
+    def get_entry_dict(self, include_scribbles=False):
         """ Return a dictionary of this model containing just the fields needed
         for javascript rendering.  """
 
@@ -47,7 +47,7 @@ class PersonSegmentationTask(EmptyModelBase):
         # scribbles here
         scribbles = None
         responses = self.responses.all().order_by('-added')
-        if responses:
+        if include_scribbles and responses:
             scribbles = json.loads(responses[0].scribbles)
 
         parse_pose, visible = self.parse_pose.visible_part_end_points(self.part)
