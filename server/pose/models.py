@@ -80,13 +80,13 @@ class ParsePose(ResultBase):
     PART_LEG_RIGHT = 'LR'
 
     part_description = {
-            PART_HEAD:      PartDescription('head',      [9]),
-            PART_ARM_LEFT:  PartDescription('left arm',  [8, 6]),
-            PART_ARM_RIGHT: PartDescription('right arm', [7, 5]),
-            PART_TORSO:     PartDescription('torso',     [0]),
-            PART_LEG_LEFT:  PartDescription('left leg',  [4, 2]),
-            PART_LEG_RIGHT: PartDescription('right leg', [3, 1]),
-            }
+        PART_HEAD:      PartDescription('head',                   [9]),
+        PART_ARM_LEFT:  PartDescription('left arm + left hand',   [8, 6]),
+        PART_ARM_RIGHT: PartDescription('right arm + right hand', [7, 5]),
+        PART_TORSO:     PartDescription('torso',                  [0]),
+        PART_LEG_LEFT:  PartDescription('left leg + left foot',   [4, 2]),
+        PART_LEG_RIGHT: PartDescription('right leg + right foot', [3, 1]),
+        }
 
     def __unicode__(self):
         return u'pose annotation'
