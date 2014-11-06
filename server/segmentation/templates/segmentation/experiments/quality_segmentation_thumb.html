@@ -1,14 +1,15 @@
-<div class="row-fluid">
-	<div class="span6">
-    {% with entry.task.get_entry_dict as task %}
+{% with entry.task.get_entry_dict as task %}
+  <p class="caption">Body Part: {{ task.part_name }}</p>
+  <div class="row-fluid">
+    <div class="span6">
       {% include "segmentation/segmentation.svg" with orig="True" %}
-    {% endwith %}
-	</div>
-	<div class="span6">
-    {% with entry.task.person.photo as photo %}
-      <svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ photo.aspect_ratio }}" viewBox="0 0 {{ photo.aspect_ratio }} 1" style="width:100%">
-        <image x="0" y="0" width="{{ photo.aspect_ratio }}" height="1" xlink:href="{{ photo.image_orig.url }}"/>
-      </svg>
-    {% endwith %}
-	</div>
-</div>
+    </div>
+    <div class="span6">
+      {% with task.photo as photo %}
+        <svg version="1.2" class="fix-aspect" data-id="{{ entry.id }}" data-aspect="{{ photo.aspect_ratio }}" viewBox="0 0 {{ photo.aspect_ratio }} 1" style="width:100%">
+          <image x="0" y="0" width="{{ photo.aspect_ratio }}" height="1" xlink:href="{{ photo.image.orig }}"/>
+        </svg>
+      {% endwith %}
+    </div>
+  </div>
+{% endwith %}
