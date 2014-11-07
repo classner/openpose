@@ -64,6 +64,7 @@ class PartDescription:
         self.description = description
         self.sticks = np.array(sticks)
 
+
 class ParsePose(ResultBase):
     person = models.ForeignKey(Person, related_name='parse_poses')
 
@@ -147,7 +148,8 @@ class ParsePose(ResultBase):
 
         end_points, visibility = self.visible_end_points()
 
-        return (end_points[end_point_indexes, :], visibility[end_point_indexes])
+        return (end_points[end_point_indexes, :],
+                visibility[end_point_indexes])
 
     def visible_part_end_points(self, part=None):
         if part:
@@ -160,7 +162,8 @@ class ParsePose(ResultBase):
         to_endpoints = ParsePose._build_to_endpoints()
         end_points = to_endpoints.dot(annotation)
 
-        visibility = to_endpoints.dot(np.array(self.visible, dtype=np.float)) > 0.99
+        visibility = to_endpoints.dot(
+            np.array(self.visible, dtype=np.float)) > 0.99
 
         return (end_points, visibility)
 
