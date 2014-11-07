@@ -2,12 +2,8 @@ from django.core.management.base import BaseCommand
 
 import numpy as np
 
-from PIL import Image
-
-import cv2
-
 from photos.models import Photo
-from pose.models import Person, AABB
+from pose.models import AABB
 
 
 class Command(BaseCommand):
