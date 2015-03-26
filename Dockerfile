@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:14.10
 MAINTAINER Martin Kiefel "mk@nopw.de"
 
 ENV LC_ALL C.UTF-8
