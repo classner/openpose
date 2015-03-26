@@ -273,8 +273,6 @@ class Experiment(MtModelBase):
         elif hasattr(obj, 'photo'):
             photo = obj.photo
             score = photo.publishable_score()
-            #if photo.num_vertices:
-                #score += photo.num_vertices
             return score
         else:
             return 0
