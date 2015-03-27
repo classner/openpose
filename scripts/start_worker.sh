@@ -17,7 +17,7 @@ if [ $# -ge 2 ]; then
 fi
 
 # TODO: run as a background process with a higher log level
-celery_cmd="builtin cd $SRC_DIR; celery worker -B -A config -Q celery --loglevel=info --concurrency=$concurrency"
+celery_cmd="builtin cd $SRC_DIR; env http_proxy=http://192.124.27.80:8080 https_proxy=http://192.124.27.80:8080 celery worker -B -A config -Q celery --loglevel=info --concurrency=$concurrency"
 
 set -x
 if [[ $USER == $user ]]; then
