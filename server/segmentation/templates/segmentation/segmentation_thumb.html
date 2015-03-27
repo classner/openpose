@@ -3,6 +3,14 @@
     <div class="overlay-wrapper">
       {% include "segmentation/segmentation.svg" with orig="True" %}
     </div>
-    <p class="caption">Body Part: {{ task.part_name }}</p>
+    <p class="caption">Body Part: {{ task.part_name }}
+      {% for assessment in entry.qualities.all %}
+      {% if assessment.correct %}
+      <i class="icon-fixed-width icon-ok"></i>
+      {% else %}
+      <i class="icon-fixed-width icon-remove"></i>
+      {% endif %}
+      {% endfor %}
+    </p>
   {% endwith %}
 </div>
