@@ -1,5 +1,7 @@
+import sys
 import os.path
 from random import choice
+import re
 
 from django.core.management.base import BaseCommand
 from imagekit.utils import open_image
@@ -10,9 +12,7 @@ import numpy as np
 
 import cv2
 
-from PIL import Image
-
-import h5py
+import lmdb
 
 from photos.models import PhotoDataset
 from pose.models import ParsePose
@@ -43,8 +43,11 @@ class Command(BaseCommand):
             print('The photo: {} has more than one good segmentation'
                   .format(photo_name))
 
-        segmentation = np.asarray(open_image(
-            choice(segmentations).segmentation))
+        segmentation_file = choice(segmentations).segmentation
+        segmentation_image = open_image(segmentation_file)
+        segmentation = np.asarray(segmentation_image)
+        segmentation_image.close()
+        segmentation_file.close()
 
         # some images are jpegs; binarize them again
         segmentation = (segmentation > 128).astype(np.uint8) * 255
@@ -150,17 +153,58 @@ class Command(BaseCommand):
 
         return combined.astype(np.uint8) - background_label
 
+    def write_segmentation_(self, caffe, photo, person, segmentation, txn):
+        # get the context in which this segmentation lies in
+        bounding_box = person.bounding_box
+        height = photo.orig_height
+
+        scaled_bounding_box = np.round(np.array([
+            bounding_box.min_point[0],
+            bounding_box.min_point[1],
+            bounding_box.max_point[0],
+            bounding_box.max_point[1]])
+            * height).astype(np.int)
+
+        image_file = open_image(photo.image_orig)
+        image = np.asarray(image_file)[
+            scaled_bounding_box[1]:scaled_bounding_box[3],
+            scaled_bounding_box[0]:scaled_bounding_box[2]
+        ]
+        image_file.close()
+        photo.image_orig.close()
+
+        input = np.concatenate((image, segmentation[:, :, None]),
+                               axis=2)
+        datum = caffe.io.array_to_datum(input)
+        txn.put(str(photo.name), datum.SerializeToString(), overwrite=False)
+
     def handle(self, *args, **options):
-        dataset_name = args[0]
-        output_folder = args[1]
+        caffe_root = args[0]
+        dataset_name = args[1]
+        include_regex = args[2]
+        db_path = args[3]
+
+        # Load caffe
+        sys.path.insert(0, os.path.join(caffe_root, 'python'))
+        import caffe
+
+        # Get LMDB file database up and running
+        db = lmdb.open(db_path, map_size=int(1e12))
+        txn = db.begin(write=True)
+        transactions = 0
 
         photos = PhotoDataset.objects.get(name=dataset_name).photos.all()
+
+        include = re.compile(include_regex)
 
         # walk through all images and write out a correct person segmentation
         print(self.part_index_)
         for photo in progress.bar(photos):
             # XXX for now we'll assume that we have one person per image
             assert(photo.persons.count() == 1)
+
+            if not include.search(photo.name):
+                continue
 
             person = photo.persons.all()[0]
 
@@ -189,81 +233,83 @@ class Command(BaseCommand):
             segmentation = self.fiddle_part_segmentation_(
                 parse_pose, segmentation, part_segmentations)
 
-            # colors = (np.array([
-            #     [0, 0, 0],
-            #     [0, 0, 0],
-            #     [0.90, 0.62, 0],
-            #     [0.34, 0.71, 0.91],
-            #     [0, 0.62, 0.45],
-            #     [0.97, 0.93, 0.35],
-            #     [0, 0.45, 0.70],
-            #     [0.84, 0.37, 0],
-            #     [0.80, 0.47, 0.65],
-            #     [0.52, 0.56, 0.66]
-            # ]) * 255).astype(np.uint8)
+            self.write_segmentation_(caffe, photo, person, segmentation, txn)
 
-            colors = (np.array([
-                [0, 0, 0],
-                [0.80, 0.47, 0.65],
-                [0, 0.62, 0.45],
-                [0.34, 0.71, 0.91],
-                [0.84, 0.37, 0],
-                [0, 0.45, 0.70],
-                [0.97, 0.93, 0.35],
-            ]) * 255).astype(np.uint8)
+            transactions += 1
 
-            # (orange "#e69f00")
-            # (skyblue "#56b4e9")
-            # (bluegreen "#009e73")
-            # (yellow "#f8ec59")
-            # (blue "#0072b2")
-            # (vermillion "#d55e00")
-            # (redpurple "#cc79a7")
-            # (bluegray "#848ea9"))
+            if transactions > 300:
+                txn.commit()
+                transactions = 0
+                txn = db.begin(write=True)
 
-            # colors = (np.array([
-            #     [0, 0, 0],
-            #     [0, 0, 0],
-            #     [0, 0.4717, 0.4604],
-            #     [0.4906, 0, 0],
-            #     [1.0, 0.6, 0.2],
-            #     [0, 0, 0.509],
-            #     [0.2, 0.2, 0.2],
-            #     [0.5, 0.5, 0.5],
-            #     ]) * 255).astype(np.uint8)
+        if transactions > 0:
+            txn.commit()
 
-            Image.fromarray(colors[segmentation]).save(
-                os.path.join(output_folder, '{}.png'.format(photo.name)))
-
-            Image.open(photo.image_orig).save(
-                os.path.join(output_folder, '{}.orig.png'.format(photo.name)))
-
-            # get the context in which this segmentation lies in
-            bounding_box = person.bounding_box
-            width = photo.orig_width
-            height = photo.orig_height
-
-            scaled_bounding_box = np.round(np.array([
-                bounding_box.min_point[0],
-                bounding_box.min_point[1],
-                bounding_box.max_point[0],
-                bounding_box.max_point[1]])
-                * height).astype(np.int)
-
-            full_segmentation = np.zeros((height, width))
-            full_segmentation[
-                scaled_bounding_box[1]:scaled_bounding_box[3],
-                scaled_bounding_box[0]:scaled_bounding_box[2]
-                ] = segmentation
-
-            # segmentation_file = h5py.File(
-            #     os.path.join(output_folder,
-            #                  '{}.part_segmentation.h5'.format(photo.name)
-            #                  ), 'w')
-            # segmentation_file.create_dataset(
-            #     '/part_segmentation',
-            #     data=segmentation.transpose([1, 0]),
-            #     compression='gzip', compression_opts=6,
-            #     dtype=np.uint8)
-            # segmentation_file.close()
+        db.close()
         print(self.part_index_)
+
+        # colors = (np.array([
+        #     [0, 0, 0],
+        #     [0, 0, 0],
+        #     [0.90, 0.62, 0],
+        #     [0.34, 0.71, 0.91],
+        #     [0, 0.62, 0.45],
+        #     [0.97, 0.93, 0.35],
+        #     [0, 0.45, 0.70],
+        #     [0.84, 0.37, 0],
+        #     [0.80, 0.47, 0.65],
+        #     [0.52, 0.56, 0.66]
+        # ]) * 255).astype(np.uint8)
+
+        # colors = (np.array([
+        #     [0, 0, 0],
+        #     [0.80, 0.47, 0.65],
+        #     [0, 0.62, 0.45],
+        #     [0.34, 0.71, 0.91],
+        #     [0.84, 0.37, 0],
+        #     [0, 0.45, 0.70],
+        #     [0.97, 0.93, 0.35],
+        # ]) * 255).astype(np.uint8)
+
+        # (orange "#e69f00")
+        # (skyblue "#56b4e9")
+        # (bluegreen "#009e73")
+        # (yellow "#f8ec59")
+        # (blue "#0072b2")
+        # (vermillion "#d55e00")
+        # (redpurple "#cc79a7")
+        # (bluegray "#848ea9"))
+
+        # colors = (np.array([
+        #     [0, 0, 0],
+        #     [0, 0, 0],
+        #     [0, 0.4717, 0.4604],
+        #     [0.4906, 0, 0],
+        #     [1.0, 0.6, 0.2],
+        #     [0, 0, 0.509],
+        #     [0.2, 0.2, 0.2],
+        #     [0.5, 0.5, 0.5],
+        #     ]) * 255).astype(np.uint8)
+
+        # Image.fromarray(colors[segmentation]).save(
+        #     os.path.join(output_folder, '{}.png'.format(photo.name)))
+
+        # Image.open(photo.image_orig).save(
+        #     os.path.join(output_folder, '{}.orig.png'.format(photo.name)))
+
+        # full_segmentation = np.zeros((height, width))
+        # full_segmentation[
+        #     scaled_bounding_box[1]:scaled_bounding_box[3],
+        #     scaled_bounding_box[0]:scaled_bounding_box[2]
+        #     ] = segmentation
+
+        # segmentation_file = h5py.File(
+        #     os.path.join(output_folder,
+        #                  '{}.part_segmentation.h5'.format(photo.name)
+        #                  ), 'w')
+        # segmentation_file.create_dataset(
+        #     '/part_segmentation',
+        #     data=segmentation.transpose([1, 0]),
+        #     compression='gzip', compression_opts=6,
+        #     dtype=np.uint8)
+        # segmentation_file.close()
