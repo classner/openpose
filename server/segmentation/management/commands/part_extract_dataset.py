@@ -1,7 +1,6 @@
 import sys
 import os.path
 from random import choice
-import re
 
 from django.core.management.base import BaseCommand
 from imagekit.utils import open_image
@@ -14,7 +13,7 @@ import cv2
 
 import lmdb
 
-from photos.models import PhotoDataset
+from photos.models import Photo
 from pose.models import ParsePose
 
 
@@ -173,15 +172,18 @@ class Command(BaseCommand):
         image_file.close()
         photo.image_orig.close()
 
-        input = np.concatenate((image, segmentation[:, :, None]),
-                               axis=2)
+        input = np.transpose(
+            np.concatenate((image, segmentation[:, :, None]),
+                           axis=2),
+            [2, 0, 1])
+
         datum = caffe.io.array_to_datum(input)
         txn.put(str(photo.name), datum.SerializeToString(), overwrite=False)
 
     def handle(self, *args, **options):
         caffe_root = args[0]
         dataset_name = args[1]
-        include_regex = args[2]
+        include_list_path = args[2]
         db_path = args[3]
 
         # Load caffe
@@ -193,54 +195,53 @@ class Command(BaseCommand):
         txn = db.begin(write=True)
         transactions = 0
 
-        photos = PhotoDataset.objects.get(name=dataset_name).photos.all()
-
-        include = re.compile(include_regex)
-
         # walk through all images and write out a correct person segmentation
-        print(self.part_index_)
-        for photo in progress.bar(photos):
-            # XXX for now we'll assume that we have one person per image
-            assert(photo.persons.count() == 1)
+        with open(include_list_path, 'r') as list_file:
+            for photo_name in progress.bar(list_file.readlines()):
+                photo_name = photo_name.rstrip()
+                photo = Photo.objects.get(dataset__name=dataset_name,
+                                          name=photo_name)
 
-            if not include.search(photo.name):
-                continue
+                # XXX for now we'll assume that we have one person per image
+                assert(photo.persons.count() == 1)
 
-            person = photo.persons.all()[0]
+                person = photo.persons.all()[0]
 
-            assert(person.parse_poses.count() == 1)
-            parse_pose = person.parse_poses.all()[0]
+                assert(person.parse_poses.count() == 1)
+                parse_pose = person.parse_poses.all()[0]
 
-            all_tasks = person.segmentation_tasks.all()
+                all_tasks = person.segmentation_tasks.all()
 
-            segmentation = self.correct_segmentation_(photo.name, all_tasks)
+                segmentation = self.correct_segmentation_(photo.name,
+                                                          all_tasks)
 
-            part_segmentations = {}
-            for part in ParsePose.part_description:
-                # we treat the torse differently
-                # it should be able to infer it from the rest of the parts
-                if part == ParsePose.PART_TORSO:
+                part_segmentations = {}
+                for part in ParsePose.part_description:
+                    # we treat the torse differently
+                    # it should be able to infer it from the rest of the parts
+                    if part == ParsePose.PART_TORSO:
+                        continue
+
+                    part_segmentations[part] = self.correct_segmentation_(
+                        photo.name, all_tasks, part)
+
+                if segmentation is None or any(
+                        map(lambda s: s is None, part_segmentations.values())):
+                    print('exclude: {}'.format(photo.name))
                     continue
 
-                part_segmentations[part] = self.correct_segmentation_(
-                    photo.name, all_tasks, part)
+                segmentation = self.fiddle_part_segmentation_(
+                    parse_pose, segmentation, part_segmentations)
 
-            if segmentation is None or any(
-                    map(lambda s: s is None, part_segmentations.values())):
-                print('exclude: {}'.format(photo.name))
-                continue
+                self.write_segmentation_(caffe, photo, person, segmentation,
+                                         txn)
 
-            segmentation = self.fiddle_part_segmentation_(
-                parse_pose, segmentation, part_segmentations)
+                transactions += 1
 
-            self.write_segmentation_(caffe, photo, person, segmentation, txn)
-
-            transactions += 1
-
-            if transactions > 300:
-                txn.commit()
-                transactions = 0
-                txn = db.begin(write=True)
+                if transactions > 300:
+                    txn.commit()
+                    transactions = 0
+                    txn = db.begin(write=True)
 
         if transactions > 0:
             txn.commit()

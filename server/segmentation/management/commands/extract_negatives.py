@@ -24,10 +24,11 @@ class Command(BaseCommand):
 
     def write_segmentation_(self, caffe, image_path, txn):
         # Only take the part of the image that contains the person.
-        image = np.array(Image.open(image_path))
+        image = np.array(Image.open(image_path), dtype=np.uint8)
 
         # This image is assumed not to have any person in it.
-        segmentation = np.zeros((image.shape[0], image.shape[1], 1))
+        segmentation = np.zeros((image.shape[0], image.shape[1], 1),
+                                dtype=np.uint8)
 
         input = np.transpose(
             np.concatenate((image, segmentation),
