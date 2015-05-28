@@ -92,9 +92,9 @@ def calc_overlay_img(imgImage, bounding_box, maybe_scribbles, scribbles, segment
     fgd_model = np.zeros((1, 65), np.float64)
 
     margin = 1
-    forground_scribble_label = 1
+    foreground_scribble_label = 1
     background_scribble_label = 0
-    forground_prob_label = 3
+    foreground_prob_label = 3
     background_prob_label = 2
 
     rect = (margin, margin, width-margin, height-margin)
@@ -139,7 +139,7 @@ def calc_overlay_img(imgImage, bounding_box, maybe_scribbles, scribbles, segment
         points = np.array(scribble[u'points'])
 
         if scribble[u'is_foreground']:
-            fill = forground_scribble_label
+            fill = foreground_scribble_label
         else:
             fill = background_prob_label
 
@@ -160,7 +160,7 @@ def calc_overlay_img(imgImage, bounding_box, maybe_scribbles, scribbles, segment
         points = np.array(scribble[u'points'])
 
         if scribble[u'is_foreground']:
-            fill = forground_scribble_label
+            fill = foreground_scribble_label
         else:
             fill = background_scribble_label
 
@@ -188,7 +188,5 @@ def calc_overlay_img(imgImage, bounding_box, maybe_scribbles, scribbles, segment
     grabCut(img, scribbles_map, rect, bgd_model, fgd_model, 5, GC_INIT_WITH_MASK)
 
     seg = np.where((scribbles_map==1) + (scribbles_map==3),255,0).astype('uint8')
-
-    Image.fromarray(seg).save('out.png')
 
     return Image.fromarray(seg)

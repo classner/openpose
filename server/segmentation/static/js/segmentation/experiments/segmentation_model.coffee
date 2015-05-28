@@ -1,7 +1,7 @@
 class SegmentationModel
   constructor: (@ui, @view, args) ->
     # action log and undo/redo
-    @undoredo = new UndoRedo(ui, args)
+    @undoredo = new UndoRedo(@ui, args)
     @log = new ActionLog()
     @log.action($.extend(true, {name:'init'}, args))
 
