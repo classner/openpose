@@ -7,6 +7,8 @@ import numpy as np
 
 import lmdb
 
+from PIL import Image
+
 
 class Command(BaseCommand):
     help = 'Compute database mean'
@@ -39,6 +41,13 @@ class Command(BaseCommand):
                     weight_update = 1.0 / float(count + size)
                     mean = (mean * weight_mean +
                             input.sum(axis=2).sum(axis=1)[:-1] * weight_update)
+
+                    image = input[0:3, :, :].transpose((1, 2, 0))
+                    print(k + ' '+ str(image.dtype))
+                    Image.fromarray(image.astype(np.uint8)).save(k + '.jpg')
+
+                    print(np.max(input[3, :, :]))
+                    print(np.min(input[3, :, :]))
 
                     count += size
 
