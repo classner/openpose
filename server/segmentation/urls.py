@@ -7,7 +7,7 @@ urlpatterns = patterns(
     url(r'^segmentation$',
         segmentation, name='segmentation.segmentation'),
 
-    url(r'^task$',
+    url(r'^mask$',
         task_segment_body, name='segmentation.task_segment_body'),
 
     url(r'^part$',
@@ -16,7 +16,7 @@ urlpatterns = patterns(
     url(r'^quality$',
         task_quality, name='segmentation.task_quality'),
 
-    url(r'^task/(?P<dataset_id>\w+)$',
+    url(r'^mask/(?P<dataset_id>\w+)$',
         task_segment_body),
 
     url(r'^part/(?P<dataset_id>\w+)$',
