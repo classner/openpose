@@ -10,13 +10,11 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         """ For every ParsePose we create a Person entry for a photo. """
-        admin_user = orm['accounts.UserProfile'].objects.get(user__username='admin')
 
         for pose in orm.ParsePose.objects.all():
             aspect_ratio = pose.photo.aspect_ratio
 
             person = pose.photo.persons.create(
-                    user=admin_user,
                     bounding_box_data=json.dumps([0, 0, aspect_ratio, 1])
                     )
 

@@ -12,7 +12,10 @@ source "$DIR/load_config.sh"
 
 echo ""
 echo "===================================================================="
-echo "This is a rather generic install script. Please, install necessary packages yourself."
-echo "This is meant for development only."
 
-
+bash "${DIR}/scripts/install/install_packages.sh"
+bash "${DIR}/scripts/install/install_nodejs.sh"
+bash "${DIR}/scripts/install/install_python.sh"
+bash "${DIR}/scripts/install/install_memcached.sh"
+bash "${DIR}/scripts/install/install_server.sh"
+bash "${DIR}/scripts/install/install_nginx.sh"

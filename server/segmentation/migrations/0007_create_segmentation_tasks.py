@@ -9,7 +9,6 @@ class Migration(DataMigration):
     def forwards(self, orm):
         """ For every Person we create a PersonSegmentationTask
         entry for a person. """
-        admin_user = orm['accounts.UserProfile'].objects.get(user__username='admin')
 
         for person in orm['pose.Person'].objects.all():
             # for now every person only has one annotation and we will use that
