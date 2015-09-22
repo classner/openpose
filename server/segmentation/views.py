@@ -133,7 +133,7 @@ def task_segment(request, dataset_id='all', part=False):
             return response
 
         task_filter = {
-                #'responses__isnull': True
+                'responses__isnull': True
                 }
 
         if dataset_id != 'all':
@@ -147,9 +147,12 @@ def task_segment(request, dataset_id='all', part=False):
             'part__isnull': not part
             })
 
+        # this excludes all tasks that did not receive _any_ response,
+        # the tasks are usually worked on by turkers first.
         tasks = (PersonSegmentationTask.objects.filter(**task_filter)
-                .exclude(responses__qualities__isnull = True)
-                .exclude(responses__qualities__correct = True))
+                 # .exclude(responses__qualities__isnull = True)
+                 # .exclude(responses__qualities__correct = True)
+        )
 
         if part:
             instructions = u'segmentation/experiments/segment_part_person_inst_content.html'
