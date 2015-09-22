@@ -16,6 +16,3 @@ service supervisor start
 supervisorctl start ${PROJECT_NAME}
 service nginx start
 bash "$DIR/start_worker.sh" &
-
-# give it some time to start
-tail -f $REPO_DIR/nginx-access.log

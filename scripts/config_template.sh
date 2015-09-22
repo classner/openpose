@@ -64,6 +64,9 @@ SRC_DIR=$REPO_DIR/server
 #   $DATA_DIR/media: any locally saved images (currently everything is on S3)
 DATA_DIR=$REPO_DIR/data
 
+# Location where docker database stores its data: (does not have to be inside the repository)
+DB_DIR=$REPO_DIR/db
+
 # Location where backups of the database are stored (does not have to be inside
 # the repository).  This directory is touched by scripts/dump_database.sh and
 # scripts/restore_database.sh.

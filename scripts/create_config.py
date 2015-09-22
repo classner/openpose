@@ -161,6 +161,14 @@ Note: $REPO_DIR refers to the repository directory.
 ''')
 
 prompt_var(
+    'DB_DIR',
+    default='$REPO_DIR/db',
+    message='''
+Location where the db stores its data.
+Note: $REPO_DIR refers to the repository directory.
+''')
+
+prompt_var(
     'BACKUP_DIR',
     default='$REPO_DIR/backup',
     message='''

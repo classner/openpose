@@ -30,6 +30,7 @@ npm
 openssl
 postgresql-client
 python-dev
+python-pil
 python-opencv
 python-pip
 python-setuptools
