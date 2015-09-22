@@ -41,7 +41,7 @@ def configure_experiments():
         keywords='person,images,segment',
         #frame_height=8000,
         requirements={},
-        auto_add_hits=True,
+        auto_add_hits=False,
         has_tutorial=True,
     )
 
@@ -68,7 +68,7 @@ def configure_experiments():
         keywords='person,part,images,segment',
         #frame_height=8000,
         requirements={},
-        auto_add_hits=True,
+        auto_add_hits=False,
         has_tutorial=True,
     )
 
