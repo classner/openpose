@@ -12,7 +12,7 @@ from photos.add import add_photo
 
 
 class Command(BaseCommand):
-    args = '<dir>'
+    args = '<user> <datasetname> <dir>'
     help = 'Adds photos from folder'
 
     option_list = BaseCommand.option_list + (
@@ -25,16 +25,24 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        admin_user = UserProfile.objects.get(user__username='admin')
+        if len(args) != 3:
+            print 'Please supply a folder and the name of the dataset.'
+            return
+
+        username = args[0]
+        dataset_name = args[1]
+        folder = args[2]
 
         delete = bool(options['delete'])
 
-        print 'Visiting: %s' % args[0]
-        for root, dirs, files in os.walk(args[0]):
+        user = UserProfile.objects.get(user__username=username)
+
+        print 'Visiting: %s' % folder
+        for root, dirs, files in os.walk(folder):
             print 'Visiting %s: %d files' % (root, len(files))
 
             # only create a category if has at least one photo
-            dataset, _ = PhotoDataset.objects.get_or_create(name='LSP ext')
+            dataset, _ = PhotoDataset.objects.get_or_create(name=dataset_name)
 
             num_added = 0
             for filename in progress.bar(files):
@@ -52,7 +60,7 @@ class Command(BaseCommand):
                     try:
                         add_photo(
                             path=path,
-                            user=admin_user,
+                            user=user,
                             dataset=dataset,
                             flickr_user=flickr_user,
                             flickr_id=flickr_id,

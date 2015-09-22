@@ -50,11 +50,14 @@ class PersonSegmentationTask(EmptyModelBase):
         if include_scribbles and responses:
             scribbles = json.loads(responses[0].scribbles)
 
-        parse_pose, visible = self.parse_pose.visible_part_end_points(self.part)
-        parts = [ p
-                for i, p in enumerate(parse_pose.tolist())
-                if visible[i]
-                ]
+        parts = []
+
+        if self.parse_pose:
+            parse_pose, visible = self.parse_pose.visible_part_end_points(self.part)
+            parts = [ p
+                      for i, p in enumerate(parse_pose.tolist())
+                      if visible[i]
+            ]
 
         part_name = None
         if self.part:
