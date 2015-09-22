@@ -11,6 +11,12 @@ from common.utils import dict_union
 
 @shared_task
 def update_index_context_task():
+    aggregated_time = MtAssignment.objects.filter(hit__sandbox=False) \
+                                          .aggregate(s=Sum('time_ms'))['s']
+    if aggregated_time:
+        aggregated_time = str(aggregated_time / 3600000)
+    else:
+        aggregated_time = 'N/A'
 
     data = {
         'num_assignments_good': MtAssignment.objects.filter(hit__sandbox=False, status='A').count(),
@@ -21,7 +27,7 @@ def update_index_context_task():
         'num_users_good': MtAssignment.objects.filter(hit__sandbox=False, status__isnull=False, worker__blocked=False).distinct('worker').count(),
         'num_users_all': MtAssignment.objects.filter(hit__sandbox=False, status__isnull=False).distinct('worker').count(),
 
-        'num_hours_all': MtAssignment.objects.filter(hit__sandbox=False).aggregate(s=Sum('time_ms'))['s'] / 3600000,
+        'num_hours_all': aggregated_time,
     }
 
     if settings.ENABLE_CACHING:
