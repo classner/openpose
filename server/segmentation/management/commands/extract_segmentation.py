@@ -18,6 +18,7 @@ from part_segmentation import PartSegmentation
 
 
 class Command(BaseCommand):
+    args = '<dataset> <file-list-file> <output-folder>'
     help = 'Extract a dataset'
 
     def correct_segmentation_(self, photo_name, all_tasks, part=None):
@@ -51,6 +52,11 @@ class Command(BaseCommand):
         return segmentation
 
     def handle(self, *args, **options):
+        if len(args) != 3:
+            print 'Please, suppy a dataset name, file containing a newline-separated list of name'
+            print 'and an output folder.'
+            return
+
         dataset_name = args[0]
         include_list_path = args[1]
         output_path = args[2]
@@ -74,8 +80,6 @@ class Command(BaseCommand):
 
                 person = photo.persons.all()[0]
 
-                assert(person.parse_poses.count() == 1)
-                parse_pose = person.parse_poses.all()[0]
 
                 all_tasks = person.segmentation_tasks.all()
 
@@ -101,18 +105,19 @@ class Command(BaseCommand):
                     os.path.join(output_path, photo.name)
                     + '_segmentation.png')
 
-                # Write part segmentation if we've got a valid one.
-                if not any(map(lambda s: s is None,
-                               part_segmentations.values())):
-                    part_segmentation = processor.combine(
-                        parse_pose, segmentation, part_segmentations)
-                    Image.fromarray(part_segmentation).save(
-                        os.path.join(output_path, photo.name)
-                        + '_part_segmentation.png')
+                if person.parse_poses.count():
+                    # Write part segmentation if we've got a valid one.
+                    if not any(map(lambda s: s is None,
+                                part_segmentations.values())):
+                        part_segmentation = processor.combine(
+                            parse_pose, segmentation, part_segmentations)
+                        Image.fromarray(part_segmentation).save(
+                            os.path.join(output_path, photo.name)
+                            + '_part_segmentation.png')
 
-                # Write pose annotation.
-                annotation_file.write('{}: {}\n'.format(
-                    photo.name, parse_pose.pose))
+                    # Write pose annotation.
+                    annotation_file.write('{}: {}\n'.format(
+                        photo.name, parse_pose.pose))
                 bb_file.write('{}: {}\n'.format(
                     photo.name, json.loads(person.bounding_box_data)))
 
