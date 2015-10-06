@@ -65,7 +65,8 @@ The first thing that you want to do is to set a few variables that describe your
 setup. This is done with calling `python scripts/create_config.py`. The script
 asks you several questions and creates a configuration file in
 `scripts/config.sh` from the template `scripts/config_template.sh`. The
-variables will be used by virtually any following script.
+variables will be used by virtually any following script. USE `admin` AS USER
+NAME TO AVOID COMPLICATIONS!
 
 ## Installing
 First, you should decide if you want to run the code only for doing some simple
@@ -156,7 +157,7 @@ Adding images to the database is as easy as calling `python manage.py
 import_folder admin test ../data/media/images/`. The script takes the server
 user that will own the images (for me this was usually the admin account), the
 name of the data-set (here it's `test`) and a folder that contains the JPEG
-images.
+images (it's the only supported format!).
 
 In case you are using the docker image, the best way to interact with the server
 is to copy images and such into the shared folder `media` between the container
@@ -198,4 +199,3 @@ file name of the JPEG image without its extension.
 ## Aftermath
 Once you are happy with everything, do not forget to change the debug state in
 `server/config/settings_local.py` to `False`.
-

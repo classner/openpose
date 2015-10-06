@@ -1,4 +1,10 @@
+# Temporary.
+images
+
+# Folders that are being used by the server.
 /data/
+/db/
+/media/
 /backup/
 /venv/
 /opt/
@@ -6,9 +12,15 @@
 /figures/
 /synthetic/
 /test-renders/
+/celerybeat-schedule
+
+# OS folders.
 dist/
 build/
+release/
 .DS_Store/
+
+# Files.
 *.DS_Store
 *~
 *.log
@@ -20,8 +32,6 @@ build/
 .*.tmp
 .swp
 .ropeproject
-celerybeat-schedule
 tmp.conf
 pg_dump.sql.gz
-release
 Thumbs.db
