@@ -14,7 +14,7 @@ echo "===================================================================="
 echo "Now creating docker image."
 REV=`git rev-parse HEAD`
 docker build -t "${PROJECT_NAME}:${REV}" .
-docker tag "${PROJECT_NAME}:${REV}" "${PROJECT_NAME}:latest"
+docker tag -f "${PROJECT_NAME}:${REV}" "${PROJECT_NAME}:latest"
 
 # exit message
 echo "$0: done!"

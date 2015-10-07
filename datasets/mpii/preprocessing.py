@@ -42,6 +42,9 @@ for act_idx, act in enumerate(ACTS):
     if TRAIN_TEST[act_idx] == 1:
         if os.path.exists(os.path.join(DSET_FOLDER, 'images',
                                        POS_ANNOTS[act_idx][0][0, 0][0][0])):
+            if POS_ANNOTS[act_idx][0][0, 0][0][0] == '054669741.jpg':
+                # Unusable annotation.
+                continue
             if SINGLE_ANNOTS[act_idx][0].shape[0] > 0:
                 try:
                     # Check whether pose annotation is availabe.
@@ -118,13 +121,30 @@ for act_name in sampled_ids.keys():
         y1 = np.min(visible_joints[1, :, 0])
         x2 = np.max(visible_joints[0, :, 0])
         y2 = np.max(visible_joints[1, :, 0])
+        # Get the scale.
+        scale_to_200px = POS_ANNOTS['annorect'][sample_id]['scale'][0, 0][0, 0]
         # Add border.
-        border_x = (x2 - x1) // 3
-        border_y = (y2 - y1) // 3
+        if (x2 - x1) > (y2 - y1):
+            # landscape format.
+            border_x = (x2 - x1) / 4.
+            border_y = (y2 - y1) / 2.
+        else:
+            border_x = (x2 - x1) / 2.
+            border_y = (y2 - y1) / 4.
         x1 = max(x1 - border_x, 0)
         y1 = max(y1 - border_y, 0)
         x2 = min(x2 + border_x, image.shape[1] - 1)
         y2 = min(y2 + border_y, image.shape[0] - 1)
+        # Fix extreme cases.
+        if float(x2 - x1) / float(y2 - y1) < 0.3:
+            # Raise the width.
+            x1 = max(x1 - 2 * border_x, 0)
+            x2 = min(x2 + 2 * border_x, image.shape[1] - 1)
+        elif float(y2 - y1) / float(x2 - x1) < 0.3:
+            # Raise the height.
+            y1 = max(y1 - 2 * border_y, 0)
+            y2 = min(y2 + 2 * border_y, image.shape[0] - 1)
+        x1, x2, y1, y2 = int(x1), int(x2), int(y1), int(y2)
         visimage = image.copy()
         cv2.rectangle(visimage,
                       (x1, y1), (x2, y2),
@@ -147,7 +167,6 @@ for act_name in sampled_ids.keys():
                                  '{0:05d}.png'.format(running_idx)),
                     visimage)
         # Determine the desired scale.
-        scale_to_200px = POS_ANNOTS['annorect'][sample_id]['scale'][0, 0][0, 0]
         factor = 1. / scale_to_200px * (300. / 200.)
         extracted_image_os = image[y1:y2, x1:x2, :]
         extracted_image_rs = cv2.resize(extracted_image_os,
@@ -178,7 +197,7 @@ poses_array = np.dstack(poses)
 np.savez_compressed(os.path.join(TARGET_DSET_FOLDER, 'annotations.npz'),
                     poses=poses_array)
 
-#################################################################################
+################################################################################
 # Testing area.
 print(poses_array.shape)
 t = np.sum(poses_array, axis=1)

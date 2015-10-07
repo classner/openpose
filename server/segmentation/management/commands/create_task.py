@@ -27,7 +27,7 @@ class Command(BaseCommand):
             username = args[0]
             dataset_name = args[1]
 
-        user = UserProfile.objects.get(user__username=username)
+        # user = UserProfile.objects.get(user__username=username)
 
         persons = Person.objects.filter(photo__dataset__name=dataset_name)
 
@@ -36,7 +36,7 @@ class Command(BaseCommand):
         for p in progress.bar(persons):
             # check if this person already has a task
             if p.segmentation_tasks.count() == 0:
-                p.segmentation_tasks.create(user=user,
+                p.segmentation_tasks.create(# user=user,
                                             part=None)
                 created_count += 1
 

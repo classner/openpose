@@ -28,13 +28,13 @@ class Command(BaseCommand):  # pylint: disable=W0232
             dataset_name = args[1]
             part = None
 
-            if len(args) == 3:
+            if len(args) > 2:
                 part = args[2]
-            else:
+            elif len(args) > 3:
                 puts(colored.red('Too many arguments.'))
                 return
 
-        user = UserProfile.objects.get(user__username=username)
+        # user = UserProfile.objects.get(user__username=username)
         persons = Person.objects.filter(photo__dataset__name=dataset_name)
 
         created_count = 0
@@ -44,11 +44,11 @@ class Command(BaseCommand):  # pylint: disable=W0232
                 part__isnull=True,
                 responses__qualities__correct=True).count()
 
-            if correct_full_tasks > 0:
+            if correct_full_tasks > 0 or part is None:
                 # check if there is not already a part task that we would like
                 # to create
                 _, created = person.segmentation_tasks.get_or_create(
-                    user=user,
+                    # user=user,
                     parse_pose=person.parse_poses.all()[0],
                     part=part)
 
