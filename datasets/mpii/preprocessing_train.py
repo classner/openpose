@@ -21,6 +21,7 @@ ACTS = MAT['RELEASE'][0, 0]['act'][:, 0]
 TRAIN_TEST = MAT['RELEASE'][0, 0]['img_train'][0]
 POS_ANNOTS = MAT['RELEASE'][0, 0]['annolist'][0]
 SINGLE_ANNOTS = MAT['RELEASE'][0, 0]['single_person']
+
 # The internal structure of the activity storage is
 #
 # * category name: act[0][0]
