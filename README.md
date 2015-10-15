@@ -164,6 +164,10 @@ is to copy images and such into the shared folder `media` between the container
 and the host machine, which is mounted in `/home/appuser/data/media` inside the
 container.
 
+If you want to import pose annotations, run `python manage.py import_mpii_annotation admin test annotations.npz` followed by
+`python manage.py create_part_task admin test`.
+
+Otherwise:
 The above action only adds images. You need to specify the area that contains
 the object/person with `python manage.py create_bounding_box admin test`. Again
 `admin` is the user that create the objects and `test` is the data-set's name.
@@ -199,3 +203,8 @@ file name of the JPEG image without its extension.
 ## Aftermath
 Once you are happy with everything, do not forget to change the debug state in
 `server/config/settings_local.py` to `False`.
+
+## Current setup
+
+Our current setup has the images located at
+`/srv/data0/classner/media` with the user `dispatch` at feist.is.tue.mpg.de.
