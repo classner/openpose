@@ -26,6 +26,10 @@ POS_ANNOTS = MAT['RELEASE'][0, 0]['annolist'][0]
 TPOS_ANNOTS = ANNOLIST['annolist'][0]
 SINGLE_ANNOTS = MAT['RELEASE'][0, 0]['single_person']
 
+np.sum(MAT['RELEASE'][0, 0]['img_train'][0] == 0)
+np.sum(np.array([val[0].size == 1 for val in MAT['RELEASE'][0, 0]['single_person']]))
+a = np.array([val[0].size == 1 for val in MAT['RELEASE'][0, 0]['single_person']])
+np.sum(np.logical_and(MAT['RELEASE'][0, 0]['img_train'][0] == 0, a))
 # Get some statistics.
 # Total person annotations in the test set.
 TOTAL_PERSONS = 0
@@ -62,44 +66,48 @@ for act_idx, act in enumerate(ACTS):
         else:
             actnames.append(act[1][0])
     if TRAIN_TEST[act_idx] == 0:
-        if SINGLE_ANNOTS[act_idx][0].shape[1] > 0 and SINGLE_ANNOTS[act_idx][0].shape[0] > 0:
+        if SINGLE_ANNOTS[act_idx][0].size == 1:
             if os.path.exists(os.path.join(DSET_FOLDER, 'images',
                                            POS_ANNOTS[act_idx][0][0, 0][0][0])):
                 foundpose = False
-                for idx in range(TPOS_ANNOTS['annorect'][act_idx]['annopoints'].shape[1]):
-                    try:
-                        # Check whether pose annotation is availabe.
-                        _ = TPOS_ANNOTS['annorect'][act_idx]['annopoints']\
-                            [0, idx][0, 0]['point'][0]['x']
-                        _ = TPOS_ANNOTS['annorect'][act_idx]['annopoints']\
-                            [0, idx][0, 0]['point'][0]['y']
-                        if not act_idx in im_poses.keys():
-                            im_poses[act_idx] = []
-                        im_poses[act_idx].append(idx)
-                        if not foundpose:
-                            foundpose = True
-                            activities[act_idn].append(act_idx)
-                    except ValueError:
-                        pass
-                    except IndexError:
-                        pass
+                # for idx in range(TPOS_ANNOTS['annorect'][act_idx]['annopoints'].shape[1]):
+                idx = SINGLE_ANNOTS[act_idx][0][0, 0] - 1
+                # try:
+                # Check whether pose annotation is availabe.
+                _ = TPOS_ANNOTS['annorect'][act_idx]['annopoints']\
+                    [0, idx][0, 0]['point'][0]['x']
+                _ = TPOS_ANNOTS['annorect'][act_idx]['annopoints']\
+                    [0, idx][0, 0]['point'][0]['y']
+                if not act_idx in im_poses.keys():
+                    im_poses[act_idx] = []
+                im_poses[act_idx].append(idx)
+                if not foundpose:
+                    foundpose = True
+                activities[act_idn].append(act_idx)
+                # except ValueError:
+                #     pass
+                # except IndexError:
+                #     pass
                 if not foundpose:
                     print("Missing pose!")
             else:
                 print("Missing image: {}!".format(
-                      POS_ANNOTS[act_idx][0][0, 0][0][0]))
+                    POS_ANNOTS[act_idx][0][0, 0][0][0]))
 
 print(len(activities))
 print(os.linesep.join(activities.keys()))
 
 for actkey, actval in activities.items():
-    print(len(actval))
+    print(actkey, len(actval))
 
 selected_activities = []
 for act_name in activities.keys():
-    selected_activities.append(act_name)
+    if len(activities[act_name]) > 0:
+        selected_activities.append(act_name)
 
 print('Number of selected activities:', len(selected_activities))
+for key, val in im_poses.items():
+    assert len(val) == 1
 
 # Sample 3 images from each.
 np.random.seed(42)
@@ -136,10 +144,10 @@ for act_name in sampled_ids.keys():
                                 [0, pose_idx][0, 0]['point'][0]['id'][info_idx][0, 0]
                 pose[0, joint_idx, 0] = \
                     TPOS_ANNOTS['annorect'][sample_id]['annopoints']\
-                        [0, pose_idx][0, 0]['point'][0]['x'][info_idx][0, 0] + 1
+                        [0, pose_idx][0, 0]['point'][0]['x'][info_idx][0, 0] - 1
                 pose[1, joint_idx, 0] = \
                     TPOS_ANNOTS['annorect'][sample_id]['annopoints']\
-                        [0, pose_idx][0, 0]['point'][0]['y'][info_idx][0, 0] + 1
+                        [0, pose_idx][0, 0]['point'][0]['y'][info_idx][0, 0] - 1
                 try:
                     pose[2, joint_idx, 0] = \
                         TPOS_ANNOTS['annorect'][sample_id]['annopoints']\
@@ -153,7 +161,7 @@ for act_name in sampled_ids.keys():
             x2 = np.max(visible_joints[0, :, 0])
             y2 = np.max(visible_joints[1, :, 0])
             # Get the scale.
-            scale_to_200px = POS_ANNOTS['annorect'][sample_id]['scale'][0, 0][0, 0]
+            scale_to_200px = TPOS_ANNOTS['annorect'][sample_id]['scale'][0, pose_idx][0, 0]
             # Add border.
             if (x2 - x1) > (y2 - y1):
                 # landscape format.
@@ -179,10 +187,10 @@ for act_name in sampled_ids.keys():
             visimage = image.copy()
             cv2.rectangle(visimage,
                           (x1, y1), (x2, y2),
-                        #   (POS_ANNOTS['annorect'][sample_id]['x1'][0, 0][0, 0],
-                        #    POS_ANNOTS['annorect'][sample_id]['y1'][0, 0][0, 0]),
-                        #   (POS_ANNOTS['annorect'][sample_id]['x2'][0, 0][0, 0],
-                        #    POS_ANNOTS['annorect'][sample_id]['y2'][0, 0][0, 0]),
+                          #   (POS_ANNOTS['annorect'][sample_id]['x1'][0, 0][0, 0],
+                          #    POS_ANNOTS['annorect'][sample_id]['y1'][0, 0][0, 0]),
+                          #   (POS_ANNOTS['annorect'][sample_id]['x2'][0, 0][0, 0],
+                          #    POS_ANNOTS['annorect'][sample_id]['y2'][0, 0][0, 0]),
                           (0, 255, 0),
                           5)
             # Add joints.

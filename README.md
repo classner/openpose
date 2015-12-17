@@ -189,6 +189,11 @@ The quality of the segmentations can be checked on
 This presents you all submitted tasks that do not have a quality assessment,
 yet. We used this to curate the submissions from the Turkers.
 
+## Caching
+
+The server uses two methods for caching: the services `memcached` and
+`supervisor`. Both must be restarted to see effects of changes.
+
 ## Get the segmentation data
 You can use the following script to extract the segmentation information. The
 script expects the data-set's name, a file that contains the names to the images

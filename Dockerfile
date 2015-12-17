@@ -2,6 +2,9 @@ FROM ubuntu:14.10
 MAINTAINER Martin Kiefel "mk@nopw.de"
 
 ENV LC_ALL C.UTF-8
+# Add your proxy if necessary.
+# ENV http_proxy 1.2.3.4:8080
+# ENV http_proxy 1.2.3.4:8080
 
 # create container user
 RUN useradd --create-home appuser

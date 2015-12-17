@@ -106,10 +106,10 @@ for act_name in sampled_ids.keys():
                             [0, 0][0, 0]['point'][0]['id'][info_idx][0, 0]
             pose[0, joint_idx, 0] = \
                 POS_ANNOTS['annorect'][sample_id]['annopoints']\
-                    [0, 0][0, 0]['point'][0]['x'][info_idx][0, 0] + 1
+                    [0, 0][0, 0]['point'][0]['x'][info_idx][0, 0] - 1
             pose[1, joint_idx, 0] = \
                 POS_ANNOTS['annorect'][sample_id]['annopoints']\
-                    [0, 0][0, 0]['point'][0]['y'][info_idx][0, 0] + 1
+                    [0, 0][0, 0]['point'][0]['y'][info_idx][0, 0] - 1
             try:
                 pose[2, joint_idx, 0] = \
                     POS_ANNOTS['annorect'][sample_id]['annopoints']\
