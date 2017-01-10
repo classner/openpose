@@ -1,3 +1,12 @@
+# Openpose
+
+Openpose is a human segmentation tool built on top of OpenSurfaces by Sean Bell
+et al. It allows to easily separate foreground and background by using the
+GrabCut algorithm. Credits for it's creation go to Martin Kiefel and the
+OpenSurfaces authors.
+
+The original README follows:
+
 # OpenSurfaces
 
 OpenSurfaces is a large database of annotated surfaces created from real-world
