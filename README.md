@@ -3,79 +3,8 @@
 Openpose is a human segmentation tool built on top of OpenSurfaces by Sean Bell
 et al. It allows to easily separate foreground and background by using the
 GrabCut algorithm. Credits for it's creation go to Martin Kiefel and the
-OpenSurfaces authors.
-
-The original README follows:
-
-# OpenSurfaces
-
-OpenSurfaces is a large database of annotated surfaces created from real-world
-consumer photographs. Our annotation framework draws on crowdsourcing to
-segment surfaces from photos, and then annotate them with rich surface
-properties, including material, texture and contextual information.
-
-Documentation is available at: http://opensurfaces.cs.cornell.edu/docs/
-
-## Citation
-
-If you use our code, please cite our paper:
-
-    Sean Bell, Paul Upchurch, Noah Snavely, Kavita Bala
-    OpenSurfaces: A Richly Annotated Catalog of Surface Appearance
-    ACM Transactions on Graphics (SIGGRAPH 2013)
-
-    @article{bell13opensurfaces,
-		author = "Sean Bell and Paul Upchurch and Noah Snavely and Kavita Bala",
-		title = "Open{S}urfaces: A Richly Annotated Catalog of Surface Appearance",
-		journal = "ACM Trans. on Graphics (SIGGRAPH)",
-		volume = "32",
-		number = "4",
-		year = "2013",
-	}
-
-and if you use the Intrinsic Images code, please also cite:
-
-    Sean Bell, Kavita Bala, Noah Snavely
-    Intrinsic Images in the Wild
-    ACM Transactions on Graphics (SIGGRAPH 2014)
-
-    @article{bell14intrinsic,
-		author = "Sean Bell and Kavita Bala and Noah Snavely",
-		title = "Intrinsic Images in the Wild",
-		journal = "ACM Trans. on Graphics (SIGGRAPH)",
-		volume = "33",
-		number = "4",
-		year = "2014",
-	}
-
-It's nice to see how many people are using our code; please "star" this project
-on GitHub and report any bugs using the
-[issue tracker](https://github.com/seanbell/opensurfaces/issues).
-
-## Roadmap
-This documentation tells you how to run a segmentation web-app. It explains how
-to configure and run the application, as well as pointing out how to get the
-database up and running. After the setup, you can add images that are organized
-in data-sets. There exist simple scripts that create object bounding boxes
-covering the full images. For more specific use-cases, e.g., when you have more
-localized information about the objects that you would like to segment, I would
-like to ask you to take a look at the specific scripts and adjust them
-accordingly. Then the next step is to create segmentation tasks on each of the
-bounding boxes. A script will help you there as well. I used this abstraction to
-create different segmentation masks for different body parts of a person, but
-any other sub-part segmentation could make sense here. These tasks could be
-directly used with Amazon Mechanical Turk, too. After the segmentation task and
-its quality assessment through the web interface a final scripts extracts all
-good segmentation masks as PNG into some output folder.
-
-
-## Configure
-The first thing that you want to do is to set a few variables that describe your
-setup. This is done with calling `python scripts/create_config.py`. The script
-asks you several questions and creates a configuration file in
-`scripts/config.sh` from the template `scripts/config_template.sh`. The
-variables will be used by virtually any following script. USE `admin` AS USER
-NAME TO AVOID COMPLICATIONS!
+OpenSurfaces authors. It has been used to create the UP dataset(s):
+http://up.is.tuebingen.mpg.de. It is heavily based on the OpenSurfaces package (http://opensurfaces.cs.cornell.edu).
 
 ## Installing
 First, you should decide if you want to run the code only for doing some simple
@@ -217,8 +146,3 @@ file name of the JPEG image without its extension.
 ## Aftermath
 Once you are happy with everything, do not forget to change the debug state in
 `server/config/settings_local.py` to `False`.
-
-## Current setup
-
-Our current setup has the images located at
-`/srv/data0/classner/media` with the user `dispatch` at feist.is.tue.mpg.de.
